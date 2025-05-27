@@ -2,163 +2,187 @@
 
 /* Responsive styles */
 @media (max-width: 768px) {
-    body {
-        flex-direction: column;
-    }
-    
-    .nav-toggle {
-        display: flex;
-    }
-    
-    .sidebar {
-        position: fixed;
-        left: -100%;
-        top: 0;
-        width: 85%;
-        max-width: var(--sidebar-width);
-        height: 100%;
-        z-index: 99;
-        transition: left 0.3s ease;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-    }
-    
-    .sidebar.active {
-        left: 0;
-    }
-    
-    .main {
-        width: 100%;
-        margin-left: 0;
-    }
+  body {
+    flex-direction: column;
+  }
 
-     /* Makes sure Title is centered & burger bar on left */
-    .notes-header {
-        position: relative;
-        justify-content: space-between;
-    }
-    
-    .current-category {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        text-align: center;
-        z-index: 1;
-        pointer-events: none; /* So clicks pass through to elements below if needed */
-    }
-    
-    .add-note-btn {
-        position: relative;
-        z-index: 2;
-        margin-left: auto; /* Ensures it stays on the right */
-    }
-    /* End of new rules */
-    
-    .notes-container {
-        grid-template-columns: 1fr;
-    }
-    
-    .note {
-        min-height: 120px;
-    }
-    
-    /* Overlay for when sidebar is open */
-    .sidebar-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 98;
-    }
-    
-    .sidebar-overlay.active {
-        display: block;
-    }
-    
-    /* Adjust expanded note for mobile */
-    .note.expanded {
-        width: 90%;
-        height: 80%;
-    }
-    
-    /* Adjust modal for mobile */
-    .modal-content {
-        width: 90%;
-        padding: 15px;
-    }
-    
-    .icon-grid {
-        grid-template-columns: repeat(6, 1fr);
-    }
-    
-    /* Fix for note controls on mobile (always visible) */
-    .note-delete, .note-expand {
-        opacity: 0.5;
-    }
+  .nav-toggle {
+    display: flex;
+  }
 
-    .category .category-controls {
-      opacity: 0.5;
-      transition: opacity 0.2s;
-    }
+  .sidebar {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    width: 85%;
+    max-width: var(--sidebar-width);
+    height: 100%;
+    z-index: 99;
+    transition: left 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  }
 
-    .category:active .category-controls {
-      opacity: 1;
-    }
+  .sidebar.active {
+    left: 0;
+  }
+
+  .main {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  /* Makes sure Title is centered & burger bar on left */
+  .notes-header {
+    position: relative;
+    justify-content: space-between;
+    padding-left: 50px; /* Example: space for nav-toggle/user-info */
+    padding-right: 50px; /* Example: space for add-note-btn */
+  }
+
+  /* Keep .user-info and .add-note-btn on the sides */
+  .notes-header .user-info {
+    /* This will be on the left by default with space-between */
+    /* You might want to limit its width if it can get too long */
+    max-width: calc(
+      50% - 80px
+    ); /* Adjust 80px based on half the width of header-controls-group */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .current-category {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 1;
+    pointer-events: none; /* So clicks pass through to elements below if needed */
+  }
+
+  .add-note-btn {
+    position: relative;
+    z-index: 2;
+    margin-left: auto; /* Ensures it stays on the right */
+  }
+
+  .header-controls-group {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10; /* Was already in note-controls.css */
+    /* margin-left and margin-right are overridden by absolute positioning */
+    padding: 4px 6px; /* Keep from note-controls.css */
+    /* background-color, border-radius from base style in note-controls.css will apply */
+  }
+
+  .notes-container {
+    grid-template-columns: 1fr;
+  }
+
+  .note {
+    min-height: 120px;
+  }
+
+  /* Overlay for when sidebar is open */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 98;
+  }
+
+  .sidebar-overlay.active {
+    display: block;
+  }
+
+  /* Adjust expanded note for mobile */
+  .note.expanded {
+    width: 90%;
+    height: 80%;
+  }
+
+  /* Adjust modal for mobile */
+  .modal-content {
+    width: 90%;
+    padding: 15px;
+  }
+
+  .icon-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  /* Fix for note controls on mobile (always visible) */
+  .note-delete,
+  .note-expand {
+    opacity: 0.5;
+  }
+
+  .category .category-controls {
+    opacity: 0.5;
+    transition: opacity 0.2s;
+  }
+
+  .category:active .category-controls {
+    opacity: 1;
+  }
 }
 
 /* Small screens adjustments */
 @media (max-width: 480px) {
-    .notes-header {
-        padding: 15px 10px;
-    }
-    
-    .current-category {
-        font-size: 18px;
-        max-width: 70%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-    
-    .note {
-        min-height: 100px;
-    }
-    
-    .icon-grid {
-        grid-template-columns: repeat(4, 1fr);
-    }
+  .notes-header {
+    padding: 15px 10px;
+  }
+
+  .current-category {
+    font-size: 18px;
+    max-width: 70%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .note {
+    min-height: 100px;
+  }
+
+  .icon-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 /* Login page responsiveness */
 @media (max-width: 480px) {
-    .login-form {
-        width: 90%;
-        padding: 20px;
-    }
-    
-    .login-title {
-        font-size: 22px;
-    }
-    
-    .login-input {
-        padding: 12px 10px;
-        font-size: 16px; /* Better for mobile input fields */
-    }
-    
-    .login-btn {
-        padding: 14px 12px;
-        font-size: 16px;
-    }
+  .login-form {
+    width: 90%;
+    padding: 20px;
+  }
+
+  .login-title {
+    font-size: 22px;
+  }
+
+  .login-input {
+    padding: 12px 10px;
+    font-size: 16px; /* Better for mobile input fields */
+  }
+
+  .login-btn {
+    padding: 14px 12px;
+    font-size: 16px;
+  }
 }
 
 /* Fix for iOS input zoom issues */
-@media screen and (-webkit-min-device-pixel-ratio: 0) { 
-    select,
-    textarea,
-    input[type="text"],
-    input[type="password"] {
-        font-size: 16px;
-    }
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  select,
+  textarea,
+  input[type="text"],
+  input[type="password"] {
+    font-size: 16px;
+  }
 }

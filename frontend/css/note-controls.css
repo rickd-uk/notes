@@ -113,6 +113,10 @@
   visibility: visible;
 }
 
+.nav-toggle {
+  margin-bottom: 30px;
+}
+
 /* Global spell check toggle in sidebar */
 .spell-check-toggle {
   display: flex;
@@ -253,6 +257,10 @@ body.dark-mode .header-controls-group {
     position: relative; /* Ensure proper positioning */
     z-index: 10; /* Make sure it doesn't interfere with other elements */
   }
+
+  .notes-header .user-info {
+    margin-right: 30px;
+  }
 }
 
 /* Very small screen adjustments */
@@ -290,12 +298,34 @@ body.dark-mode .header-controls-group {
     margin-right: 5px;
     padding: 2px 4px;
     position: static; /* Reset position to avoid overlapping issues */
+    margin-bottom: 5px;
+    margin-left: 180px;
   }
 
   /* Ensure the notes header has proper layout */
   .notes-header {
-    flex-wrap: nowrap; /* Prevent wrapping that could cause overlap */
+    flex-wrap: wrap; /* Prevent wrapping that could cause overlap */
     justify-content: flex-end; /* Push elements to the right */
+    padding: 10px 10px;
+    margin-bottom: 30px;
+  }
+
+  /* Ensure user-info doesn't take up all space if it wraps */
+  .notes-header .user-info {
+    /* Apply to the .user-info container or .username-display */
+    /* To prevent it from taking full width if it wraps to its own line */
+    /* flex-basis: auto; /* Allow it to shrink */
+    /* max-width: 100%; /* Or a more constrained max-width if needed next to other items */
+    margin-bottom: 5px;
+    /* Add specific text overflow handling for the username itself if not already done */
+  }
+  .notes-header .username-display {
+    display: inline-block; /* Or block if it needs to be on its own line when long */
+    max-width: 150px; /* Example: Adjust as needed */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle; /* Align with buttons if on the same line */
   }
 
   /* Make sure the current category indicator doesn't overlap */
@@ -303,5 +333,11 @@ body.dark-mode .header-controls-group {
     max-width: 40%; /* Limit width to prevent overlap */
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+}
+
+@media (min-width: 370px) {
+  .username-display {
+    margin-left: 40px;
   }
 }
