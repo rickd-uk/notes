@@ -322,6 +322,9 @@ export function toggleNoteExpansion(noteElement) {
     });
   }
 
+  const expandedNoteControls = document.querySelector(
+    ".expanded-note-controls",
+  ); // Get the toolbar element
   const noteId = noteElement.dataset.id;
   const isExpanding = !noteElement.classList.contains("expanded");
 
@@ -372,6 +375,11 @@ export function toggleNoteExpansion(noteElement) {
     overlay.style.backgroundColor = "rgba(0, 0, 0, 0.95)";
     overlay.style.zIndex = "9000";
 
+    // Show the expanded note controls toolbar
+    if (expandedNoteControls) {
+      expandedNoteControls.classList.add("active");
+    }
+
     // Add expanded note controls
     import("./noteControls.js").then((module) => {
       module.addExpandedNoteControls(noteElement);
@@ -395,6 +403,11 @@ export function toggleNoteExpansion(noteElement) {
 
     // Allow scrolling on main container again
     document.body.style.overflow = "";
+
+    // Hide the expanded note controls toolbar
+    if (expandedNoteControls) {
+      expandedNoteControls.classList.remove("active");
+    }
 
     // RESTORE ALL DELETE BUTTONS
     setTimeout(recreateAllNoteButtons, 50);

@@ -1,6 +1,10 @@
 // noteControls.js - Controls for expanded note mode
-import { getQuillEditor, getAllQuillEditors } from './quillEditor.js';
-import { toggleToolbars, getToolbarsVisible, setToolbarsVisible } from './toolbarToggle.js';
+import { getQuillEditor, getAllQuillEditors } from "./quillEditor.js";
+import {
+  toggleToolbars,
+  getToolbarsVisible,
+  setToolbarsVisible,
+} from "./toolbarToggle.js";
 
 // Track spell check state globally - default to enabled
 let spellCheckEnabled = false;
@@ -10,58 +14,70 @@ let spellCheckEnabled = false;
  */
 export function addExpandedNoteControls(noteElement) {
   const noteId = noteElement.dataset.id;
-  
-  // Remove existing controls if any
-  removeExpandedNoteControls();
-  
+
   // Create controls container
-  const controlsContainer = document.createElement('div');
-  controlsContainer.className = 'expanded-note-controls';
-  controlsContainer.id = 'expandedNoteControls';
-  
+  const controlsContainer = document.querySelector(".expanded-note-controls");
+
+  if (!controlsContainer) {
+    console.error(
+      "CRITICAL: .expanded-note-controls container not found in DOM!",
+    );
+    return;
+  }
+
+  // Clear any previous buttons from the container to prevent duplicates
+  controlsContainer.innerHTML = "";
+
   // Get current states - ensure toolbar is visible by default in expanded view
   const wasVisible = getToolbarsVisible();
   if (!wasVisible) {
     setToolbarsVisible(true); // Turn on toolbars when expanding
   }
-  
+
   // Add toolbar toggle button with improved icon
-  const toolbarToggleBtn = document.createElement('button');
-  toolbarToggleBtn.className = `expanded-control-btn active`; // Active by default
+  const toolbarToggleBtn = document.createElement("button");
+  toolbarToggleBtn.className = `expanded-control-btn`;
+
+  if (getToolbarsVisible()) {
+    // Set 'active' based on actual current state
+    toolbarToggleBtn.classList.add("active");
+  }
+
   toolbarToggleBtn.innerHTML = `
     <span style="font-weight: bold;">T</span>
     <span class="tooltip">Toggle Formatting Toolbar</span>
   `;
-  toolbarToggleBtn.addEventListener('click', () => {
+  toolbarToggleBtn.addEventListener("click", () => {
     const newState = toggleToolbars();
-    toolbarToggleBtn.classList.toggle('active', newState);
+    toolbarToggleBtn.classList.toggle("active", newState);
   });
-  
+
   // Add spell check toggle button - enabled by default
-  const spellCheckBtn = document.createElement('button');
+  const spellCheckBtn = document.createElement("button");
   spellCheckBtn.className = `expanded-control-btn active`; // Active by default
   spellCheckBtn.innerHTML = `
     <span style="font-weight: bold;">Aa</span>
     <span class="tooltip">Toggle Spell Check</span>
   `;
-  spellCheckBtn.addEventListener('click', () => {
+
+  spellCheckBtn.addEventListener("click", () => {
     toggleSpellCheck();
-    spellCheckBtn.classList.toggle('active', spellCheckEnabled);
+    spellCheckBtn.classList.toggle("active", spellCheckEnabled);
   });
-  
+
   // Add buttons to container
   controlsContainer.appendChild(toolbarToggleBtn);
   controlsContainer.appendChild(spellCheckBtn);
-  
+
   // Add container to the document body - needs to be at body level because note is positioned fixed
   document.body.appendChild(controlsContainer);
-  
+
   // Ensure spell check is on when expanding a note
   if (!spellCheckEnabled) {
     toggleSpellCheck();
-    spellCheckBtn.classList.add('active');
+    //spellCheckBtn.classList.add("active");
   }
-  
+
   // Apply current spell check state to all editors for consistency
   applySpellCheckToAll(spellCheckEnabled);
 }
@@ -70,9 +86,9 @@ export function addExpandedNoteControls(noteElement) {
  * Remove expanded note controls when note is collapsed
  */
 export function removeExpandedNoteControls() {
-  const controlsContainer = document.getElementById('expandedNoteControls');
+  const controlsContainer = document.querySelector(".expanded-note-controls");
   if (controlsContainer) {
-    controlsContainer.remove();
+    controlsContainer.innerHTML = ""; // Clear the buttons
   }
 }
 
@@ -82,13 +98,13 @@ export function removeExpandedNoteControls() {
 export function toggleSpellCheck() {
   spellCheckEnabled = !spellCheckEnabled;
   applySpellCheckToAll(spellCheckEnabled);
-  
+
   // Save preference to localStorage
-  localStorage.setItem('spellCheckEnabled', spellCheckEnabled.toString());
-  
+  localStorage.setItem("spellCheckEnabled", spellCheckEnabled.toString());
+
   // Update any UI elements that show spell check state
   updateSpellCheckButtonState();
-  
+
   return spellCheckEnabled;
 }
 
@@ -100,24 +116,24 @@ export function toggleSpellCheck() {
 function applySpellCheck(noteId, enabled) {
   const quill = getQuillEditor(noteId);
   if (!quill) return;
-  
+
   const editorElement = quill.root;
-  
+
   // Set or remove the spellcheck attribute on the editor element
   if (enabled) {
-    editorElement.setAttribute('spellcheck', 'true');
+    editorElement.setAttribute("spellcheck", "true");
   } else {
-    editorElement.setAttribute('spellcheck', 'false');
+    editorElement.setAttribute("spellcheck", "false");
   }
-  
+
   // Force redraw of the editor to apply spelling changes
   // This is a hack, but it works to refresh the spell checker
   const originalDisplay = editorElement.style.display;
-  editorElement.style.display = 'none';
-  
+  editorElement.style.display = "none";
+
   // Force reflow
   void editorElement.offsetHeight;
-  
+
   // Restore original display
   editorElement.style.display = originalDisplay;
 }
@@ -128,13 +144,13 @@ function applySpellCheck(noteId, enabled) {
  */
 export function initSpellCheck() {
   // Load preference from localStorage
-  const savedPreference = localStorage.getItem('spellCheckEnabled');
+  const savedPreference = localStorage.getItem("spellCheckEnabled");
   if (savedPreference !== null) {
-    spellCheckEnabled = savedPreference === 'true';
+    spellCheckEnabled = savedPreference === "true";
   } else {
     // Default to enabled if no preference saved
     spellCheckEnabled = false;
-    localStorage.setItem('spellCheckEnabled', 'true');
+    localStorage.setItem("spellCheckEnabled", "true");
   }
 }
 
@@ -166,17 +182,21 @@ export function applySpellCheckToAll(enabled) {
  */
 function updateSpellCheckButtonState() {
   // Update the expanded view button if it exists
-  const expandedControlsContainer = document.getElementById('expandedNoteControls');
+  const expandedControlsContainer = document.getElementById(
+    "expandedNoteControls",
+  );
   if (expandedControlsContainer) {
-    const spellCheckBtn = expandedControlsContainer.querySelector('button:nth-child(2)');
+    const spellCheckBtn = expandedControlsContainer.querySelector(
+      "button:nth-child(2)",
+    );
     if (spellCheckBtn) {
-      spellCheckBtn.classList.toggle('active', spellCheckEnabled);
+      spellCheckBtn.classList.toggle("active", spellCheckEnabled);
     }
   }
-  
+
   // Update the main view button if it exists
-  const mainSpellCheckToggle = document.getElementById('mainSpellCheckToggle');
+  const mainSpellCheckToggle = document.getElementById("mainSpellCheckToggle");
   if (mainSpellCheckToggle) {
-    mainSpellCheckToggle.classList.toggle('active', spellCheckEnabled);
+    mainSpellCheckToggle.classList.toggle("active", spellCheckEnabled);
   }
 }

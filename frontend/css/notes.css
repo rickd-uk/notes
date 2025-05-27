@@ -1,263 +1,301 @@
 /* notes.css - Styles for note cards and expanded notes */
 
 .note {
-    background-color: var(--surface-color);
-    border-radius: var(--border-radius);
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    min-height: 150px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.2s, transform 0.2s;
-    position: relative;
-    cursor: pointer;
+  background-color: var(--surface-color);
+  border-radius: var(--border-radius);
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  min-height: 150px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition:
+    box-shadow 0.2s,
+    transform 0.2s;
+  position: relative;
+  cursor: pointer;
 }
 
 .note:hover {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 .note-content {
-    flex-grow: 1;
-    resize: none;
-    border: none;
-    background: transparent;
-    font-size: 14px;
-    line-height: 1.5;
-    outline: none;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    min-height: 100px;
+  flex-grow: 1;
+  resize: none;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  line-height: 1.5;
+  outline: none;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100px;
 }
 
 /* Ensure note-content container has proper flex properties */
 .note-editor-container {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 100px;
-    overflow: hidden; /* Prevent overflow */
-    width: 100%;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100px;
+  overflow: hidden; /* Prevent overflow */
+  width: 100%;
 }
 
 /* Fix footer to stay at bottom */
 .note-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 10px;
-    font-size: 12px;
-    color: #757575;
-    position: relative;
-    min-height: 20px;
-    flex-shrink: 0; /* Prevent shrinking */
-    width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #757575;
+  position: relative;
+  min-height: 20px;
+  flex-shrink: 0; /* Prevent shrinking */
+  width: 100%;
 }
 
 .note-timestamp {
-    flex-grow: 1;
-    overflow: hidden; /* Prevent text overflow */
-    text-overflow: ellipsis; /* Add ellipsis for overflowing text */
-    white-space: nowrap; /* Keep on single line */
-    padding-right: 30px; /* Space for expand button */
+  flex-grow: 1;
+  overflow: hidden; /* Prevent text overflow */
+  text-overflow: ellipsis; /* Add ellipsis for overflowing text */
+  white-space: nowrap; /* Keep on single line */
+  padding-right: 30px; /* Space for expand button */
 }
 
 /* Make sure the toolbar doesn't overlap with the delete button */
 .ql-toolbar.ql-snow {
-    padding-right: 40px !important; /* Make room for delete button */
+  padding-right: 40px !important; /* Make room for delete button */
 }
 
 /* EXTREME DELETE BUTTON FIX WITH INLINE STYLES OVERRIDE */
 button.note-delete {
-    /* Position absolutely at top right corner */
-    position: absolute !important;
-    top: 6px !important;
-    right: 6px !important;
-    bottom: auto !important;
-    left: auto !important;
-    
-    /* Basic styling */
-    opacity: 0;
-    background: none !important;
-    border: none !important;
-    color: #f44336 !important;
-    cursor: pointer !important;
-    padding: 6px !important;
-    border-radius: 4px !important;
-    font-size: 18px !important;
-    
-    /* Make visible against backgrounds */
-    background-color: rgba(255, 255, 255, 0.7) !important;
-    
-    /* Force proper display */
-    display: block !important;
-    width: 30px !important;
-    height: 30px !important;
-    line-height: 18px !important;
-    text-align: center !important;
-    
-    /* Prevent any transforms */
-    transform: none !important;
-    margin: 0 !important;
-    
-    /* Lower z-index */
-    z-index: 5 !important;
+  /* Position absolutely at top right corner */
+  position: absolute !important;
+  top: 6px !important;
+  right: 6px !important;
+  bottom: auto !important;
+  left: auto !important;
+
+  /* Basic styling */
+  opacity: 0;
+  background: none !important;
+  border: none !important;
+  color: #f44336 !important;
+  cursor: pointer !important;
+  padding: 6px !important;
+  border-radius: 4px !important;
+  font-size: 18px !important;
+
+  /* Make visible against backgrounds */
+  background-color: rgba(255, 255, 255, 0.7) !important;
+
+  /* Force proper display */
+  display: block !important;
+  width: 30px !important;
+  height: 30px !important;
+  line-height: 18px !important;
+  text-align: center !important;
+
+  /* Prevent any transforms */
+  transform: none !important;
+  margin: 0 !important;
+
+  /* Lower z-index */
+  z-index: 5 !important;
 }
 
 .note:hover button.note-delete {
-    opacity: 1 !important;
+  opacity: 1 !important;
 }
 
 button.note-delete:hover {
-    background-color: rgba(244, 67, 54, 0.1) !important;
+  background-color: rgba(244, 67, 54, 0.1) !important;
 }
 
 /* Ensure expand button stays at bottom right */
 .note-expand {
-    position: absolute !important;
-    top: auto !important; /* Ensure it's not at top */
-    right: 10px !important;
-    bottom: 10px !important;
-    left: auto !important; /* Ensure it's not at left */
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.2s;
-    z-index: 2;
-    background-color: var(--background-color);
-    border-radius: 4px;
-    font-size: 18px;
+  position: absolute !important;
+  top: auto !important; /* Ensure it's not at top */
+  right: 10px !important;
+  bottom: 10px !important;
+  left: auto !important; /* Ensure it's not at left */
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 2;
+  background-color: var(--background-color);
+  border-radius: 4px;
+  font-size: 18px;
 }
 
 .note:hover .note-expand {
-    opacity: 0.7;
+  opacity: 0.7;
 }
 
 .note-expand:hover {
-    opacity: 1 !important;
-    background-color: rgba(98, 0, 238, 0.1);
+  opacity: 1 !important;
+  background-color: rgba(98, 0, 238, 0.1);
 }
 
 /* Handle extra long content */
 .ql-container.ql-snow {
-    border: none;
-    font-family: inherit;
-    font-size: inherit;
-    overflow-y: auto; /* Allow content to scroll if needed */
-    min-height: 100px;
-    max-height: calc(100% - 40px); /* Ensure space for footer */
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  overflow-y: auto; /* Allow content to scroll if needed */
+  min-height: 100px;
+  max-height: calc(100% - 40px); /* Ensure space for footer */
 }
 
 /* Background overlay when note is expanded */
 .note-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.9); /* Even darker for better hiding */
-    z-index: 2000; /* Higher z-index to ensure it covers everything */
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s, visibility 0.3s;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.9); /* Even darker for better hiding */
+  z-index: 2000; /* Higher z-index to ensure it covers everything */
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.3s,
+    visibility 0.3s;
 }
 
 .note-overlay.active {
-    opacity: 1;
-    visibility: visible;
+  opacity: 1;
+  visibility: visible;
 }
 
 /* Expanded note styling */
 .note.expanded {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 95%;  /* Wider */
-    max-width: 1200px;  /* Increased */
-    height: 90%;  /* Taller */
-    max-height: 900px;  /* Increased */
-    z-index: 2001; /* Higher than overlay */
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    background-color: var(--surface-color); /* Ensure opaque background */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 95%; /* Wider */
+  max-width: 1200px; /* Increased */
+  height: 90%; /* Taller */
+  max-height: 900px; /* Increased */
+  z-index: 2001; /* Higher than overlay */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--surface-color); /* Ensure opaque background */
 }
 
 .note.expanded .note-content {
-    min-height: calc(100% - 50px);
-    font-size: 16px;
+  min-height: calc(100% - 50px);
+  font-size: 16px;
 }
 
 .note.expanded .note-expand .expand-icon {
-    transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 
 /* Make expanded note footer behave differently */
 .note.expanded .note-footer {
-    position: sticky;
-    bottom: 0;
-    background-color: var(--surface-color);
-    padding-top: 5px;
-    border-top: 1px solid #f0f0f0;
-    z-index: 2;
-    margin-top: auto; /* Push to bottom */
+  position: sticky;
+  bottom: 0;
+  background-color: var(--surface-color);
+  padding-top: 5px;
+  border-top: 1px solid #f0f0f0;
+  z-index: 2;
+  margin-top: auto; /* Push to bottom */
 }
 
 /* Make sure expanded note delete button also stays in top right */
 .note.expanded button.note-delete {
-    position: fixed !important;
-    top: 10px !important;
-    right: 10px !important;
-    bottom: auto !important;
-    z-index: 2002 !important; /* Higher than expanded note */
-    opacity: 1 !important;
-    background-color: rgba(255, 255, 255, 0.9) !important;
+  position: fixed !important;
+  top: 10px !important;
+  right: 10px !important;
+  bottom: auto !important;
+  z-index: 2002 !important; /* Higher than expanded note */
+  opacity: 1 !important;
+  background-color: rgba(255, 255, 255, 0.9) !important;
 }
 
 /* IMPORTANT: Hide all other delete buttons when a note is expanded */
-.note-overlay.active ~ .notes-container .note:not(.expanded) button.note-delete {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
+.note-overlay.active
+  ~ .notes-container
+  .note:not(.expanded)
+  button.note-delete {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 /* Hide all other notes when overlay is active */
 .note-overlay.active ~ .notes-container .note:not(.expanded) {
-    z-index: 1 !important;
+  z-index: 1 !important;
+}
+
+@media (max-width: 480px) {
+  .note.expanded {
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    max-width: 100%;
+    border-radius: 0;
+    top: 0;
+    left: 0;
+    transform: none;
+    padding-bottom: 50px; /* Add padding to the entire expanded note container to make space for the controls if they are inside it,
+                                  or if its content needs to not go behind the fixed controls.
+                                  If expanded-note-controls is fixed to the viewport, this padding ensures scrollable content
+                                  doesn't get obscured by the controls at the very bottom.
+                                  Adjust this value to match or exceed the space taken by expanded-note-controls.
+                                  If the controls are ~34px high and bottom:15px, they take up ~49px from bottom.
+                                  If you move them to bottom:50px, they take space up to ~84px from bottom.
+                               */
+  }
+
+  .note.expanded .note-footer {
+    /* If the note-expand button is in the footer, and footer is sticky,
+        this footer itself might need to be pushed up or have padding.
+        However, the .note-expand is already absolute to the .note.expanded.
+        The main concern is the expanded-note-controls covering it.
+     */
+    /* No changes needed here if the above fix for .expanded-note-controls is applied and sufficient. */
+  }
 }
 
 /* Mobile adjustments */
 @media (max-width: 768px) {
-    .note.expanded {
-        width: 100%; /* Full width on mobile */
-        height: 100%; /* Full height on mobile */
-        max-height: 100%;
-        max-width: 100%;
-        border-radius: 0; /* Remove border radius for full screen experience */
-        top: 0;
-        left: 0;
-        transform: none;
-    }
-    
-    /* Always show control buttons on mobile */
-    .note-delete, .note-expand {
-        opacity: 0.7;
-    }
+  .note.expanded {
+    width: 100%; /* Full width on mobile */
+    height: 100%; /* Full height on mobile */
+    max-height: 100%;
+    max-width: 100%;
+    border-radius: 0; /* Remove border radius for full screen experience */
+    top: 0;
+    left: 0;
+    transform: none;
+  }
 
-    /* Ensure delete button is visible on mobile expanded view */
-    .note.expanded button.note-delete {
-        top: 15px !important;
-        right: 15px !important;
-        opacity: 1 !important;
-        background-color: rgba(255, 255, 255, 0.9) !important;
-    }
+  /* Always show control buttons on mobile */
+  .note-delete,
+  .note-expand {
+    opacity: 0.7;
+  }
+
+  /* Ensure delete button is visible on mobile expanded view */
+  .note.expanded button.note-delete {
+    top: 15px !important;
+    right: 15px !important;
+    opacity: 1 !important;
+    background-color: rgba(255, 255, 255, 0.9) !important;
+  }
 }
