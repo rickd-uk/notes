@@ -1,28 +1,30 @@
 /* base.css - Variables, resets, and basic styling */
 
 :root {
-    --sidebar-width: 220px;
-    --primary-color: #6200ee;
-    --secondary-color: #03dac6;
-    --background-color: #f5f5f5;
-    --surface-color: #ffffff;
-    --text-color: #333333;
-    --border-radius: 8px;
+  --sidebar-width: 220px;
+  --primary-color: #6200ee;
+  --secondary-color: #03dac6;
+  --background-color: #f5f5f5;
+  --surface-color: #ffffff;
+  --text-color: #333333;
+  --border-radius: 8px;
 }
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+    Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 
 body {
-    background-color: var(--background-color);
-    color: var(--text-color);
-    height: 100vh;
-    display: flex;
-    overflow: hidden;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
 }
 
 /* Prevent text selection for specific elements */
@@ -44,7 +46,7 @@ body {
 }
 
 .fallback-text {
-    font-size: 24px;
-    color: var(--primary-color);
-    padding: 20px;
+  font-size: 24px;
+  color: var(--primary-color);
+  padding: 20px;
 }

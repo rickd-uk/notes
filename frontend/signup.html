@@ -1,175 +1,213 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#6200ee">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="theme-color" content="#6200ee" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <title>Simple Notes - Sign Up</title>
-    
+
     <!-- CSS files -->
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/login.css">
-    <link rel="stylesheet" href="css/responsive.css">
-    
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/login.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+
     <style>
-        .signup-link, .login-link {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 14px;
-        }
-        
-        .signup-link a, .login-link a {
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-        
-        .signup-link a:hover, .login-link a:hover {
-            text-decoration: underline;
-        }
-        
-        .login-form {
-            padding-bottom: 20px;
-        }
+      .signup-link,
+      .login-link {
+        text-align: center;
+        margin-top: 15px;
+        font-size: 14px;
+      }
+
+      .signup-link a,
+      .login-link a {
+        color: var(--primary-color);
+        text-decoration: none;
+      }
+
+      .signup-link a:hover,
+      .login-link a:hover {
+        text-decoration: underline;
+      }
+
+      .login-form {
+        padding-bottom: 20px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="login-container">
-        <div class="login-form">
-            <h1 class="login-title">Create Account</h1>
-            <div class="login-error" id="signupError"></div>
-            <form id="signupForm" onsubmit="return false;">
-                <input type="text" id="username" class="login-input" placeholder="Username" autocomplete="username">
-                <input type="email" id="email" class="login-input" placeholder="Email" autocomplete="email">
-                <input type="password" id="password" class="login-input" placeholder="Password" autocomplete="new-password">
-                <input type="password" id="confirmPassword" class="login-input" placeholder="Confirm Password" autocomplete="new-password">
-                <button type="button" id="signupBtn" class="login-btn">Sign Up</button>
-            </form>
-            <div class="login-link">
-                Already have an account? <a href="login.html">Log in</a>
-            </div>
+      <div class="login-form">
+        <h1 class="login-title">Create Account</h1>
+        <div class="login-error" id="signupError"></div>
+        <form id="signupForm" onsubmit="return false;">
+          <input
+            type="text"
+            id="username"
+            class="login-input"
+            placeholder="Username"
+            autocomplete="username"
+          />
+          <input
+            type="email"
+            id="email"
+            class="login-input hidden-field"
+            placeholder="Email"
+            autocomplete="email"
+          />
+          <input
+            type="password"
+            id="password"
+            class="login-input"
+            placeholder="Password"
+            autocomplete="new-password"
+          />
+          <input
+            type="password"
+            id="confirmPassword"
+            class="login-input"
+            placeholder="Confirm Password"
+            autocomplete="new-password"
+          />
+          <button type="button" id="signupBtn" class="login-btn">
+            Sign Up
+          </button>
+        </form>
+        <div class="login-link">
+          Already have an account? <a href="login.html">Log in</a>
         </div>
+      </div>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const signupBtn = document.getElementById('signupBtn');
-            const usernameInput = document.getElementById('username');
-            const emailInput = document.getElementById('email');
-            const passwordInput = document.getElementById('password');
-            const confirmPasswordInput = document.getElementById('confirmPassword');
-            const signupError = document.getElementById('signupError');
-            
-            // Check if already authenticated
-            const checkAuth = async () => {
-                try {
-                    const response = await fetch('/api/auth/me');
-                    if (response.ok) {
-                        // Already authenticated
-                        window.location.href = '/';
-                    }
-                } catch (error) {
-                    // Not authenticated, continue showing signup form
-                    console.log('Not authenticated');
-                }
-            };
-            
-            // Validate form fields
-            const validateForm = () => {
-                // Reset error message
-                signupError.style.display = 'none';
-                
-                const username = usernameInput.value.trim();
-                const email = emailInput.value.trim();
-                const password = passwordInput.value;
-                const confirmPassword = confirmPasswordInput.value;
-                
-                // Check if fields are empty
-                if (!username || !email || !password || !confirmPassword) {
-                    signupError.textContent = 'All fields are required';
-                    signupError.style.display = 'block';
-                    return false;
-                }
-                
-                // Validate username length
-                if (username.length < 3 || username.length > 20) {
-                    signupError.textContent = 'Username must be between 3 and 20 characters';
-                    signupError.style.display = 'block';
-                    return false;
-                }
-                
-                // Validate email format
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(email)) {
-                    signupError.textContent = 'Please enter a valid email address';
-                    signupError.style.display = 'block';
-                    return false;
-                }
-                
-                // Validate password length
-                if (password.length < 8) {
-                    signupError.textContent = 'Password must be at least 8 characters long';
-                    signupError.style.display = 'block';
-                    return false;
-                }
-                
-                // Check if passwords match
-                if (password !== confirmPassword) {
-                    signupError.textContent = 'Passwords do not match';
-                    signupError.style.display = 'block';
-                    return false;
-                }
-                
-                return true;
-            };
-            
-            // Sign up user
-            const signup = async () => {
-                if (!validateForm()) {
-                    return;
-                }
-                
-                const username = usernameInput.value.trim();
-                const email = emailInput.value.trim();
-                const password = passwordInput.value;
-                
-                try {
-                    const response = await fetch('/api/auth/register', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username, email, password })
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (response.ok) {
-                        // Redirect to main app after successful signup
-                        window.location.href = '/';
-                    } else {
-                        // Display error message from server
-                        signupError.textContent = data.error || 'An error occurred during sign up';
-                        signupError.style.display = 'block';
-                    }
-                } catch (error) {
-                    console.error('Sign up error:', error);
-                    signupError.textContent = 'An error occurred during sign up';
-                    signupError.style.display = 'block';
-                }
-            };
-            
-            // Event listeners
-            signupBtn.addEventListener('click', signup);
-            
-            // Handle Enter key
-            confirmPasswordInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    signup();
-                }
+      document.addEventListener("DOMContentLoaded", () => {
+        const signupBtn = document.getElementById("signupBtn");
+        const usernameInput = document.getElementById("username");
+        const emailInput = document.getElementById("email");
+        const passwordInput = document.getElementById("password");
+        const confirmPasswordInput = document.getElementById("confirmPassword");
+        const signupError = document.getElementById("signupError");
+
+        // Check if already authenticated
+        const checkAuth = async () => {
+          try {
+            const response = await fetch("/api/auth/me");
+            if (response.ok) {
+              // Already authenticated
+              window.location.href = "/";
+            }
+          } catch (error) {
+            // Not authenticated, continue showing signup form
+            console.log("Not authenticated");
+          }
+        };
+
+        // Validate form fields
+        const validateForm = () => {
+          // Reset error message
+          signupError.style.display = "none";
+
+          const username = usernameInput.value.trim();
+          const email = emailInput.value.trim();
+          const password = passwordInput.value;
+          const confirmPassword = confirmPasswordInput.value;
+
+          // Check if fields are empty
+          if (!username || !password || !confirmPassword) {
+            signupError.textContent = "All fields are required";
+            signupError.style.display = "block";
+            return false;
+          }
+
+          // Validate username length
+          if (username.length < 3 || username.length > 20) {
+            signupError.textContent =
+              "Username must be between 3 and 20 characters";
+            signupError.style.display = "block";
+            return false;
+          }
+
+          // Validate email format
+          // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          // if (!emailRegex.test(email)) {
+          //   signupError.textContent = "Please enter a valid email address";
+          //   signupError.style.display = "block";
+          //   return false;
+          // }
+
+          // Validate password length
+          if (password.length < 8) {
+            signupError.textContent =
+              "Password must be at least 8 characters long";
+            signupError.style.display = "block";
+            return false;
+          }
+
+          // Check if passwords match
+          if (password !== confirmPassword) {
+            signupError.textContent = "Passwords do not match";
+            signupError.style.display = "block";
+            return false;
+          }
+
+          return true;
+        };
+
+        // Sign up user
+        const signup = async () => {
+          if (!validateForm()) {
+            return;
+          }
+
+          const username = usernameInput.value.trim();
+          const email = emailInput.value.trim();
+          const password = passwordInput.value;
+
+          try {
+            const response = await fetch("/api/auth/register", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username, email, password }),
             });
-            
-            // Check if already authenticated
-            checkAuth();
+
+            const data = await response.json();
+
+            if (response.ok) {
+              // Redirect to main app after successful signup
+              window.location.href = "/";
+            } else {
+              // Display error message from server
+              signupError.textContent =
+                data.error || "An error occurred during sign up";
+              signupError.style.display = "block";
+            }
+          } catch (error) {
+            console.error("Sign up error:", error);
+            signupError.textContent = "An error occurred during sign up";
+            signupError.style.display = "block";
+          }
+        };
+
+        // Event listeners
+        signupBtn.addEventListener("click", signup);
+
+        // Handle Enter key
+        confirmPasswordInput.addEventListener("keypress", (e) => {
+          if (e.key === "Enter") {
+            signup();
+          }
         });
+
+        // Check if already authenticated
+        checkAuth();
+      });
     </script>
-</body>
+  </body>
 </html>

@@ -1,64 +1,67 @@
 /* login.css - Styles for the login page */
 
 .login-container {
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .login-form {
-    background-color: var(--surface-color);
-    padding: 30px;
-    border-radius: var(--border-radius);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 350px;
+  background-color: var(--surface-color);
+  padding: 30px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 350px;
 }
 
 .login-title {
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 24px;
-    color: var(--primary-color);
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: var(--primary-color);
 }
 
 .login-input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border-radius: var(--border-radius);
-    border: 1px solid #e0e0e0;
-    font-size: 16px;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: var(--border-radius);
+  border: 1px solid #e0e0e0;
+  font-size: 16px;
 }
 
 .login-input:focus {
-    outline: none;
-    border-color: var(--primary-color);
+  outline: none;
+  border-color: var(--primary-color);
 }
 
 .login-btn {
-    width: 100%;
-    padding: 12px;
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.2s;
+  width: 100%;
+  padding: 12px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s;
 }
 
 .login-btn:hover {
-    background-color: #5000d2;
+  background-color: #5000d2;
 }
 
 .login-error {
-    color: #f44336;
-    text-align: center;
-    margin-bottom: 15px;
-    display: none;
+  color: #f44336;
+  text-align: center;
+  margin-bottom: 15px;
+  display: none;
 }
 
+.hidden-field {
+  display: none;
+}
 /* Additional responsive styles for login page are in responsive.css */

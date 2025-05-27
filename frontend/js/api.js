@@ -1,27 +1,27 @@
 // api.js - API interaction functions
-import { 
-  getApiUrl, 
-  getCurrentCategoryId, 
-  setNotes, 
-  setCategories, 
-  getCategories
-} from './state.js';
-import { 
-  getCachedNotes, 
-  getCachedCategories, 
-  saveNotesToCache, 
+import {
+  getApiUrl,
+  getCurrentCategoryId,
+  setNotes,
+  setCategories,
+  getCategories,
+} from "./state.js";
+import {
+  getCachedNotes,
+  getCachedCategories,
+  saveNotesToCache,
   saveCategoriesToCache,
   clearNotesCache,
   clearAllCaches,
-  isCacheFresh
-} from './cache.js';
-import { renderNotes, renderCategories } from './ui.js';
-import { showToast } from './uiUtils.js';
+  isCacheFresh,
+} from "./cache.js";
+import { renderNotes, renderCategories } from "./ui.js";
+import { showToast } from "./uiUtils.js";
 
 // Fetch notes from API with caching
 export async function loadNotes() {
   const currentCategoryId = getCurrentCategoryId();
-  
+
   // First try to render from cache for immediate display
   const cachedNotes = getCachedNotes(currentCategoryId);
   if (cachedNotes) {
@@ -31,7 +31,7 @@ export async function loadNotes() {
 
   // Show loading indicator if no cached data
   if (!cachedNotes) {
-    document.getElementById('notesContainer').innerHTML = `
+    document.getElementById("notesContainer").innerHTML = `
       <div class="empty-state">
         <div class="empty-icon">⏳</div>
         <div class="empty-message">Loading notes...</div>
@@ -42,39 +42,41 @@ export async function loadNotes() {
   try {
     const apiUrl = getApiUrl();
     let url = `${apiUrl}/notes`;
-    if (currentCategoryId !== 'all') {
+    if (currentCategoryId !== "all") {
       url = `${apiUrl}/notes/category/${currentCategoryId}`;
     }
-    
+
     const response = await fetch(url);
-    if (!response.ok) throw new Error('Failed to fetch notes');
+    if (!response.ok) throw new Error("Failed to fetch notes");
     const freshNotes = await response.json();
-    
+
     // Only update UI if notes changed or we didn't have cache
-    if (!cachedNotes || JSON.stringify(freshNotes) !== JSON.stringify(cachedNotes)) {
+    if (
+      !cachedNotes ||
+      JSON.stringify(freshNotes) !== JSON.stringify(cachedNotes)
+    ) {
       setNotes(freshNotes);
 
       // Apply sorting if the function exists
-      if (typeof window.applySortAfterLoad === 'function') {
+      if (typeof window.applySortAfterLoad === "function") {
         window.applySortAfterLoad();
       }
 
-
       renderNotes();
     }
-    
+
     // Update the cache with fresh data
     saveNotesToCache(currentCategoryId, freshNotes);
-    
+
     return freshNotes;
   } catch (error) {
-    console.error('Error loading notes:', error);
-    
+    console.error("Error loading notes:", error);
+
     // If we have cached notes, continue using them
     if (!cachedNotes) {
-      showToast('Error loading notes');
+      showToast("Error loading notes");
     }
-    
+
     return cachedNotes || [];
   }
 }
@@ -90,12 +92,12 @@ export async function loadCategories() {
 
   // Show loading indicator for empty categories
   if (!cachedCategories) {
-    document.querySelector('.categories').innerHTML = `
-      <div class="category${getCurrentCategoryId() === 'all' ? ' active' : ''}" data-id="all">
+    document.querySelector(".categories").innerHTML = `
+      <div class="category${getCurrentCategoryId() === "all" ? " active" : ""}" data-id="all">
         <div class="category-icon">📄</div>
         <div class="category-name">All Notes</div>
       </div>
-      <div class="category${getCurrentCategoryId() === 'uncategorized' ? ' active' : ''}" data-id="uncategorized">
+      <div class="category${getCurrentCategoryId() === "uncategorized" ? " active" : ""}" data-id="uncategorized">
         <div class="category-icon">📌</div>
         <div class="category-name">Uncategorized</div>
       </div>
@@ -109,11 +111,14 @@ export async function loadCategories() {
   try {
     const apiUrl = getApiUrl();
     const response = await fetch(`${apiUrl}/categories`);
-    if (!response.ok) throw new Error('Failed to fetch categories');
+    if (!response.ok) throw new Error("Failed to fetch categories");
     const freshCategories = await response.json();
 
     // Only update UI if categories changed or we didn't have cache
-    if (!cachedCategories || JSON.stringify(freshCategories) !== JSON.stringify(cachedCategories)) {
+    if (
+      !cachedCategories ||
+      JSON.stringify(freshCategories) !== JSON.stringify(cachedCategories)
+    ) {
       setCategories(freshCategories);
       renderCategories();
     }
@@ -122,13 +127,13 @@ export async function loadCategories() {
 
     return freshCategories;
   } catch (error) {
-    console.error('Error loading categories:', error);
+    console.error("Error loading categories:", error);
 
     // If we have cached categories, continue using them
     if (!cachedCategories) {
-      showToast('Error loading categories');
+      showToast("Error loading categories");
     }
-    
+
     return cachedCategories || [];
   }
 }
@@ -137,11 +142,15 @@ export async function loadCategories() {
 export function preloadAdjacentCategories() {
   const currentCategoryId = getCurrentCategoryId();
   const categories = getCategories();
-  
+
   // Create an array of all category IDs including system categories
-  const allCategoryIds = ['all', 'uncategorized', ...categories.map(c => c.id.toString())];
+  const allCategoryIds = [
+    "all",
+    "uncategorized",
+    ...categories.map((c) => c.id.toString()),
+  ];
   const currentIndex = allCategoryIds.indexOf(currentCategoryId);
-  
+
   // Preload next and previous categories
   if (currentIndex > 0) {
     prefetchNotes(allCategoryIds[currentIndex - 1]);
@@ -154,21 +163,22 @@ export function preloadAdjacentCategories() {
 // Prefetch notes for a category without rendering them
 async function prefetchNotes(categoryId) {
   // Skip if we already have fresh cached data
-  if (isCacheFresh(categoryId, 5)) { // 5 minutes
+  if (isCacheFresh(categoryId, 5)) {
+    // 5 minutes
     return; // Use existing cache if it's less than 5 minutes old
   }
 
   try {
     const apiUrl = getApiUrl();
     let url = `${apiUrl}/notes`;
-    if (categoryId !== 'all') {
+    if (categoryId !== "all") {
       url = `${apiUrl}/notes/category/${categoryId}`;
     }
-    
+
     const response = await fetch(url);
-    if (!response.ok) throw new Error('Failed to prefetch notes');
+    if (!response.ok) throw new Error("Failed to prefetch notes");
     const prefetchedNotes = await response.json();
-    
+
     // Only update the cache
     saveNotesToCache(categoryId, prefetchedNotes);
   } catch (error) {
@@ -182,29 +192,34 @@ export async function createNote(categoryId) {
   try {
     const apiUrl = getApiUrl();
     const newNote = {
-      content: '',
-      category_id: categoryId === 'all' ? null : categoryId === 'uncategorized' ? null : categoryId
+      content: "",
+      category_id:
+        categoryId === "all"
+          ? null
+          : categoryId === "uncategorized"
+            ? null
+            : categoryId,
     };
-    
+
     const response = await fetch(`${apiUrl}/notes`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newNote)
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newNote),
     });
-    
-    if (!response.ok) throw new Error('Failed to create note');
+
+    if (!response.ok) throw new Error("Failed to create note");
     const createdNote = await response.json();
-    
+
     // Clear cache for current category and 'all' category
     clearNotesCache(categoryId);
-    if (categoryId !== 'all') {
-      clearNotesCache('all');
+    if (categoryId !== "all") {
+      clearNotesCache("all");
     }
-    
+
     return createdNote;
   } catch (error) {
-    console.error('Error creating note:', error);
-    showToast('Error creating note');
+    console.error("Error creating note:", error);
+    showToast("Error creating note");
     return null;
   }
 }
@@ -214,27 +229,27 @@ export async function updateNote(noteId, content, categoryId) {
   try {
     const apiUrl = getApiUrl();
     const updatedNote = { content, category_id: categoryId };
-    
+
     const response = await fetch(`${apiUrl}/notes/${noteId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedNote)
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedNote),
     });
-    
-    if (!response.ok) throw new Error('Failed to update note');
+
+    if (!response.ok) throw new Error("Failed to update note");
     const result = await response.json();
-    
+
     // Clear cache for current category and 'all' category
     const currentCategoryId = getCurrentCategoryId();
     saveNotesToCache(currentCategoryId, null); // Force reload next time
-    if (currentCategoryId !== 'all') {
-      clearNotesCache('all');
+    if (currentCategoryId !== "all") {
+      clearNotesCache("all");
     }
-    
+
     return result;
   } catch (error) {
-    console.error('Error updating note:', error);
-    showToast('Error saving note');
+    console.error("Error updating note:", error);
+    showToast("Error saving note");
     return null;
   }
 }
@@ -244,22 +259,22 @@ export async function deleteNote(noteId) {
   try {
     const apiUrl = getApiUrl();
     const response = await fetch(`${apiUrl}/notes/${noteId}`, {
-      method: 'DELETE'
+      method: "DELETE",
     });
-    
-    if (!response.ok) throw new Error('Failed to delete note');
-    
+
+    if (!response.ok) throw new Error("Failed to delete note");
+
     // Clear cache for current category and 'all' category
     const currentCategoryId = getCurrentCategoryId();
     clearNotesCache(currentCategoryId);
-    if (currentCategoryId !== 'all') {
-      clearNotesCache('all');
+    if (currentCategoryId !== "all") {
+      clearNotesCache("all");
     }
-    
+
     return true;
   } catch (error) {
-    console.error('Error deleting note:', error);
-    showToast('Error deleting note');
+    console.error("Error deleting note:", error);
+    showToast("Error deleting note");
     return false;
   }
 }
@@ -269,24 +284,24 @@ export async function deleteAllNotesInCategory(categoryId) {
   try {
     const apiUrl = getApiUrl();
     const url = `${apiUrl}/notes/category/${categoryId}`;
-    
+
     const response = await fetch(url, {
-      method: 'DELETE'
+      method: "DELETE",
     });
-    
-    if (!response.ok) throw new Error('Failed to delete notes');
+
+    if (!response.ok) throw new Error("Failed to delete notes");
     const result = await response.json();
-    
+
     // Clear cache for current category and 'all' category
     clearNotesCache(categoryId);
-    if (categoryId !== 'all') {
-      clearNotesCache('all');
+    if (categoryId !== "all") {
+      clearNotesCache("all");
     }
-    
+
     return result;
   } catch (error) {
-    console.error('Error deleting all notes:', error);
-    showToast('Error deleting notes');
+    console.error("Error deleting all notes:", error);
+    showToast("Error deleting notes");
     return { error: true };
   }
 }
@@ -296,18 +311,18 @@ export async function createCategory(name, icon) {
   try {
     const apiUrl = getApiUrl();
     const response = await fetch(`${apiUrl}/categories`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, icon })
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, icon }),
     });
-    
-    if (!response.ok) throw new Error('Failed to create category');
+
+    if (!response.ok) throw new Error("Failed to create category");
     const newCategory = await response.json();
-    
+
     return newCategory;
   } catch (error) {
-    console.error('Error creating category:', error);
-    showToast('Error creating category');
+    console.error("Error creating category:", error);
+    showToast("Error creating category");
     return null;
   }
 }
@@ -317,18 +332,18 @@ export async function updateCategory(id, name, icon) {
   try {
     const apiUrl = getApiUrl();
     const response = await fetch(`${apiUrl}/categories/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, icon })
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, icon }),
     });
-    
-    if (!response.ok) throw new Error('Failed to update category');
+
+    if (!response.ok) throw new Error("Failed to update category");
     const updatedCategory = await response.json();
-    
+
     return updatedCategory;
   } catch (error) {
-    console.error('Error updating category:', error);
-    showToast('Error updating category');
+    console.error("Error updating category:", error);
+    showToast("Error updating category");
     return null;
   }
 }
@@ -338,22 +353,22 @@ export async function deleteCategory(id) {
   try {
     const apiUrl = getApiUrl();
     const response = await fetch(`${apiUrl}/categories/${id}`, {
-      method: 'DELETE'
+      method: "DELETE",
     });
-    
-    if (!response.ok) throw new Error('Failed to delete category');
-    
+
+    if (!response.ok) throw new Error("Failed to delete category");
+
     // Clear all notes caches since category assignments changed
-    clearNotesCache('all');
-    clearNotesCache('uncategorized');
-    getCategories().forEach(cat => {
+    clearNotesCache("all");
+    clearNotesCache("uncategorized");
+    getCategories().forEach((cat) => {
       clearNotesCache(cat.id.toString());
     });
-    
+
     return true;
   } catch (error) {
-    console.error('Error deleting category:', error);
-    showToast('Error deleting category');
+    console.error("Error deleting category:", error);
+    showToast("Error deleting category");
     return false;
   }
 }
@@ -364,18 +379,18 @@ export async function deleteAllCategories() {
   try {
     const apiUrl = getApiUrl();
     const response = await fetch(`${apiUrl}/categories/all`, {
-      method: 'DELETE'
+      method: "DELETE",
     });
-    
-    if (!response.ok) throw new Error('Failed to delete all categories');
-    
+
+    if (!response.ok) throw new Error("Failed to delete all categories");
+
     // Clear all notes caches since category assignments changed
     clearAllCaches();
-    
+
     return await response.json();
   } catch (error) {
-    console.error('Error deleting all categories:', error);
-    showToast('Error deleting all categories');
+    console.error("Error deleting all categories:", error);
+    showToast("Error deleting all categories");
     return { error: true };
   }
 }
@@ -385,60 +400,58 @@ export async function deleteAllCategoriesSequential() {
   try {
     const apiUrl = getApiUrl();
     const categories = getCategories();
-    
+
     if (!categories || categories.length === 0) {
-      return { count: 0, message: 'No categories to delete' };
+      return { count: 0, message: "No categories to delete" };
     }
-    
+
     // Show loading indicator for long operations
-    showToast('Deleting all categories...');
-    
+    showToast("Deleting all categories...");
+
     // Delete categories one by one
     let deletedCount = 0;
     for (const category of categories) {
       const response = await fetch(`${apiUrl}/categories/${category.id}`, {
-        method: 'DELETE'
+        method: "DELETE",
       });
-      
+
       if (response.ok) {
         deletedCount++;
       }
     }
-    
+
     // Clear all caches
     clearAllCaches();
-    
-    return { 
-      count: deletedCount, 
-      message: `Deleted ${deletedCount} categories` 
+
+    return {
+      count: deletedCount,
+      message: `Deleted ${deletedCount} categories`,
     };
   } catch (error) {
-    console.error('Error deleting all categories:', error);
-    showToast('Error deleting all categories');
+    console.error("Error deleting all categories:", error);
+    showToast("Error deleting all categories");
     return { error: true };
   }
 }
-
-
 
 // Get current user info
 export async function getCurrentUser() {
   try {
     const apiUrl = getApiUrl();
     const response = await fetch(`${apiUrl}/auth/me`);
-    
+
     if (!response.ok) {
       if (response.status === 401) {
         // Not authenticated
         return null;
       }
-      throw new Error('Failed to fetch user information');
+      throw new Error("Failed to fetch user information");
     }
-    
+
     const data = await response.json();
     return data.user;
   } catch (error) {
-    console.error('Error fetching current user:', error);
+    console.error("Error fetching current user:", error);
     return null;
   }
 }
@@ -448,16 +461,14 @@ export async function logout() {
   try {
     const apiUrl = getApiUrl();
     await fetch(`${apiUrl}/auth/logout`, {
-      method: 'POST'
+      method: "POST",
     });
-    
-    window.location.href = '/login.html';
+
+    window.location.href = "/login.html";
     return true;
   } catch (error) {
-    console.error('Logout error:', error);
-    showToast('Error logging out');
+    console.error("Logout error:", error);
+    showToast("Error logging out");
     return false;
   }
 }
-
-
