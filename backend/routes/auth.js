@@ -46,9 +46,11 @@ router.post("/register", async (req, res) => {
     }
 
     // Check if email already exists
-    const existingUserByEmail = await db.getUserByEmail(email);
-    if (existingUserByEmail) {
-      return res.status(400).json({ error: "Email already registered" });
+    if (email) {
+      const existingUserByEmail = await db.getUserByEmail(email);
+      if (existingUserByEmail) {
+        return res.status(400).json({ error: "Email already registered" });
+      }
     }
 
     // Hash password
