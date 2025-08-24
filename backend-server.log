@@ -1,0 +1,15 @@
+
+> backend@1.0.0 start
+> node index.js
+
+--- Database Connection Settings ---
+DB_HOST: 127.0.0.1
+DB_PORT: 5435
+DB_USER: notesapp_user
+DB_NAME: notesapp
+DB_PASSWORD: Loaded
+------------------------------------
+✅ Database connected successfully
+🚀 Server running on http://localhost:3012
+Login attempt: { username: 'admin', password: '***' }
+Admin login successful

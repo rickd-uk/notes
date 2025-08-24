@@ -45,7 +45,7 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ error: "Username already taken" });
     }
 
-    // Check if email already exists
+    // Check if email already exists, but only if an email is provided
     if (email) {
       const existingUserByEmail = await db.getUserByEmail(email);
       if (existingUserByEmail) {
@@ -53,9 +53,26 @@ router.post("/register", async (req, res) => {
       }
     }
 
-    // Hash password
-    const saltRounds = 10;
-    const passwordHash = await bcrypt.hash(password, saltRounds);
+    // --- Start of Security Update ---
+    // Load security config from environment variables
+    const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS, 10) || 12;
+    const pepper = process.env.BCRYPT_PEPPER;
+
+    if (!pepper) {
+      console.error(
+        "CRITICAL: BCRYPT_PEPPER is not set. Halting registration.",
+      );
+      return res
+        .status(500)
+        .json({ error: "Server security misconfiguration" });
+    }
+
+    // Add the pepper to the password before hashing
+    const passwordWithPepper = password + pepper;
+    // --- End of Security Update ---
+
+    // Hash the peppered password
+    const passwordHash = await bcrypt.hash(passwordWithPepper, saltRounds);
 
     // Create user
     const newUser = await db.createUser(username, email, passwordHash);
@@ -102,6 +119,15 @@ router.post("/login", async (req, res) => {
       .json({ error: "Username and password are required" });
   }
 
+  // --- Start of Security Update ---
+  const pepper = process.env.BCRYPT_PEPPER;
+  if (!pepper) {
+    console.error("CRITICAL: BCRYPT_PEPPER is not set. Halting login.");
+    return res.status(500).json({ error: "Server security misconfiguration" });
+  }
+  const passwordWithPepper = password + pepper;
+  // --- End of Security Update ---
+
   try {
     // First try to match against .env admin credentials for backward compatibility
     if (ADMIN_USERNAME && ADMIN_PASSWORD_HASH && username === ADMIN_USERNAME) {
@@ -146,7 +172,10 @@ router.post("/login", async (req, res) => {
     }
 
     // Verify password
-    const passwordMatch = await bcrypt.compare(password, user.password_hash);
+    const passwordMatch = await bcrypt.compare(
+      passwordWithPepper,
+      user.password_hash,
+    );
 
     if (!passwordMatch) {
       console.log("Login failed - password mismatch");

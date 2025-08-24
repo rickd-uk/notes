@@ -1,15 +1,31 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
+require("dotenv").config(); // Make sure to load environment variables
 
 async function generateHash() {
-  const plainPassword = 'notesapp2025'; // Simple, easy to remember password
-  const saltRounds = 10;
-  
+  // --- Improved Security ---
+  const plainPassword = "notesapp2025";
+
+  // 1. Load configuration from environment variables
+  const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS, 10) || 12;
+  const pepper = process.env.BCRYPT_PEPPER;
+
+  if (!pepper) {
+    console.error("Error: BCRYPT_PEPPER is not set in your .env file.");
+    return;
+  }
+
   try {
-    const hash = await bcrypt.hash(plainPassword, saltRounds);
-    console.log('Password:', plainPassword);
-    console.log('Password hash:', hash);
+    // 2. Add the pepper to the password before hashing
+    const passwordWithPepper = plainPassword + pepper;
+
+    // 3. Generate the hash with a stronger work factor
+    const hash = await bcrypt.hash(passwordWithPepper, saltRounds);
+
+    console.log("Password:", plainPassword);
+    console.log("Password hash:", hash);
+    console.log("Salt Rounds:", saltRounds);
   } catch (error) {
-    console.error('Error generating hash:', error);
+    console.error("Error generating hash:", error);
   }
 }
 

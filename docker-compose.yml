@@ -7,9 +7,9 @@ services:
     environment:
       POSTGRES_DB: notesapp
       POSTGRES_USER: notesapp_user
-      POSTGRES_PASSWORD: cherry2025
+      POSTGRES_PASSWORD: mysecretpassword
     ports:
-      - "5432:5432"
+      - "5435:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init-db:/docker-entrypoint-initdb.d
@@ -17,3 +17,4 @@ services:
 
 volumes:
   postgres_data:
+
