@@ -23,3 +23,10 @@ build/
 # you might want to commit a default config and ignore the local one.
 frontend/config.local.json
 
+# Backup files
+*.sql
+
+# NPM/Node temporary files
+backend/11.5.2
+backend/backend@1.0.0
+backend/node
