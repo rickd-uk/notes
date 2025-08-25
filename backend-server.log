@@ -11,5 +11,63 @@ DB_PASSWORD: Loaded
 ------------------------------------
 ✅ Database connected successfully
 🚀 Server running on http://localhost:3012
-Login attempt: { username: 'admin', password: '***' }
-Admin login successful
+Error getting categories: Error: connect ECONNREFUSED 127.0.0.1:5435
+    at /home/rick/Documents/D/PRJ/LNG/NODE_JS/notes/backend/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /home/rick/Documents/D/PRJ/LNG/NODE_JS/notes/backend/routes/categories.js:16:22 {
+  errno: -111,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 5435
+}
+Error: connect ECONNREFUSED 127.0.0.1:5435
+    at /home/rick/Documents/D/PRJ/LNG/NODE_JS/notes/backend/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /home/rick/Documents/D/PRJ/LNG/NODE_JS/notes/backend/routes/notes.js:16:22 {
+  errno: -111,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 5435
+}
+Error getting categories: Error: connect ECONNREFUSED 127.0.0.1:5435
+    at /home/rick/Documents/D/PRJ/LNG/NODE_JS/notes/backend/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /home/rick/Documents/D/PRJ/LNG/NODE_JS/notes/backend/routes/categories.js:16:22 {
+  errno: -111,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 5435
+}
+Error: connect ECONNREFUSED 127.0.0.1:5435
+    at /home/rick/Documents/D/PRJ/LNG/NODE_JS/notes/backend/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /home/rick/Documents/D/PRJ/LNG/NODE_JS/notes/backend/routes/notes.js:16:22 {
+  errno: -111,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 5435
+}
+Error getting categories: Error: connect ECONNREFUSED 127.0.0.1:5435
+    at /home/rick/Documents/D/PRJ/LNG/NODE_JS/notes/backend/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /home/rick/Documents/D/PRJ/LNG/NODE_JS/notes/backend/routes/categories.js:16:22 {
+  errno: -111,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 5435
+}
+Error: connect ECONNREFUSED 127.0.0.1:5435
+    at /home/rick/Documents/D/PRJ/LNG/NODE_JS/notes/backend/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /home/rick/Documents/D/PRJ/LNG/NODE_JS/notes/backend/routes/notes.js:16:22 {
+  errno: -111,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 5435
+}
