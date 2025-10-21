@@ -9,6 +9,31 @@ const router = express.Router();
 // Apply authentication to all note routes
 router.use(authenticate);
 
+// Get all notes for the current user
+router.get("/", async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    // Handle admin user from .env
+    if (userId === "admin") {
+      const result = await db.query(
+        "SELECT * FROM notes ORDER BY updated_at DESC",
+      );
+      return res.json(result.rows);
+    }
+
+    // For regular users
+    const result = await db.query(
+      "SELECT * FROM notes WHERE user_id = $1 ORDER BY updated_at DESC",
+      [userId],
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 // Get notes by category for the current user
 router.get("/category/:id", async (req, res) => {
   try {

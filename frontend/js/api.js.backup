@@ -47,12 +47,6 @@ export async function loadNotes() {
     }
 
     const response = await fetch(url);
-    console.log(
-      "[api.js] loadNotes response status:",
-      response.status,
-      "ok:",
-      response.ok,
-    );
     // Check for authentication errors
     if (response.status === 401) {
       console.log("Authentication required - redirecting to login");
@@ -123,14 +117,6 @@ export async function loadCategories() {
   try {
     const apiUrl = getApiUrl();
     const response = await fetch(`${apiUrl}/categories`);
-
-    // Check for authentication errors
-    if (response.status === 401) {
-      console.log("Authentication required - redirecting to login");
-      window.location.href = "/login.html";
-      return cachedCategories || [];
-    }
-
     if (!response.ok) throw new Error("Failed to fetch categories");
     const freshCategories = await response.json();
 

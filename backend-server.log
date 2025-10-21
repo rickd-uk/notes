@@ -13,5 +13,3 @@ DB_PASSWORD: Loaded
 🚀 Server running on http://localhost:3012
 📊 Request size limit: 2MB
 📝 Note content limit: 500KB characters / 1MB bytes
-Login attempt: { username: 'admin', password: '***' }
-Admin login successful
