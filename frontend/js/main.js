@@ -12,6 +12,7 @@ import { initDarkMode } from "./darkMode.js";
 import { initToolbarToggle } from "./toolbarToggle.js";
 import { applyToolbarVisibilityToAll } from "./quillEditor.js";
 import { initSpellCheck, applySpellCheckToAll } from "./noteControls.js";
+import { initSidebarToggles } from "./sidebarToggles.js";
 
 // Function to update the username display
 async function updateUsernameDisplay() {
@@ -84,6 +85,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       applySpellCheckToAll(isSpellCheckEnabled);
     }, 200);
   }, 700);
+
+  // Initialize sidebar toggles (for main page only)
+  setTimeout(() => {
+    initSidebarToggles();
+  }, 900);
 
   // Preload adjacent categories after initial load
   setTimeout(() => {

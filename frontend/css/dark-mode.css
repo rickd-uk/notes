@@ -29,7 +29,7 @@ body.dark-mode {
     justify-content: space-between;
     padding: 10px 20px;
     margin-top: auto;
-    margin-bottom: 10px;
+    margin-bottom: 0; /* Changed from 10px to 0 */
     border-top: 1px solid var(--border-color);
 }
 
@@ -138,60 +138,4 @@ body.dark-mode .theme-icon-light {
 
 body.dark-mode .theme-icon-dark {
     display: inline-block;
-}
-
-/* Modal adjustments for dark mode */
-body.dark-mode .modal-content {
-    background-color: var(--surface-color);
-    border: 1px solid var(--border-color);
-}
-
-body.dark-mode .modal-input {
-    background-color: #2a2a2a;
-    border-color: var(--border-color);
-    color: var(--text-color);
-}
-
-body.dark-mode .icon-item {
-    background-color: #2a2a2a;
-}
-
-body.dark-mode .icon-item:hover {
-    background-color: rgba(187, 134, 252, 0.2);
-}
-
-body.dark-mode .icon-item.selected {
-    background-color: var(--primary-color);
-}
-
-/* Toast adjustments */
-body.dark-mode .toast {
-    background-color: #424242;
-}
-
-body.dark-mode .login-form {
-    background-color: var(--surface-color);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
-body.dark-mode .login-title {
-    color: var(--primary-color);
-}
-
-body.dark-mode .login-input {
-    background-color: #2a2a2a;
-    border-color: var(--border-color);
-    color: var(--text-color);
-}
-
-body.dark-mode .login-input:focus {
-    border-color: var(--primary-color);
-}
-
-body.dark-mode .login-btn {
-    background-color: var(--primary-color);
-}
-
-body.dark-mode .login-btn:hover {
-    background-color: #9b69fd;
 }

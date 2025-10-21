@@ -13,6 +13,9 @@ const authRoutes = require("./routes/auth");
 const notesRoutes = require("./routes/notes");
 const categoriesRoutes = require("./routes/categories");
 
+// Import middleware
+const { handlePayloadTooLarge } = require("./middleware/contentSizeValidator");
+
 // Error handling for uncaught exceptions
 process.on("uncaughtException", (err) => {
   console.error("Uncaught Exception:", err);
@@ -27,13 +30,60 @@ const port = process.env.PORT || 3012;
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+
+// Configure body parser with size limits
+// Set to 2MB to be more generous than frontend, but still protect the server
+app.use(
+  express.json({
+    limit: "2mb",
+    verify: (req, res, buf, encoding) => {
+      // Track the raw body size
+      req.rawBody = buf;
+    },
+  }),
+);
+
+app.use(
+  express.urlencoded({
+    limit: "2mb",
+    extended: true,
+  }),
+);
+
 app.use(cookieParser());
 
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/notes", notesRoutes);
 app.use("/api/categories", categoriesRoutes);
+
+// Error handling middleware for payload too large
+app.use(handlePayloadTooLarge);
+
+// General error handler
+app.use((err, req, res, next) => {
+  console.error("Error:", err);
+
+  // Handle specific error types
+  if (err.type === "entity.too.large") {
+    return res.status(413).json({
+      error: "Payload too large",
+      message: "The request is too large. Maximum size is 2MB.",
+    });
+  }
+
+  if (err.type === "entity.parse.failed") {
+    return res.status(400).json({
+      error: "Invalid JSON",
+      message: "The request body contains invalid JSON.",
+    });
+  }
+
+  // Generic error response
+  res.status(err.status || 500).json({
+    error: err.message || "Internal server error",
+  });
+});
 
 // Static files and history middleware for single-page application routing
 app.use(express.static(path.join(__dirname, "../frontend")));
@@ -52,6 +102,8 @@ async function startServer() {
     app
       .listen(port, () => {
         console.log(`🚀 Server running on http://localhost:${port}`);
+        console.log(`📊 Request size limit: 2MB`);
+        console.log(`📝 Note content limit: 500KB characters / 1MB bytes`);
       })
       .on("error", (err) => {
         if (err.code === "EADDRINUSE") {

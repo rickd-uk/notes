@@ -1,28 +1,68 @@
-// quillEditor.js - Quill rich text editor integration
-import { handleNoteInput } from './eventHandlers.js';
-import { getToolbarsVisible } from './toolbarToggle.js';
-import { isSpellcheckEnabled, applySpellcheckToEditor } from './spellcheckToggle.js';
+// quillEditor.js - Quill rich text editor integration with content size limits
+import { handleNoteInput } from "./eventHandlers.js";
+import { getToolbarsVisible } from "./toolbarToggle.js";
+import {
+  isSpellcheckEnabled,
+  applySpellcheckToEditor,
+} from "./spellcheckToggle.js";
+import {
+  validateContentSize,
+  validatePasteSize,
+  handlePasteValidation,
+  showSizeIndicator,
+  LIMITS,
+} from "./contentLimits.js";
+import { showToast } from "./uiUtils.js";
 
 // Store Quill editor instances
 let quillEditors = {};
 
 // Configure Quill toolbar options
 const quillToolbarOptions = [
-  ['bold', 'italic', 'underline', 'strike'],
-  ['blockquote', 'code-block'],
-  [{ 'header': 1 }, { 'header': 2 }],
-  [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-  [{ 'color': [] }, { 'background': [] }],
-  ['link'],
-  ['clean']
+  ["bold", "italic", "underline", "strike"],
+  ["blockquote", "code-block"],
+  [{ header: 1 }, { header: 2 }],
+  [{ list: "ordered" }, { list: "bullet" }],
+  [{ color: [] }, { background: [] }],
+  ["link"],
+  ["clean"],
 ];
+
+// Show a temporary warning message
+function showPasteWarning(message, isError = false) {
+  // Remove any existing paste warning
+  const existingWarning = document.querySelector(".paste-warning");
+  if (existingWarning) {
+    existingWarning.remove();
+  }
+
+  const warning = document.createElement("div");
+  warning.className = `paste-warning${isError ? " error" : ""}`;
+  warning.innerHTML = `
+<button class="paste-warning-close" aria-label="Close">×</button>
+<div>${message}</div>
+`;
+
+  document.body.appendChild(warning);
+
+  const closeBtn = warning.querySelector(".paste-warning-close");
+  closeBtn.addEventListener("click", () => warning.remove());
+
+  // Auto-remove after 8 seconds
+  setTimeout(() => {
+    if (warning.parentNode) {
+      warning.remove();
+    }
+  }, 8000);
+}
 
 // Initialize Quill for all notes
 export function initializeQuillEditors() {
-  document.querySelectorAll('.note').forEach(noteElement => {
+  document.querySelectorAll(".note").forEach((noteElement) => {
     const noteId = noteElement.dataset.id;
-    const textareaContent = noteElement.querySelector('.note-content')?.value || '';
-    
+    const textareaContent =
+      noteElement.querySelector(".note-content")?.value || "";
+
     // Create Quill editor for this note
     createQuillEditor(noteElement, noteId, textareaContent);
   });
@@ -32,149 +72,331 @@ export function initializeQuillEditors() {
 export function createQuillEditor(noteElement, noteId, initialContent) {
   // Clean up any existing editor for this note
   destroyQuillEditor(noteId);
-  
+
+  // Validate initial content size
+  const validation = validateContentSize(initialContent || "");
+  if (!validation.isValid) {
+    console.warn(
+      `Note ${noteId} has oversized content (${validation.formatted.current}), truncating...`,
+    );
+    showToast(`Note content was too large and has been truncated`, "warning");
+  }
+
   // Create container for editor
-  const editorContainer = document.createElement('div');
-  editorContainer.className = 'note-editor-container';
-  
+  const editorContainer = document.createElement("div");
+  editorContainer.className = "note-editor-container";
+
   // Create editor element
-  const editorElement = document.createElement('div');
-  editorElement.className = 'quill-editor';
-  
+  const editorElement = document.createElement("div");
+  editorElement.className = "quill-editor";
+
   // Check if this editor is in a modal
-  const isInModal = !!noteElement.closest('.modal');
-  
+  const isInModal = !!noteElement.closest(".modal");
+
   // Set spell checking based on setting (default to on in modals, follow toggle in main view)
   const useSpellcheck = isInModal ? true : isSpellcheckEnabled();
-  editorElement.setAttribute('spellcheck', useSpellcheck ? 'true' : 'false');
-  
+  editorElement.setAttribute("spellcheck", useSpellcheck ? "true" : "false");
+
   editorContainer.appendChild(editorElement);
-  
+
   // Replace textarea with editor
-  const textarea = noteElement.querySelector('.note-content');
+  const textarea = noteElement.querySelector(".note-content");
   if (textarea) {
     textarea.parentNode.replaceChild(editorContainer, textarea);
   } else {
     // If no textarea (e.g., creating from scratch), just append
-    noteElement.insertBefore(editorContainer, noteElement.querySelector('.note-footer'));
+    noteElement.insertBefore(
+      editorContainer,
+      noteElement.querySelector(".note-footer"),
+    );
   }
-  
+
   // Initialize Quill
   const quill = new Quill(editorElement, {
     modules: {
-      toolbar: quillToolbarOptions
+      toolbar: quillToolbarOptions,
+      clipboard: {
+        matchVisual: false,
+      },
     },
-    placeholder: 'Start writing...',
-    theme: 'snow'
+    placeholder: "Start writing...",
+    theme: "snow",
   });
-  
+
   // Set initial content
   if (initialContent) {
-    // Check if content is HTML
-    if (initialContent.trim().startsWith('<')) {
-      quill.clipboard.dangerouslyPasteHTML(initialContent);
-    } else {
-      quill.setText(initialContent);
+    try {
+      // Check if content is HTML
+      if (initialContent.trim().startsWith("<")) {
+        quill.clipboard.dangerouslyPasteHTML(initialContent);
+      } else {
+        quill.setText(initialContent);
+      }
+    } catch (error) {
+      console.error("Error setting initial content:", error);
+      quill.setText("(Error loading note content)");
     }
   }
-  
+
   // Store reference to editor
   quillEditors[noteId] = quill;
-  
+
+  // ===== PASTE EVENT HANDLER WITH SIZE VALIDATION =====
+  quill.root.addEventListener(
+    "paste",
+    function (e) {
+      // Get the clipboard data
+      const clipboardData = e.clipboardData || window.clipboardData;
+      if (!clipboardData) return;
+
+      // Get pasted content
+      let pastedContent = "";
+
+      // Try to get HTML content first
+      const htmlData = clipboardData.getData("text/html");
+      if (htmlData) {
+        pastedContent = htmlData;
+      } else {
+        // Fall back to plain text
+        const textData = clipboardData.getData("text/plain");
+        if (textData) {
+          // Convert plain text to HTML paragraphs
+          pastedContent = textData
+            .split("\n")
+            .map((line) => (line ? `<p>${line}</p>` : "<p><br></p>"))
+            .join("");
+        }
+      }
+
+      if (!pastedContent) return;
+
+      // Get current content
+      const currentContent = quill.root.innerHTML;
+
+      // Validate the paste operation
+      const validation = handlePasteValidation(pastedContent, currentContent);
+
+      if (!validation.success) {
+        // Prevent the paste
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Show error message
+        showPasteWarning(validation.message, true);
+        showToast(validation.message, "error");
+
+        return false;
+      }
+
+      // If there's a warning but paste is allowed
+      if (validation.message) {
+        showPasteWarning(validation.message, false);
+      }
+
+      // Allow the paste to proceed normally
+      // Quill will handle the actual insertion
+    },
+    true,
+  ); // Use capture phase to intercept before Quill processes it
+
   // Handle content changes
-  quill.on('text-change', function() {
+  quill.on("text-change", function (delta, oldDelta, source) {
     // Get HTML content from the editor
     const content = quill.root.innerHTML;
+
+    // Validate content size
+    const validation = validateContentSize(content);
+
+    // Update size indicator
+    showSizeIndicator(noteElement, validation);
+
+    // If content is too large, show error and prevent saving
+    if (!validation.isValid) {
+      showToast(
+        `Note is too large (${validation.formatted.current}). Maximum size is ${validation.formatted.max}. Please reduce content.`,
+        "error",
+      );
+
+      // Don't save oversized content
+      return;
+    }
+
+    // Warn if approaching limit
+    if (validation.isNearLimit && source === "user") {
+      showToast(
+        `Note is ${validation.percentage.toFixed(0)}% of maximum size`,
+        "warning",
+      );
+    }
+
+    // Handle the input normally
     handleNoteInput(noteId, content);
   });
-  
+
   // Apply current toolbar visibility state to the new editor
   applyToolbarVisibility(noteId);
-  
+
   // Apply spell check setting to the Quill editor root element
   if (!isInModal) {
-    quill.root.setAttribute('spellcheck', useSpellcheck ? 'true' : 'false');
+    quill.root.setAttribute("spellcheck", useSpellcheck ? "true" : "false");
   }
-  
+
+  // Show initial size indicator if needed
+  const initialValidation = validateContentSize(initialContent || "");
+  showSizeIndicator(noteElement, initialValidation);
+
   return quill;
 }
 
 // Apply current toolbar visibility to a specific editor
 export function applyToolbarVisibility(noteId) {
   const toolbarsVisible = getToolbarsVisible();
-  const editorContainer = document.querySelector(`.note[data-id="${noteId}"] .note-editor-container`);
-  
+  const editorContainer = document.querySelector(
+    `.note[data-id="${noteId}"] .note-editor-container`,
+  );
+
   if (editorContainer) {
-    const toolbar = editorContainer.querySelector('.ql-toolbar');
-    const editor = editorContainer.querySelector('.ql-container');
-    
+    const toolbar = editorContainer.querySelector(".ql-toolbar");
+    const editor = editorContainer.querySelector(".ql-container");
+
     if (toolbar) {
-      toolbar.style.display = toolbarsVisible ? '' : 'none';
+      toolbar.style.display = toolbarsVisible ? "" : "none";
     }
-    
+
     if (editor) {
-      editor.style.marginTop = toolbarsVisible ? '' : '0';
-      editor.style.height = toolbarsVisible ? '' : 'calc(100% - 10px)';
+      editor.style.marginTop = toolbarsVisible ? "" : "0";
+      editor.style.height = toolbarsVisible ? "" : "100%";
     }
   }
 }
 
-// Apply current toolbar visibility to all editors
-export function applyToolbarVisibilityToAll() {
-  for (const noteId in quillEditors) {
+// Toggle toolbar visibility for all editors
+export function toggleAllToolbars(visible) {
+  Object.keys(quillEditors).forEach((noteId) => {
     applyToolbarVisibility(noteId);
-  }
+  });
 }
 
-// Clean up Quill editor instances when notes are removed
-export function destroyQuillEditor(noteId) {
-  if (quillEditors[noteId]) {
-    // No explicit destroy method in Quill, but we can clean up our reference
-    delete quillEditors[noteId];
-  }
-}
-
-// Get a specific editor instance
+// Get a specific Quill editor instance
 export function getQuillEditor(noteId) {
   return quillEditors[noteId];
 }
 
-// Update the Quill editor layout after expanding/collapsing
-export function updateQuillEditorLayout(noteId) {
-  if (quillEditors[noteId]) {
-    // Force Quill to update its layout after a short delay
-    window.setTimeout(() => {
-      quillEditors[noteId].update();
-    }, 100);
-  }
-}
-
-// Focus on a specific editor
+// Focus on a specific Quill editor
 export function focusQuillEditor(noteId) {
-  if (quillEditors[noteId]) {
-    quillEditors[noteId].focus();
+  const quill = quillEditors[noteId];
+  if (quill) {
+    quill.focus();
+    // Move cursor to end
+    const length = quill.getLength();
+    quill.setSelection(length, 0);
   }
 }
 
-// Clear all editor instances
+// Destroy a specific Quill editor
+export function destroyQuillEditor(noteId) {
+  const quill = quillEditors[noteId];
+  if (quill) {
+    // Get the editor container
+    const noteElement = document.querySelector(`.note[data-id="${noteId}"]`);
+    if (noteElement) {
+      const editorContainer = noteElement.querySelector(
+        ".note-editor-container",
+      );
+      if (editorContainer) {
+        editorContainer.remove();
+      }
+    }
+
+    delete quillEditors[noteId];
+  }
+}
+
+// Clear all Quill editors
 export function clearQuillEditors() {
+  Object.keys(quillEditors).forEach((noteId) => {
+    destroyQuillEditor(noteId);
+  });
   quillEditors = {};
 }
 
-// Make quillEditors globally accessible via a function
-// Safer than exposing the variable directly
-export function getAllQuillEditors() {
-  window.getAllQuillEditors = function() {
-    return quillEditors;
+// Update Quill editor layout (for responsive changes)
+export function updateQuillEditorLayout(noteId) {
+  const quill = quillEditors[noteId];
+  if (quill) {
+    // Force Quill to recalculate its dimensions
+    quill.root.style.height = "";
+    setTimeout(() => {
+      quill.root.style.height = quill.root.scrollHeight + "px";
+    }, 0);
+  }
+}
+
+// Apply spellcheck to all editors
+export function applySpellcheckToAllEditors(enabled) {
+  Object.keys(quillEditors).forEach((noteId) => {
+    const quill = quillEditors[noteId];
+    if (quill) {
+      quill.root.setAttribute("spellcheck", enabled ? "true" : "false");
+    }
+  });
+}
+
+// Get content from a Quill editor with size validation
+export function getQuillContent(noteId) {
+  const quill = quillEditors[noteId];
+  if (!quill) return null;
+
+  const content = quill.root.innerHTML;
+  const validation = validateContentSize(content);
+
+  return {
+    content,
+    validation,
+    isValid: validation.isValid,
   };
+}
+
+// Added this function:
+export function getAllQuillEditors() {
   return quillEditors;
 }
 
-// Apply spell check state to all editors
-export function applySpellcheckToAll() {
-  // Just call the central function from spellcheckToggle.js
-  // which handles cursor position preservation
-  if (typeof applySpellcheckState === 'function') {
-    applySpellcheckState();
+export function applyToolbarVisibilityToAll() {
+  Object.keys(quillEditors).forEach((noteId) => {
+    applyToolbarVisibility(noteId);
+  });
+}
+
+// Set content in a Quill editor with size validation
+export function setQuillContent(noteId, content) {
+  const quill = quillEditors[noteId];
+  if (!quill) return false;
+
+  const validation = validateContentSize(content);
+
+  if (!validation.isValid) {
+    showToast(
+      `Content is too large (${validation.formatted.current}). Cannot set content.`,
+      "error",
+    );
+    return false;
+  }
+
+  try {
+    if (content.trim().startsWith("<")) {
+      quill.clipboard.dangerouslyPasteHTML(content);
+    } else {
+      quill.setText(content);
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error setting content:", error);
+    showToast("Error setting note content", "error");
+    return false;
   }
 }
+
+// Export the editors object for debugging
+export { quillEditors };

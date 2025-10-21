@@ -1,13 +1,13 @@
 /* spellcheck-toggle.css - Styles for spell check toggle functionality */
 
-/* Container for the spell check toggle */
+/* Container for the spell check toggle in sidebar */
 .spellcheck-toggle {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 10px 20px;
-  margin-top: auto;
   border-top: 1px solid var(--border-color);
+  margin-bottom: 0; /* Remove bottom margin */
 }
 
 /* Spell check toggle label */
@@ -16,30 +16,30 @@
   color: var(--text-color);
 }
 
-/* CSS to properly handle spell check underlines */
-[data-spellcheck="true"] .ql-editor:not(.modal .ql-editor) {
+/* CSS to properly handle spell check underlines for non-expanded notes only */
+[data-spellcheck="true"] .note:not(.expanded) .ql-editor {
   -webkit-spellcheck: true;
   -moz-spellcheck: true;
   spellcheck: true;
 }
 
-[data-spellcheck="false"] .ql-editor:not(.modal .ql-editor) {
+[data-spellcheck="false"] .note:not(.expanded) .ql-editor {
   -webkit-spellcheck: false;
   -moz-spellcheck: false;
   spellcheck: false;
 }
 
 /* Force different browsers to respect spellcheck setting changes */
-[data-spellcheck="true"] .ql-editor:not(.modal .ql-editor) {
+[data-spellcheck="true"] .note:not(.expanded) .ql-editor {
   text-decoration-skip-ink: auto;
 }
 
-[data-spellcheck="false"] .ql-editor:not(.modal .ql-editor) {
+[data-spellcheck="false"] .note:not(.expanded) .ql-editor {
   text-decoration-skip-ink: none;
 }
 
 /* Ensure spell check underlines are visible when enabled */
-[data-spellcheck="true"] .ql-editor:not(.modal .ql-editor) ::spelling-error {
+[data-spellcheck="true"] .note:not(.expanded) .ql-editor ::spelling-error {
   text-decoration: wavy underline #e74c3c;
   text-decoration-skip-ink: none;
 }
@@ -53,6 +53,11 @@
   .spellcheck-label {
     font-size: 13px;
   }
+}
+
+/* Dark mode support */
+body.dark-mode .spellcheck-toggle {
+  border-color: var(--border-color);
 }
 
 /* Note: The switch styling is inherited from dark-mode.css */
