@@ -35,12 +35,13 @@ export function renderNotes() {
 
   if (notes.length === 0) {
     notesContainer.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">📝</div>
-        <div class="empty-message">No notes in this category</div>
-        <button class="empty-action" id="emptyAddNoteBtn">Create a note</button>
-      </div>
-    `;
+<div class="empty-state">
+  <div class="empty-icon">📝</div>
+  <div class="empty-message">No notes in this category</div>
+  <div>  </div>
+  <button class="empty-action" id="emptyAddNoteBtn">Create a note</button>
+</div>
+`;
     document
       .getElementById("emptyAddNoteBtn")
       .addEventListener("click", createNewNote);
@@ -78,19 +79,19 @@ export function renderNotes() {
       // Create placeholder with properly encoded content
       // Make sure to properly sanitize and encode HTML content to prevent XSS
       noteElement.innerHTML = `
-        <div class="note-content-placeholder" data-content="${encodeURIComponent(note.content || "")}"></div>
-        <div class="note-footer">
-          <div class="note-timestamp">${formattedDate}</div>
-          <div class="note-category" data-category-id="${categoryId || "null"}">
-            <div class="note-category-icon">${categoryIcon}</div>
-            <!-- <div class="note-category-name">${categoryName}</div>  -->
-          </div>
-        </div>
-        <button class="note-delete" title="Delete note">🗑️</button>
-        <div class="note-expand" title="Expand/collapse note">
-          <span class="expand-icon">⤢</span>
-        </div>
-      `;
+<div class="note-content-placeholder" data-content="${encodeURIComponent(note.content || "")}"></div>
+<div class="note-footer">
+  <div class="note-timestamp">${formattedDate}</div>
+  <div class="note-category" data-category-id="${categoryId || "null"}">
+    <div class="note-category-icon">${categoryIcon}</div>
+    <!-- <div class="note-category-name">${categoryName}</div>  -->
+  </div>
+</div>
+<button class="note-delete" title="Delete note">🗑️</button>
+<div class="note-expand" title="Expand/collapse note">
+  <span class="expand-icon">⤢</span>
+</div>
+`;
       fragment.appendChild(noteElement);
     });
 
@@ -215,30 +216,30 @@ export function renderCategories() {
   const customCategoriesHTML = categories
     .map(
       (category) => `
-    <div class="category${currentCategoryId === category.id.toString() ? " active" : ""}" data-id="${category.id}">
-      <div class="category-icon">${category.icon || "📁"}</div>
-      <div class="category-name">${category.name}</div>
-      <div class="category-controls">
-        <button class="btn-edit" title="Edit category">✏️</button>
-        <button class="btn-delete" title="Delete category">🗑️</button>
-      </div>
-    </div>
-  `,
+<div class="category${currentCategoryId === category.id.toString() ? " active" : ""}" data-id="${category.id}">
+<div class="category-icon">${category.icon || "📁"}</div>
+<div class="category-name">${category.name}</div>
+<div class="category-controls">
+<button class="btn-edit" title="Edit category">✏️</button>
+<button class="btn-delete" title="Delete category">🗑️</button>
+</div>
+</div>
+`,
     )
     .join("");
 
   // Update the existing system categories and add custom ones
   categoriesContainer.innerHTML = `
-    <div class="category${currentCategoryId === "all" ? " active" : ""}" data-id="all">
-      <div class="category-icon">📄</div>
-      <div class="category-name">All Notes</div>
-    </div>
-    <div class="category${currentCategoryId === "uncategorized" ? " active" : ""}" data-id="uncategorized">
-      <div class="category-icon">📌</div>
-      <div class="category-name">Uncategorized</div>
-    </div>
-    ${customCategoriesHTML}
-  `;
+<div class="category${currentCategoryId === "all" ? " active" : ""}" data-id="all">
+  <div class="category-icon">📄</div>
+  <div class="category-name">All Notes</div>
+</div>
+<div class="category${currentCategoryId === "uncategorized" ? " active" : ""}" data-id="uncategorized">
+  <div class="category-icon">📌</div>
+  <div class="category-name">Uncategorized</div>
+</div>
+${customCategoriesHTML}
+`;
 
   // Update current category label
   /*  if (currentCategoryId === 'all') {
@@ -338,31 +339,31 @@ export function toggleNoteExpansion(noteElement) {
 
     // Add inline styles to maximize size
     noteElement.style.cssText = `
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 95%;
-      max-width: 1200px;
-      height: 90%;
-      max-height: 900px;
-      z-index: 9001;
-      background-color: var(--surface-color);
-    `;
+position: fixed;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+width: 95%;
+max-width: 1200px;
+height: 90%;
+max-height: 900px;
+z-index: 9001;
+background-color: var(--surface-color);
+`;
 
     // Apply mobile styles if needed
     if (window.innerWidth <= 768) {
       noteElement.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        transform: none;
-        border-radius: 0;
-        z-index: 9001;
-        background-color: var(--surface-color);
-      `;
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+transform: none;
+border-radius: 0;
+z-index: 9001;
+background-color: var(--surface-color);
+`;
     }
 
     // Move to body to ensure proper positioning and z-index
