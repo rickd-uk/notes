@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const morgan = require("morgan");
 const history = require("connect-history-api-fallback");
 const path = require("path");
 require("dotenv").config();
@@ -30,6 +31,7 @@ const port = process.env.PORT || 3012;
 
 // Middleware
 app.use(cors());
+app.use(morgan("combined"));
 
 // Configure body parser with size limits
 // Set to 2MB to be more generous than frontend, but still protect the server
