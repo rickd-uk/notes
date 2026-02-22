@@ -255,7 +255,22 @@ body.dark-mode .delete-all-btn:hover {
         max-width: 50%; /* Prevent long names from overlapping buttons */
     }
 }
+/* Change Password Link */
+.change-password-link {
+    display: block;
+    text-align: center;
+    padding: 8px 0;
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 14px;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
 
+.change-password-link:hover {
+    opacity: 1;
+    text-decoration: underline;
+}
 
 /* User info and username display in header */
 .user-info {

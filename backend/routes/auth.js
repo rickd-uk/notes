@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const db = require("../db");
+const { authenticate } = require("../middleware/auth");
 const router = express.Router();
 require("dotenv").config();
 
@@ -10,8 +11,15 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const ADMIN_USERNAME = process.env.AUTH_USERNAME;
 const ADMIN_PASSWORD_HASH = process.env.AUTH_PASSWORD_HASH;
 
+const SIGNUPS_ENABLED = process.env.SIGNUPS_ENABLED !== "false";
+
 // Register a new user
 router.post("/register", async (req, res) => {
+  if (!SIGNUPS_ENABLED) {
+    return res
+      .status(403)
+      .json({ error: "Signups are currently not allowed." });
+  }
   try {
     const { username, email, password } = req.body;
 
@@ -211,6 +219,89 @@ router.post("/login", async (req, res) => {
   } catch (error) {
     console.error("Login error:", error);
     return res.status(500).json({ error: "Server error during login" });
+  }
+});
+
+// Change password route (requires authentication)
+router.post("/change-password", authenticate, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  const userId = req.user.userId;
+
+  // Validate inputs
+  if (!currentPassword || !newPassword) {
+    return res
+      .status(400)
+      .json({ error: "Current password and new password are required" });
+  }
+
+  if (newPassword.length < 8) {
+    return res
+      .status(400)
+      .json({ error: "New password must be at least 8 characters long" });
+  }
+
+  const pepper = process.env.BCRYPT_PEPPER;
+  if (!pepper) {
+    console.error(
+      "CRITICAL: BCRYPT_PEPPER is not set. Halting password change.",
+    );
+    return res.status(500).json({ error: "Server security misconfiguration" });
+  }
+
+  try {
+    // Handle admin user from .env (cannot change password this way)
+    if (userId === "admin") {
+      return res.status(403).json({
+        error:
+          "Admin password is configured in .env file and cannot be changed here",
+      });
+    }
+
+    // Get user from database
+    const result = await db.query("SELECT * FROM users WHERE id = $1", [
+      userId,
+    ]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const user = result.rows[0];
+
+    // Verify current password
+    const currentPasswordWithPepper = currentPassword + pepper;
+    const passwordMatch = await bcrypt.compare(
+      currentPasswordWithPepper,
+      user.password_hash,
+    );
+
+    if (!passwordMatch) {
+      return res.status(401).json({ error: "Current password is incorrect" });
+    }
+
+    // Hash the new password
+    const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS, 10) || 12;
+    const newPasswordWithPepper = newPassword + pepper;
+    const newPasswordHash = await bcrypt.hash(
+      newPasswordWithPepper,
+      saltRounds,
+    );
+
+    // Update password in database
+    await db.query("UPDATE users SET password_hash = $1 WHERE id = $2", [
+      newPasswordHash,
+      userId,
+    ]);
+
+    console.log(`Password changed for user: ${user.username}`);
+    return res.json({
+      success: true,
+      message: "Password changed successfully",
+    });
+  } catch (error) {
+    console.error("Password change error:", error);
+    return res
+      .status(500)
+      .json({ error: "Server error during password change" });
   }
 });
 
