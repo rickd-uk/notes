@@ -27,6 +27,21 @@ async function updateUsernameDisplay() {
       if (elements.usernameDisplay) {
         elements.usernameDisplay.textContent = `${user.username}`;
       }
+
+      // Show admin link for rick
+      if (user.isAdmin) {
+        const existing = document.getElementById('adminNavLink');
+        if (!existing) {
+          const link = document.createElement('a');
+          link.id = 'adminNavLink';
+          link.href = '/admin.html';
+          link.textContent = '⚙️ Admin';
+          link.style.cssText = 'font-size:12px;color:#7eb8f7;text-decoration:none;margin-left:8px;opacity:0.8;';
+          link.onmouseover = () => link.style.opacity = '1';
+          link.onmouseout = () => link.style.opacity = '0.8';
+          elements.usernameDisplay.parentElement.appendChild(link);
+        }
+      }
     } else {
       // If no user is found, redirect to login
       window.location.href = "/login.html";

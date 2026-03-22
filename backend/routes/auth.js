@@ -11,15 +11,16 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const ADMIN_USERNAME = process.env.AUTH_USERNAME;
 const ADMIN_PASSWORD_HASH = process.env.AUTH_PASSWORD_HASH;
 
-const SIGNUPS_ENABLED = process.env.SIGNUPS_ENABLED !== "false";
 
 // Register a new user
 router.post("/register", async (req, res) => {
-  if (!SIGNUPS_ENABLED) {
-    return res
-      .status(403)
-      .json({ error: "Signups are currently not allowed." });
-  }
+  const settingResult = await db.query(
+      "SELECT value FROM app_settings WHERE key = 'signups_enabled'"
+    );
+    const signupsEnabled = settingResult.rows.length === 0 || settingResult.rows[0].value === 'true';
+    if (!signupsEnabled) {
+      return res.status(403).json({ error: "Signups are currently not allowed." });
+    }
   try {
     const { username, email, password } = req.body;
 
@@ -190,6 +191,11 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
+    // Check if account is suspended
+    if (user.suspended) {
+      return res.status(403).json({ error: 'Account suspended' });
+    }
+
     // Update last login timestamp
     await db.updateUserLastLogin(user.id);
 
@@ -343,9 +349,13 @@ router.get("/me", async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
+    const dbUser = user.rows[0];
     return res.json({
       success: true,
-      user: user.rows[0],
+      user: {
+        ...dbUser,
+        isAdmin: dbUser.username === 'rick',
+      },
     });
   } catch (error) {
     console.error("Auth check error:", error);

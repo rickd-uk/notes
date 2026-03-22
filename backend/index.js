@@ -13,6 +13,7 @@ const db = require("./db");
 const authRoutes = require("./routes/auth");
 const notesRoutes = require("./routes/notes");
 const categoriesRoutes = require("./routes/categories");
+const adminRoutes = require("./routes/admin");
 
 // Import middleware
 const { handlePayloadTooLarge } = require("./middleware/contentSizeValidator");
@@ -58,6 +59,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/notes", notesRoutes);
 app.use("/api/categories", categoriesRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Error handling middleware for payload too large
 app.use(handlePayloadTooLarge);

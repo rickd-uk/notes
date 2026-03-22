@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f1e; color: #ddd; min-height: 100vh; }
+
+    /* Top navbar */
+    .admin-nav { background: #1a1a2e; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2a2a4a; }
+    .admin-nav h1 { font-size: 16px; font-weight: 600; color: #eee; }
+    .admin-nav a { color: #7eb8f7; text-decoration: none; font-size: 13px; }
+    .admin-nav a:hover { text-decoration: underline; }
+
+    /* Layout */
+    .admin-layout { display: grid; grid-template-columns: 200px 1fr; min-height: calc(100vh - 45px); }
+
+    /* Sidebar */
+    .admin-sidebar { background: #12122a; border-right: 1px solid #2a2a4a; padding: 16px 0; }
+    .sidebar-section-label { padding: 8px 16px 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #555; }
+    .sidebar-item { padding: 9px 16px; font-size: 13px; color: #aaa; cursor: pointer; border-left: 3px solid transparent; transition: background 0.15s; }
+    .sidebar-item:hover { background: #1a1a3a; color: #ddd; }
+    .sidebar-item.active { background: #1e1e3f; color: #7eb8f7; border-left-color: #7eb8f7; }
+
+    /* Main content */
+    .admin-content { padding: 24px; overflow-y: auto; }
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* Cards */
+    .stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .stat-card { background: #1a1a35; border: 1px solid #2a2a5a; border-radius: 6px; padding: 16px; text-align: center; }
+    .stat-card .value { font-size: 28px; font-weight: bold; color: #7eb8f7; }
+    .stat-card .label { font-size: 11px; color: #888; margin-top: 4px; }
+    .stat-card.green .value { color: #a8e6cf; }
+    .stat-card.red .value { color: #f78; }
+
+    /* Tables */
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .admin-table th { padding: 8px 10px; text-align: left; color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #2a2a4a; }
+    .admin-table td { padding: 8px 10px; border-bottom: 1px solid #1a1a2e; vertical-align: middle; }
+    .admin-table tr:hover td { background: #1a1a2e; }
+
+    /* Badges */
+    .badge { display: inline-block; padding: 2px 7px; border-radius: 3px; font-size: 10px; font-weight: 600; }
+    .badge.active { background: #1a2540; color: #7eb8f7; }
+    .badge.suspended { background: #2a1a1a; color: #f78; }
+    .badge.admin { background: #1a3520; color: #a8e6cf; }
+
+    /* Buttons */
+    .btn { padding: 4px 10px; border: none; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: 500; transition: opacity 0.15s; }
+    .btn:hover { opacity: 0.8; }
+    .btn:disabled { opacity: 0.4; cursor: default; }
+    .btn-danger { background: #2a1a1a; color: #f78; }
+    .btn-warn { background: #2a2a1a; color: #fa8; }
+    .btn-success { background: #1a3520; color: #a8e6cf; }
+    .btn-primary { background: #1e2a4a; color: #7eb8f7; }
+    .btn-lg { padding: 8px 20px; font-size: 13px; }
+
+    /* Toggle */
+    .toggle-row { display: flex; align-items: center; gap: 16px; padding: 16px; background: #1a1a35; border-radius: 6px; margin-bottom: 16px; }
+    .toggle { position: relative; width: 44px; height: 24px; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; inset: 0; background: #333; border-radius: 24px; cursor: pointer; transition: 0.2s; }
+    .toggle-slider:before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.2s; }
+    input:checked + .toggle-slider { background: #4caf50; }
+    input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+    /* Logs */
+    .log-pre { background: #0a0a18; border: 1px solid #2a2a4a; border-radius: 4px; padding: 12px; font-family: monospace; font-size: 11px; line-height: 1.5; overflow-y: auto; max-height: 500px; color: #aaa; white-space: pre-wrap; word-break: break-all; }
+
+    /* Section header */
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .section-title { font-size: 16px; font-weight: 600; color: #eee; }
+
+    /* Form elements */
+    input.admin-input { background: #1a1a35; border: 1px solid #3a3a6a; color: #eee; padding: 6px 10px; border-radius: 4px; font-size: 13px; width: 200px; }
+    input.admin-input:focus { outline: none; border-color: #7eb8f7; }
+
+    /* Modal */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: #1a1a35; border: 1px solid #3a3a6a; border-radius: 8px; padding: 24px; min-width: 320px; }
+    .modal h3 { margin-bottom: 12px; color: #eee; }
+    .modal-actions { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
+
+    /* Info table */
+    .info-table { width: 100%; border-collapse: collapse; }
+    .info-table td { padding: 10px 12px; border-bottom: 1px solid #1a1a2e; font-size: 13px; }
+    .info-table td:first-child { color: #888; width: 200px; }
+    .info-table td:last-child { color: #eee; }
+
+    /* Pagination */
+    .pagination { display: flex; gap: 8px; margin-top: 16px; align-items: center; font-size: 13px; color: #888; }
+    .pagination button { background: #1a1a35; border: 1px solid #3a3a6a; color: #aaa; padding: 4px 10px; border-radius: 3px; cursor: pointer; }
+    .pagination button:disabled { opacity: 0.4; cursor: default; }
+    .pagination button:hover:not(:disabled) { border-color: #7eb8f7; color: #7eb8f7; }
+  </style>
+</head>
+<body>
+
+<nav class="admin-nav">
+  <h1>⚙️ Admin Panel</h1>
+  <div style="display:flex;gap:16px;align-items:center">
+    <span id="adminUsername" style="font-size:13px;color:#888;"></span>
+    <a href="/">← Back to Notes</a>
+  </div>
+</nav>
+
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="sidebar-section-label">System</div>
+    <div class="sidebar-item active" data-section="dashboard">📊 Dashboard</div>
+    <div class="sidebar-item" data-section="signup">🔒 Signup Toggle</div>
+    <div class="sidebar-item" data-section="server">🖥️ Server Info</div>
+    <div class="sidebar-item" data-section="logs">📋 Access Logs</div>
+    <div class="sidebar-item" data-section="backup">💾 DB Backup</div>
+    <div class="sidebar-section-label" style="margin-top:8px">Users</div>
+    <div class="sidebar-item" data-section="users">👥 User List</div>
+    <div class="sidebar-section-label" style="margin-top:8px">Content</div>
+    <div class="sidebar-item" data-section="notes">📝 Note Moderation</div>
+  </aside>
+
+  <main class="admin-content">
+
+    <!-- Dashboard -->
+    <div id="section-dashboard" class="section active">
+      <div class="section-header"><span class="section-title">Dashboard</span></div>
+      <div class="stat-cards" id="dashboardCards">
+        <div class="stat-card"><div class="value" id="statUsers">—</div><div class="label">Total Users</div></div>
+        <div class="stat-card"><div class="value" id="statNotes">—</div><div class="label">Total Notes</div></div>
+        <div class="stat-card green" id="statSignupCard"><div class="value" id="statSignup">—</div><div class="label">Signups</div></div>
+      </div>
+    </div>
+
+    <!-- Signup Toggle -->
+    <div id="section-signup" class="section">
+      <div class="section-header"><span class="section-title">Signup Toggle</span></div>
+      <div class="toggle-row">
+        <label class="toggle">
+          <input type="checkbox" id="signupToggle" onchange="handleSignupToggle(this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+        <div>
+          <div id="signupToggleLabel" style="color:#eee;font-size:14px;">Loading...</div>
+          <div style="color:#888;font-size:12px;margin-top:2px;">Controls whether new users can register</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Server Info -->
+    <div id="section-server" class="section">
+      <div class="section-header"><span class="section-title">Server Info</span></div>
+      <table class="info-table" id="serverInfoTable"><tbody></tbody></table>
+    </div>
+
+    <!-- Logs -->
+    <div id="section-logs" class="section">
+      <div class="section-header">
+        <span class="section-title">Access Logs</span>
+        <button class="btn btn-primary" onclick="loadLogs()">↻ Refresh</button>
+      </div>
+      <pre class="log-pre" id="logOutput">Loading...</pre>
+    </div>
+
+    <!-- Backup -->
+    <div id="section-backup" class="section">
+      <div class="section-header"><span class="section-title">Database Backup</span></div>
+      <div style="background:#1a1a35;border-radius:6px;padding:20px;max-width:400px;">
+        <p style="color:#aaa;font-size:13px;margin-bottom:16px;">Creates a plain SQL dump of the entire database, saved to the <code style="color:#7eb8f7">backups/</code> directory on the server.</p>
+        <button class="btn btn-primary btn-lg" id="backupBtn" onclick="runBackup()">💾 Create Backup Now</button>
+        <div id="backupStatus" style="margin-top:12px;font-size:13px;color:#888;"></div>
+      </div>
+    </div>
+
+    <!-- Users -->
+    <div id="section-users" class="section">
+      <div class="section-header"><span class="section-title">Users</span></div>
+      <table class="admin-table">
+        <thead><tr>
+          <th>Username</th><th>Email</th><th>Notes</th><th>Last Login</th><th>Status</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="usersTableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Notes -->
+    <div id="section-notes" class="section">
+      <div class="section-header"><span class="section-title">Note Moderation</span></div>
+      <table class="admin-table">
+        <thead><tr>
+          <th>User</th><th>Preview</th><th>Created</th><th>Action</th>
+        </tr></thead>
+        <tbody id="notesTableBody"></tbody>
+      </table>
+      <div class="pagination" id="notesPagination"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Modals -->
+<div class="modal-overlay" id="renameModal">
+  <div class="modal">
+    <h3>Rename User</h3>
+    <input class="admin-input" id="renameInput" placeholder="New username" style="width:100%">
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="closeModal('renameModal')">Cancel</button>
+      <button class="btn btn-warn" onclick="submitRename()">Rename</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="resetPasswordModal">
+  <div class="modal">
+    <h3>Reset Password</h3>
+    <input class="admin-input" type="password" id="resetPasswordInput" placeholder="New password (min 8 chars)" style="width:100%">
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="closeModal('resetPasswordModal')">Cancel</button>
+      <button class="btn btn-warn" onclick="submitResetPassword()">Reset</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <h3 id="confirmTitle">Confirm</h3>
+    <p id="confirmMessage" style="color:#aaa;font-size:13px;margin-top:8px;"></p>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="closeModal('confirmModal')">Cancel</button>
+      <button class="btn btn-danger" id="confirmOkBtn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="js/admin.js"></script>
+</body>
+</html>
