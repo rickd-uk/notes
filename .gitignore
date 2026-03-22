@@ -23,8 +23,15 @@ build/
 # you might want to commit a default config and ignore the local one.
 frontend/config.local.json
 
-# Backup files
+# Backup files (but not init-db migrations)
 *.sql
+!init-db/*.sql
+
+# Git worktrees
+.worktrees/
+
+# Superpowers brainstorm sessions
+.superpowers/
 
 # NPM/Node temporary files
 backend/11.5.2
