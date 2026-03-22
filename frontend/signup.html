@@ -48,6 +48,9 @@
       <div class="login-form">
         <h1 class="login-title">Create Account</h1>
         <div class="login-error" id="signupError"></div>
+        <div id="signupsDisabledMsg" style="display:none;text-align:center;padding:20px 0;color:#888;">
+          Signups are currently disabled. Please contact the administrator.
+        </div>
         <form id="signupForm" onsubmit="return false;">
           <input
             type="text"
@@ -205,8 +208,25 @@
           }
         });
 
+        // Check if signups are enabled
+        const checkSignupsEnabled = async () => {
+          try {
+            const response = await fetch("/api/auth/signup-status");
+            if (response.ok) {
+              const data = await response.json();
+              if (!data.signupsEnabled) {
+                document.getElementById("signupForm").style.display = "none";
+                document.getElementById("signupsDisabledMsg").style.display = "block";
+              }
+            }
+          } catch (error) {
+            // If check fails, leave the form visible
+          }
+        };
+
         // Check if already authenticated
         checkAuth();
+        checkSignupsEnabled();
       });
     </script>
   </body>

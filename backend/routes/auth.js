@@ -12,6 +12,20 @@ const ADMIN_USERNAME = process.env.AUTH_USERNAME;
 const ADMIN_PASSWORD_HASH = process.env.AUTH_PASSWORD_HASH;
 
 
+// Public: check if signups are currently enabled
+router.get("/signup-status", async (req, res) => {
+  try {
+    const result = await db.query(
+      "SELECT value FROM app_settings WHERE key = 'signups_enabled'"
+    );
+    const signupsEnabled = result.rows.length === 0 || result.rows[0].value === 'true';
+    res.json({ signupsEnabled });
+  } catch (err) {
+    // Default to enabled if DB error
+    res.json({ signupsEnabled: true });
+  }
+});
+
 // Register a new user
 router.post("/register", async (req, res) => {
   const settingResult = await db.query(
