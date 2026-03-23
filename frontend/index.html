@@ -69,6 +69,7 @@
     <link rel="stylesheet" href="css/spellcheck-toggle.css" />
     <link rel="stylesheet" href="css/multi-category-modal.css" />
     <link rel="stylesheet" href="css/note-controls.css" />
+    <link rel="stylesheet" href="css/settings-modal.css" />
   </head>
   <body>
     <div class="sidebar">
@@ -78,56 +79,45 @@
 
          -->
       </div>
-      <div class="categories">
-        <div class="category active" data-id="all">
-          <div class="category-icon">📄</div>
-          <div class="category-name">All Notes</div>
+      <div class="sidebar-scrollable">
+        <div class="categories">
+          <div class="category active" data-id="all">
+            <div class="category-icon">📄</div>
+            <div class="category-name">All Notes</div>
+          </div>
+          <div class="category" data-id="uncategorized">
+            <div class="category-icon">📌</div>
+            <div class="category-name">Uncategorized</div>
+          </div>
+          <!-- Custom categories will be added here -->
         </div>
-        <div class="category" data-id="uncategorized">
-          <div class="category-icon">📌</div>
-          <div class="category-name">Uncategorized</div>
+        <div class="add-category">
+          <button class="add-category-btn" id="addCategoryBtn">
+            + Add Category
+          </button>
         </div>
-        <!-- Custom categories will be added here -->
-      </div>
-      <div class="add-category">
-        <button class="add-category-btn" id="addCategoryBtn">
-          + Add Category
-        </button>
-      </div>
 
-      <!-- Toolbar Toggle (Main Page Only) -->
-      <div class="toolbar-toggle">
-        <span class="toolbar-label">Toolbar</span>
-        <label class="switch">
-          <input type="checkbox" id="sidebarToolbarToggle" />
-          <span class="slider"></span>
-        </label>
-      </div>
+        <!-- Toolbar Toggle (Main Page Only) -->
+        <div class="toolbar-toggle">
+          <span class="toolbar-label">Toolbar</span>
+          <label class="switch">
+            <input type="checkbox" id="sidebarToolbarToggle" />
+            <span class="slider"></span>
+          </label>
+        </div>
 
-      <!-- Spell Check Toggle (Main Page Only) -->
-      <div class="spellcheck-toggle">
-        <span class="spellcheck-label">Spell Check</span>
-        <label class="switch">
-          <input type="checkbox" id="sidebarSpellCheckToggle" />
-          <span class="slider"></span>
-        </label>
-      </div>
-
-      <div class="dark-mode-toggle">
-        <span class="dark-mode-label">
-          <span class="theme-icon-light">☀️ Light</span>
-          <span class="theme-icon-dark">🌙 Dark</span>
-        </span>
-        <label class="switch">
-          <input type="checkbox" id="darkModeToggle" />
-          <span class="slider"></span>
-        </label>
+        <!-- Spell Check Toggle (Main Page Only) -->
+        <div class="spellcheck-toggle">
+          <span class="spellcheck-label">Spell Check</span>
+          <label class="switch">
+            <input type="checkbox" id="sidebarSpellCheckToggle" />
+            <span class="slider"></span>
+          </label>
+        </div>
       </div>
       <div class="sidebar-footer">
-        <a href="/change-password.html" class="change-password-link"
-          >Change Password</a
-        >
         <button id="logoutBtn" class="logout-btn">Logout</button>
+        <button id="settingsBtn" class="settings-btn" title="Settings">⚙</button>
       </div>
     </div>
 
@@ -296,6 +286,41 @@
           <button class="modal-btn modal-btn-delete" id="confirmDeleteBtn">
             Delete All
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+      <div class="modal-content">
+        <div class="modal-drag-handle"></div>
+        <div class="settings-modal-header">
+          <span class="settings-modal-title">⚙ Settings</span>
+          <button class="settings-modal-close" id="settingsModalCloseBtn">✕</button>
+        </div>
+
+        <!-- Appearance -->
+        <div class="settings-section">
+          <div class="settings-section-label">Appearance</div>
+          <div class="settings-row">
+            <span>🌙 Dark Mode</span>
+            <label class="switch">
+              <input type="checkbox" id="darkModeToggle" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Account -->
+        <div class="settings-section">
+          <div class="settings-section-label">Account</div>
+          <a href="/change-password.html" class="settings-link-btn">🔑 Change Password</a>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="settings-section">
+          <div class="settings-section-label" style="color: #f44336;">Danger Zone</div>
+          <button id="deleteAllCategoriesBtn" class="settings-danger-btn">🗑 Delete All Categories</button>
         </div>
       </div>
     </div>
