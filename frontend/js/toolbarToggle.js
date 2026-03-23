@@ -122,43 +122,11 @@ function createMainViewToggles() {
   controlsContainer.className = "header-controls-group";
   controlsContainer.id = "headerControlsGroup";
 
-  const toolbarToggle = document.createElement("button");
-  toolbarToggle.id = "mainToolbarToggle";
-  toolbarToggle.className = `header-control-btn ${toolbarsVisible ? "active" : ""}`;
-  toolbarToggle.title = "Toggle Formatting Toolbar";
-  toolbarToggle.innerHTML = '<span style="font-weight: bold;">T</span>';
-  toolbarToggle.addEventListener("click", () => toggleToolbars());
-  controlsContainer.appendChild(toolbarToggle);
-  console.log("[toolbarToggle.js] Main Toolbar Toggle button created.");
-
   import("./noteControls.js")
     .then((module) => {
       console.log(
         "[toolbarToggle.js] noteControls.js module dynamically imported.",
       );
-
-      const spellCheckToggle = document.createElement("button");
-      spellCheckToggle.id = "mainSpellCheckToggle";
-      // Check if isSpellCheckEnabled function exists before calling
-      const currentSpellCheckState =
-        typeof module.isSpellCheckEnabled === "function"
-          ? module.isSpellCheckEnabled()
-          : false;
-      spellCheckToggle.className = `header-control-btn ${currentSpellCheckState ? "active" : ""}`;
-      spellCheckToggle.title = "Toggle Spell Check";
-      spellCheckToggle.innerHTML = '<span style="font-weight: bold;">Aa</span>';
-      spellCheckToggle.addEventListener("click", () => {
-        if (typeof module.toggleSpellCheck === "function") {
-          const newState = module.toggleSpellCheck();
-          spellCheckToggle.classList.toggle("active", newState);
-        } else {
-          console.warn(
-            "[toolbarToggle.js] toggleSpellCheck function not found in noteControls module.",
-          );
-        }
-      });
-      controlsContainer.appendChild(spellCheckToggle);
-      console.log("[toolbarToggle.js] Spell Check Toggle button created.");
 
       const searchButton = document.createElement("button");
       searchButton.id = "searchButton";

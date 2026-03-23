@@ -308,6 +308,16 @@
     <!-- Quill.js JavaScript -->
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
+    <!-- Set sidebar toggle states immediately from localStorage to prevent animation flicker on load -->
+    <script>
+      (function () {
+        var tb = document.getElementById('sidebarToolbarToggle');
+        var sc = document.getElementById('sidebarSpellCheckToggle');
+        if (tb) tb.checked = localStorage.getItem('toolbarsVisible') === 'true';
+        if (sc) sc.checked = localStorage.getItem('spellCheckEnabled') === 'true';
+      })();
+    </script>
+
     <!-- App JavaScript -->
     <script type="module" src="js/searchNotes.js"></script>
     <script type="module" src="js/sortNotes.js"></script>
