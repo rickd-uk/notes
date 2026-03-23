@@ -26,7 +26,7 @@ import { hideAllNoteButtons, recreateAllNoteButtons } from "./uiUtils.js";
 import { showNoteCategoryModal } from "./noteCategoryManager.js";
 
 // Render notes in the UI
-export function renderNotes() {
+export async function renderNotes() {
   // Clear existing Quill editors
   clearQuillEditors();
 
@@ -52,9 +52,12 @@ export function renderNotes() {
 
     notes.forEach((note) => {
       const noteElement = document.createElement("div");
-      noteElement.className = "note" + (note.read_only ? " note--locked" : "");
+      noteElement.className = 'note'
+        + (note.read_only ? ' note--locked' : '')
+        + (note.encrypted ? ' note--encrypted' : '');
       noteElement.dataset.id = note.id;
       noteElement.dataset.readOnly = note.read_only ? "true" : "false";
+      noteElement.dataset.encrypted = note.encrypted ? 'true' : 'false';
 
       const date = new Date(note.updated_at);
       const formattedDate = date.toLocaleString(undefined, {
@@ -88,7 +91,8 @@ export function renderNotes() {
     <div class="note-category-icon">${categoryIcon}</div>
   </div>
 </div>
-${note.read_only ? '<div class="note-lock-badge" title="Read-only">🔒</div>' : ""}
+${note.read_only && !note.encrypted ? '<div class="note-lock-badge" title="Read-only">🔒</div>' : ''}
+${note.encrypted ? '<div class="note-lock-badge" title="Encrypted">🔐</div>' : ''}
 <button class="note-delete" title="Delete note">🗑️</button>
 <div class="note-expand" title="Expand/collapse note">
   <span class="expand-icon">⤢</span>
@@ -102,14 +106,25 @@ ${note.read_only ? '<div class="note-lock-badge" title="Read-only">🔒</div>' :
     notesContainer.appendChild(fragment);
 
     // Initialize Quill editors for each note
-    document.querySelectorAll(".note").forEach((noteElement) => {
+    for (const noteElement of document.querySelectorAll(".note")) {
       const noteId = noteElement.dataset.id;
       const placeholder = noteElement.querySelector(
         ".note-content-placeholder",
       );
-      const content = placeholder
-        ? decodeURIComponent(placeholder.dataset.content)
-        : "";
+      let content = placeholder ? decodeURIComponent(placeholder.dataset.content) : '';
+
+      if (noteElement.dataset.encrypted === 'true') {
+        // Dynamic import to avoid circular dependency risk
+        const { isUnlocked, decryptNoteContent } = await import('./encryptionManager.js');
+        if (isUnlocked()) {
+          const decrypted = await decryptNoteContent(content);
+          content = decrypted || '<p><em>Decryption failed</em></p>';
+          noteElement.dataset.encryptedContent = placeholder?.dataset.content || '';
+        } else {
+          content = '<p style="opacity:0.4;font-style:italic">🔐 Encrypted — expand and unlock to view</p>';
+          noteElement.dataset.encryptedContent = placeholder?.dataset.content || '';
+        }
+      }
 
       // Create Quill editor for this note
       createQuillEditor(noteElement, noteId, content);
@@ -139,7 +154,7 @@ ${note.read_only ? '<div class="note-lock-badge" title="Read-only">🔒</div>' :
           showNoteCategoryModal(noteId);
         });
       }
-    });
+    }
   }
 
   // Fix for delete button position

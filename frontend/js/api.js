@@ -26,7 +26,7 @@ export async function loadNotes() {
   const cachedNotes = getCachedNotes(currentCategoryId);
   if (cachedNotes) {
     setNotes(cachedNotes);
-    renderNotes();
+    await renderNotes();
   }
 
   // Show loading indicator if no cached data
@@ -74,7 +74,7 @@ export async function loadNotes() {
         window.applySortAfterLoad();
       }
 
-      renderNotes();
+      await renderNotes();
     }
 
     // Update the cache with fresh data

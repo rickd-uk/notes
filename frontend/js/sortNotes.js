@@ -36,7 +36,7 @@ function updateButtonAppearance() {
  * Sort the notes based on date and update UI
  * @param {boolean} oldestFirstParam - true to sort oldest first, false for newest first
  */
-function sortAndRenderNotes(oldestFirstParam) {
+async function sortAndRenderNotes(oldestFirstParam) {
   console.log(
     `[sortNotes.js] sortAndRenderNotes called. Oldest first: ${oldestFirstParam}`,
   );
@@ -49,7 +49,7 @@ function sortAndRenderNotes(oldestFirstParam) {
   });
 
   setNotes(notesToSort); // Update the state with sorted notes
-  renderNotes(); // Re-render the UI
+  await renderNotes(); // Re-render the UI
 
   // Update the global state variable after sorting
   sortOldestFirst = oldestFirstParam;
