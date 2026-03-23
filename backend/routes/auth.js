@@ -355,7 +355,7 @@ router.get("/me", async (req, res) => {
 
     // For regular users, get fresh data from database
     const user = await db.query(
-      "SELECT id, username, email, created_at, last_login FROM users WHERE id = $1",
+      "SELECT id, username, email, created_at, last_login, has_encryption_password FROM users WHERE id = $1",
       [decoded.userId],
     );
 
@@ -374,6 +374,70 @@ router.get("/me", async (req, res) => {
   } catch (error) {
     console.error("Auth check error:", error);
     return res.status(401).json({ error: "Invalid token" });
+  }
+});
+
+// Get encryption setup info (salt + verifiers + flag) — no plaintext keys sent
+router.get('/encryption-setup', authenticate, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    if (userId === 'admin') return res.json({ has_encryption_password: false });
+    const result = await db.query(
+      `SELECT encryption_salt, encryption_verifier, encryption_recovery_verifier,
+              has_encryption_password FROM users WHERE id = $1`,
+      [userId]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ error: 'User not found' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Set encryption password (client sends salt + verifiers, never the password)
+router.post('/encryption-password', authenticate, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    if (userId === 'admin') return res.status(403).json({ error: 'Not supported for admin' });
+    const { salt, verifier, recovery_verifier } = req.body;
+    if (!salt || !verifier || !recovery_verifier) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+    await db.query(
+      `UPDATE users SET
+        encryption_salt = $1,
+        encryption_verifier = $2,
+        encryption_recovery_verifier = $3,
+        has_encryption_password = true
+       WHERE id = $4`,
+      [salt, verifier, recovery_verifier, userId]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Remove encryption password
+router.delete('/encryption-password', authenticate, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    if (userId === 'admin') return res.status(403).json({ error: 'Not supported for admin' });
+    await db.query(
+      `UPDATE users SET
+        encryption_salt = NULL,
+        encryption_verifier = NULL,
+        encryption_recovery_verifier = NULL,
+        has_encryption_password = false
+       WHERE id = $1`,
+      [userId]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
