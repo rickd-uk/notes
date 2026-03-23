@@ -1,394 +1,366 @@
-// frontend/js/searchNotes.js
+// searchNotes.js - Live search with floating results panel
 import { getNotes } from "./state.js";
-import { renderNotes } from "./ui.js"; // Assuming this is used by your search/modal logic
-import { showToast } from "./uiUtils.js"; // Assuming this is used
+import { renderNotes } from "./ui.js";
 
-// Keep track of search state
 let currentSearchTerm = "";
 let originalNotes = null;
+let selectedIndex = -1;
+let showMoreContext = false;
 
-/**
- * Search notes by content
- * @param {string} searchTerm - The term to search for
- * @returns {Array} - Filtered notes
- */
-function searchNotes(searchTerm) {
-  const allNotes = getNotes();
-  if (!searchTerm || searchTerm.trim() === "") {
-    return allNotes;
-  }
-  const normalizedTerm = searchTerm.toLowerCase().trim();
-  return allNotes.filter((note) => {
-    const content = note.content || "";
-    const plainContent = content.replace(/<[^>]*>/g, " ");
-    return plainContent.toLowerCase().includes(normalizedTerm);
-  });
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function getPlainText(html) {
+  return (html || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 
-/**
- * Create a search modal
- */
-function createSearchModal() {
-  if (document.getElementById("searchModal")) {
-    return document.getElementById("searchModal");
-  }
-
-  const modal = document.createElement("div");
-  modal.id = "searchModal";
-  modal.className = "modal";
-
-  const modalContent = document.createElement("div");
-  modalContent.className = "modal-content";
-
-  const header = document.createElement("div");
-  header.className = "modal-header";
-  header.textContent = "Search Notes";
-
-  const searchInput = document.createElement("input");
-  searchInput.type = "text";
-  searchInput.className = "modal-input";
-  searchInput.id = "searchInput";
-  searchInput.placeholder = "Type to search...";
-
-  const searchCount = document.createElement("div");
-  searchCount.id = "searchCount";
-  searchCount.style.fontSize = "14px";
-  searchCount.style.margin = "10px 0";
-  searchCount.textContent = "";
-
-  const actions = document.createElement("div");
-  actions.className = "modal-actions";
-
-  const cancelButton = document.createElement("button");
-  cancelButton.className = "modal-btn modal-btn-cancel";
-  cancelButton.textContent = "Cancel";
-
-  const performSearchButton = document.createElement("button"); // Renamed to avoid conflict if 'searchButton' is specific
-  performSearchButton.className = "modal-btn modal-btn-confirm";
-  performSearchButton.textContent = "Search";
-
-  actions.appendChild(cancelButton);
-  actions.appendChild(performSearchButton);
-
-  modalContent.appendChild(header);
-  modalContent.appendChild(searchInput);
-  modalContent.appendChild(searchCount);
-  modalContent.appendChild(actions);
-
-  modal.appendChild(modalContent);
-  document.body.appendChild(modal);
-
-  cancelButton.addEventListener("click", () => closeSearch(true)); // Pass true to clear search
-
-  performSearchButton.addEventListener("click", () => {
-    const term = searchInput.value;
-    performSearch(term);
-  });
-
-  let typingTimer;
-  searchInput.addEventListener("input", () => {
-    clearTimeout(typingTimer);
-    typingTimer = setTimeout(() => {
-      const term = searchInput.value;
-      updateSearchCount(term);
-    }, 300);
-  });
-
-  searchInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-      const term = searchInput.value;
-      performSearch(term);
-    }
-  });
-
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) {
-      closeSearch(true); // Pass true to clear search
-    }
-  });
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && modal.classList.contains("active")) {
-      closeSearch(true); // Pass true to clear search
-    }
-  });
-
-  return modal;
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
 
-/**
- * Update the search count display
- * @param {string} term - Search term
- */
-function updateSearchCount(term) {
-  const searchCountEl = document.getElementById("searchCount"); // Renamed variable
-  if (!searchCountEl) return;
-
-  if (!term || term.trim() === "") {
-    searchCountEl.textContent = "";
-    return;
-  }
-
-  const matchCount = searchNotes(term).length;
-  const totalCount = getNotes().length; // Assuming getNotes() gives all notes before filtering
-
-  searchCountEl.textContent = `Found ${matchCount} match${matchCount !== 1 ? "es" : ""} out of ${totalCount} note${totalCount !== 1 ? "s" : ""}`;
+function highlight(plainText, term) {
+  const safe = escapeHtml(plainText);
+  if (!term) return safe;
+  const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return safe.replace(new RegExp(`(${escaped})`, "gi"), "<mark>$1</mark>");
 }
 
-/**
- * Show the search modal
- */
-function showSearch() {
-  console.log("[searchNotes.js] showSearch called");
-  const modal = createSearchModal(); // Ensure modal is created if not exists
-  modal.classList.add("active");
-
-  setTimeout(() => {
-    const searchInput = document.getElementById("searchInput");
-    if (searchInput) {
-      searchInput.focus();
-      if (currentSearchTerm) {
-        searchInput.value = currentSearchTerm;
-        updateSearchCount(currentSearchTerm);
-      } else {
-        searchInput.value = ""; // Clear previous term if not restoring
-        updateSearchCount(""); // Clear count
-      }
-    }
-  }, 100); // Short delay for modal animation and focus
+function getPreview(note, expanded) {
+  const text = getPlainText(note.content);
+  if (!text) return "(empty note)";
+  return text.slice(0, expanded ? 220 : 90);
 }
 
-/**
- * Close the search modal and optionally clear search
- * @param {boolean} shouldClearSearch - Whether to clear the search results
- */
-function closeSearch(shouldClearSearch) {
-  console.log(
-    `[searchNotes.js] closeSearch called. shouldClearSearch: ${shouldClearSearch}`,
+function matchNotes(term) {
+  if (!term || !term.trim()) return [];
+  const lower = term.toLowerCase().trim();
+  return getNotes().filter(note =>
+    getPlainText(note.content).toLowerCase().includes(lower)
   );
-  const modal = document.getElementById("searchModal");
-  if (modal) {
-    modal.classList.remove("active");
-  }
-
-  if (shouldClearSearch && originalNotes && currentSearchTerm) {
-    console.log(
-      "[searchNotes.js] Clearing search and restoring original notes.",
-    );
-    restoreOriginalNotes();
-  } else if (shouldClearSearch) {
-    // If not restoring (e.g. modal closed without search), ensure search term is reset
-    currentSearchTerm = "";
-    originalNotes = null;
-  }
 }
 
-/**
- * Perform search on notes
- * @param {string} term - Search term
- */
-async function performSearch(term) {
-  // Made async to align with potential async operations in state/render
-  console.log(`[searchNotes.js] performSearch called with term: "${term}"`);
-  if (!originalNotes && (!currentSearchTerm || term !== currentSearchTerm)) {
-    // Store original notes only on a new search action
-    originalNotes = [...getNotes()]; // Get a fresh copy of all notes
-    console.log(
-      "[searchNotes.js] Stored original notes. Count:",
-      originalNotes.length,
-    );
-  }
-
-  currentSearchTerm = term.trim();
-
-  if (!currentSearchTerm) {
-    console.log(
-      "[searchNotes.js] Search term is empty. Restoring original notes.",
-    );
-    restoreOriginalNotes();
-    closeSearch(false); // Don't re-clear, already handled by restoreOriginalNotes
-    return;
-  }
-
-  const filteredNotes = searchNotes(currentSearchTerm);
-  console.log(`[searchNotes.js] Filtered notes count: ${filteredNotes.length}`);
-
-  try {
-    const stateModule = await import("./state.js");
-    stateModule.setNotes(filteredNotes); // Update state with filtered notes
-    renderNotes(); // Re-render the notes list with filtered notes
-
-    showToast(
-      `Showing ${filteredNotes.length} search result${filteredNotes.length !== 1 ? "s" : ""}`,
-    );
-    closeSearch(false); // Close modal, don't clear the active search results
-    addSearchIndicator(currentSearchTerm);
-  } catch (error) {
-    console.error(
-      "[searchNotes.js] Error during performSearch state update or render:",
-      error,
-    );
-  }
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+  return new Date(dateStr).toLocaleString(undefined, {
+    month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+  });
 }
 
-/**
- * Add a search indicator to the UI
- * @param {string} term - Search term
- */
-function addSearchIndicator(term) {
-  removeSearchIndicator(); // Remove any existing one
+// ── Panel ─────────────────────────────────────────────────────────────────────
 
-  const indicator = document.createElement("div");
-  indicator.id = "searchIndicator";
-  indicator.className = "search-indicator"; // For CSS styling
-  indicator.style.cssText = `
-        position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
-        background-color: var(--primary-color, #6200ee); color: white; padding: 8px 16px;
-        border-radius: 20px; font-size: 14px; z-index: 1001; display: flex;
-        align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);`;
+function createPanel() {
+  if (document.getElementById("liveSearchPanel")) return;
 
-  indicator.innerHTML = `
-        <span style="margin-right: 8px;">Search: "${term}"</span>
-        <button id="clearSearchBtnIndicator" style="background:none;border:none;color:white;cursor:pointer;font-weight:bold;font-size:16px;line-height:1;">✕</button>
-    `;
-  document.body.appendChild(indicator);
+  const panel = document.createElement("div");
+  panel.id = "liveSearchPanel";
+  panel.innerHTML = `
+    <div class="lsp-header">
+      <span class="lsp-icon">🔍</span>
+      <input id="lspInput" class="lsp-input" type="text"
+             placeholder="Search notes…" autocomplete="off" spellcheck="false" />
+      <button id="lspClose" class="lsp-close" title="Close">✕</button>
+    </div>
+    <label class="lsp-option">
+      <input type="checkbox" id="lspExpand" />
+      <span>Show more context</span>
+    </label>
+    <div id="lspResults" class="lsp-results"></div>
+  `;
+  document.body.appendChild(panel);
 
-  document
-    .getElementById("clearSearchBtnIndicator")
-    .addEventListener("click", () => {
-      console.log("[searchNotes.js] Clear search from indicator clicked.");
-      restoreOriginalNotes();
-      closeSearch(true); // Ensure modal is closed and state is reset
-    });
-}
+  const input = panel.querySelector("#lspInput");
+  const closeBtn = panel.querySelector("#lspClose");
+  const expandCheck = panel.querySelector("#lspExpand");
 
-/**
- * Remove search indicator from UI
- */
-function removeSearchIndicator() {
-  const indicator = document.getElementById("searchIndicator");
-  if (indicator) {
-    indicator.remove();
-  }
-}
+  let debounce;
+  input.addEventListener("input", () => {
+    clearTimeout(debounce);
+    debounce = setTimeout(() => renderResults(input.value), 180);
+  });
 
-/**
- * Restore original notes (before search filtering)
- */
-async function restoreOriginalNotes() {
-  // Made async
-  console.log("[searchNotes.js] restoreOriginalNotes called.");
-  if (originalNotes) {
-    try {
-      const stateModule = await import("./state.js");
-      stateModule.setNotes(originalNotes); // Restore notes in state
-      renderNotes(); // Re-render with original notes
-
-      originalNotes = null;
-      currentSearchTerm = "";
-      removeSearchIndicator();
-      console.log(
-        "[searchNotes.js] Original notes restored and search state reset.",
-      );
-    } catch (error) {
-      console.error(
-        "[searchNotes.js] Error during restoreOriginalNotes state update or render:",
-        error,
-      );
-    }
-  } else {
-    // If originalNotes is null, it might mean we need to reload all notes
-    // This case depends on how your application fetches notes initially
-    console.log(
-      "[searchNotes.js] No originalNotes to restore, current search term was likely empty or not set.",
-    );
-    currentSearchTerm = ""; // Ensure search term is cleared
-    removeSearchIndicator();
-  }
-}
-
-/**
- * Initialize search functionality by attaching event listener to the search button
- */
-function initSearchFunctionality() {
-  console.log(
-    "[searchNotes.js] Attempting to initialize search functionality (event listener setup)...",
-  );
-  const mainSearchButton = document.getElementById("searchButton"); // This is the button in the main header
-
-  if (!mainSearchButton) {
-    console.error(
-      '[searchNotes.js] Main search button (id="searchButton") NOT FOUND in the DOM even after uiControlsReady. Cannot attach listener.',
-    );
-    return;
-  }
-
-  console.log(
-    '[searchNotes.js] Main search button (id="searchButton") FOUND. Adding click listener.',
-  );
-  mainSearchButton.addEventListener(
-    "click",
-    (e) => {
+  input.addEventListener("keydown", e => {
+    const items = document.querySelectorAll(".lsp-item");
+    if (e.key === "ArrowDown") {
       e.preventDefault();
-      e.stopPropagation();
-      console.log("[searchNotes.js] Main search button clicked.");
-      showSearch(); // This function creates and shows the search modal
-    },
-    true,
-  ); // Use capture phase if needed, or false for bubbling
+      selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+      updateSelection(items);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      selectedIndex = Math.max(selectedIndex - 1, -1);
+      updateSelection(items);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (items[selectedIndex]) items[selectedIndex].click();
+    } else if (e.key === "Escape") {
+      closePanel();
+    }
+  });
 
-  console.log(
-    "[searchNotes.js] Search functionality (event listener on main button) initialized.",
-  );
+  closeBtn.addEventListener("click", () => closePanel());
+
+  expandCheck.addEventListener("change", e => {
+    showMoreContext = e.target.checked;
+    renderResults(input.value);
+  });
+
+  document.addEventListener("mousedown", e => {
+    const p = document.getElementById("liveSearchPanel");
+    if (!p || !p.classList.contains("active")) return;
+    if (p.contains(e.target)) return;
+    const btn = document.getElementById("searchButton");
+    if (btn && btn.contains(e.target)) return;
+    closePanel();
+  });
 }
 
-// REMOVED old DOMContentLoaded and setTimeout logic.
-// We now ONLY initialize when 'uiControlsReady' is dispatched.
-document.addEventListener("uiControlsReady", () => {
-  console.log(
-    '[searchNotes.js] "uiControlsReady" event received. Initializing search functionality.',
-  );
-  initSearchFunctionality();
-});
+function updateSelection(items) {
+  items.forEach((item, i) => item.classList.toggle("selected", i === selectedIndex));
+  if (selectedIndex >= 0 && items[selectedIndex]) {
+    items[selectedIndex].scrollIntoView({ block: "nearest" });
+  }
+}
 
-// Add some CSS for the search feature (modal and indicator)
-// This can stay as it just adds styles and doesn't depend on DOM elements being ready immediately.
+function renderResults(term) {
+  const results = document.getElementById("lspResults");
+  if (!results) return;
+  selectedIndex = -1;
+
+  if (!term || !term.trim()) {
+    results.innerHTML = '<p class="lsp-empty">Start typing to search…</p>';
+    return;
+  }
+
+  const matches = matchNotes(term);
+
+  if (matches.length === 0) {
+    results.innerHTML = `<p class="lsp-empty">No matches for "<strong>${escapeHtml(term)}</strong>"</p>`;
+    return;
+  }
+
+  const frag = document.createDocumentFragment();
+
+  const countEl = document.createElement("div");
+  countEl.className = "lsp-count";
+  countEl.textContent = `${matches.length} match${matches.length !== 1 ? "es" : ""}`;
+  frag.appendChild(countEl);
+
+  matches.forEach(note => {
+    const preview = getPreview(note, showMoreContext);
+    const item = document.createElement("div");
+    item.className = "lsp-item";
+    item.dataset.noteId = note.id;
+    item.innerHTML = `
+      <div class="lsp-preview">${highlight(preview, term.trim())}</div>
+      <div class="lsp-meta">${formatDate(note.updated_at || note.created_at)}</div>
+    `;
+    item.addEventListener("click", () => goToNote(note.id));
+    frag.appendChild(item);
+  });
+
+  results.innerHTML = "";
+  results.appendChild(frag);
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+
+function goToNote(noteId) {
+  closePanel();
+  setTimeout(() => {
+    const el = document.querySelector(`.note[data-id="${noteId}"]`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      el.classList.add("search-highlight");
+      setTimeout(() => el.classList.remove("search-highlight"), 1500);
+    }
+  }, 80);
+}
+
+// ── Open / close ──────────────────────────────────────────────────────────────
+
+function openPanel() {
+  createPanel();
+  const panel = document.getElementById("liveSearchPanel");
+  if (!panel) return;
+  panel.classList.add("active");
+  setTimeout(() => {
+    const input = document.getElementById("lspInput");
+    if (input) {
+      input.focus();
+      input.select();
+      renderResults(input.value);
+    }
+  }, 50);
+}
+
+function closePanel() {
+  const panel = document.getElementById("liveSearchPanel");
+  if (panel) panel.classList.remove("active");
+  currentSearchTerm = "";
+  originalNotes = null;
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+
+function initSearchFunctionality() {
+  const btn = document.getElementById("searchButton");
+  if (!btn) return;
+  btn.addEventListener("click", e => {
+    e.preventDefault();
+    e.stopPropagation();
+    const panel = document.getElementById("liveSearchPanel");
+    if (panel && panel.classList.contains("active")) {
+      closePanel();
+    } else {
+      openPanel();
+    }
+  }, true);
+}
+
+document.addEventListener("uiControlsReady", initSearchFunctionality);
+
+// ── Styles ────────────────────────────────────────────────────────────────────
+
 const style = document.createElement("style");
 style.textContent = `
-    /* Search modal specific styles */
-    #searchModal .modal-content {
-        max-width: 500px; /* Or your preferred width */
-    }
-    #searchModal .modal-header {
-        color: var(--primary-color, #6200ee); /* Fallback color */
-        /* Add other header styles as needed */
-    }
-    #searchInput { /* ID of the input inside the modal */
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 10px; /* Space before count/buttons */
-        border-radius: var(--border-radius, 4px);
-        border: 1px solid #e0e0e0;
-        font-size: 16px;
-        box-sizing: border-box; /* Include padding and border in the element's total width and height */
-    }
-    #searchInput:focus {
-        outline: none;
-        border-color: var(--primary-color, #6200ee); /* Fallback color */
-        box-shadow: 0 0 0 2px rgba(98, 0, 238, 0.2); /* Optional focus ring */
-    }
-    /* Dark mode support for search input */
-    body.dark-mode #searchInput {
-        background-color: var(--dm-surface-color, #2a2a2a); /* Fallback dark bg */
-        border-color: var(--dm-border-color, #444); /* Fallback dark border */
-        color: var(--dm-text-color, #e0e0e0); /* Fallback dark text */
-    }
-    body.dark-mode #searchInput:focus {
-        border-color: var(--primary-color, #bb86fc); /* Dark mode primary focus */
-    }
-    /* Search indicator styles are applied via JS inline or a dedicated class */
-    .search-indicator {
-        /* You can define base styles here if preferred over inline JS styles */
-    }
+  #liveSearchPanel {
+    position: fixed;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+    width: min(580px, 92vw);
+    max-height: 72vh;
+    background: var(--surface-color);
+    border-radius: 14px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.28);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+  #liveSearchPanel.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+  }
+  body.dark-mode #liveSearchPanel {
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(255,255,255,0.07);
+  }
+  .lsp-header {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    gap: 10px;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+  }
+  .lsp-icon { font-size: 20px; flex-shrink: 0; }
+  .lsp-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 17px;
+    background: transparent;
+    color: var(--text-color);
+    font-family: inherit;
+  }
+  .lsp-input::placeholder { opacity: 0.4; }
+  .lsp-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--text-color);
+    opacity: 0.45;
+    padding: 4px 6px;
+    border-radius: 6px;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: opacity 0.1s, background 0.1s;
+  }
+  .lsp-close:hover { opacity: 1; background: rgba(128,128,128,0.12); }
+  .lsp-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 16px;
+    font-size: 13px;
+    color: var(--text-color);
+    opacity: 0.6;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    user-select: none;
+    flex-shrink: 0;
+    transition: opacity 0.1s;
+  }
+  .lsp-option:hover { opacity: 1; }
+  .lsp-results {
+    overflow-y: auto;
+    flex: 1;
+  }
+  .lsp-count {
+    padding: 8px 16px 2px;
+    font-size: 11px;
+    color: var(--text-color);
+    opacity: 0.4;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+  .lsp-empty {
+    padding: 28px 16px;
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-color);
+    opacity: 0.45;
+    margin: 0;
+  }
+  .lsp-item {
+    padding: 11px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color);
+    transition: background 0.1s;
+  }
+  .lsp-item:last-child { border-bottom: none; }
+  .lsp-item:hover,
+  .lsp-item.selected { background: rgba(98, 0, 238, 0.06); }
+  body.dark-mode .lsp-item:hover,
+  body.dark-mode .lsp-item.selected { background: rgba(187, 134, 252, 0.09); }
+  .lsp-preview {
+    font-size: 14px;
+    color: var(--text-color);
+    line-height: 1.55;
+    word-break: break-word;
+  }
+  .lsp-preview mark {
+    background: rgba(98, 0, 238, 0.15);
+    color: var(--primary-color);
+    border-radius: 2px;
+    padding: 0 2px;
+    font-weight: 600;
+  }
+  body.dark-mode .lsp-preview mark {
+    background: rgba(187, 134, 252, 0.22);
+    color: #bb86fc;
+  }
+  .lsp-meta {
+    font-size: 11px;
+    color: var(--text-color);
+    opacity: 0.4;
+    margin-top: 4px;
+  }
+  /* Pulse animation when navigating to a note */
+  @keyframes note-search-ping {
+    0%   { outline: 2px solid rgba(98, 0, 238, 0); }
+    30%  { outline: 2px solid rgba(98, 0, 238, 0.7); }
+    100% { outline: 2px solid rgba(98, 0, 238, 0); }
+  }
+  .note.search-highlight {
+    animation: note-search-ping 1.4s ease-out;
+  }
 `;
 document.head.appendChild(style);
