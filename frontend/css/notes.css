@@ -326,3 +326,13 @@ button.note-delete:hover {
 body.dark-mode .note--locked {
   border-color: rgba(187, 134, 252, 0.5) !important;
 }
+
+/* ── Encrypted notes ──────────────────────────────────────── */
+
+.note--encrypted {
+  border: 2px solid rgba(98, 0, 238, 0.6) !important;
+}
+
+body.dark-mode .note--encrypted {
+  border-color: rgba(187, 134, 252, 0.65) !important;
+}
