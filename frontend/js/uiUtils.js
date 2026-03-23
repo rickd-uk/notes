@@ -339,9 +339,11 @@ export function updateButtonPlacement() {
   const addNoteBtn = document.getElementById('addNoteBtn');
   
   if (bulkDeleteBtn && notesHeader && addNoteBtn) {
-    if (window.innerWidth <= 768) {
-      // Move to left side on mobile
-      notesHeader.insertBefore(bulkDeleteBtn, notesHeader.firstChild);
+    if (window.innerWidth <= 1199) {
+      // Move to left side on mobile (after hamburger button)
+      const navToggle = document.getElementById('navToggleBtn');
+      const insertAfter = navToggle ? navToggle.nextSibling : notesHeader.firstChild;
+      notesHeader.insertBefore(bulkDeleteBtn, insertAfter);
     } else {
       // Move between title and add button on desktop
       notesHeader.insertBefore(bulkDeleteBtn, addNoteBtn);

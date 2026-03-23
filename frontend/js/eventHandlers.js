@@ -299,8 +299,8 @@ export async function handleCategoryClick(newCategoryId) {
   await loadNotes();
   renderCategories(); // Update header
 
-  // Close sidebar on mobile
-  if (window.innerWidth <= 768) {
+  // Close sidebar on mobile and tablet
+  if (window.innerWidth <= 1199) {
     const sidebar = document.querySelector(".sidebar");
     const sidebarOverlay = document.querySelector(".sidebar-overlay");
 

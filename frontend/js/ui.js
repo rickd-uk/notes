@@ -266,7 +266,7 @@ ${customCategoriesHTML}
   //   bulkDeleteBtn.innerHTML = '🗑️ Delete All';
   //
   //   // On mobile, ensure proper button placement
-  //   if (window.innerWidth <= 768) {
+  //   if (window.innerWidth <= 1199) {
   //     // Insert at the beginning of the header (left side)
   //     notesHeader.insertBefore(bulkDeleteBtn, notesHeader.firstChild);
   //   } else {
@@ -352,7 +352,7 @@ background-color: var(--surface-color);
 `;
 
     // Apply mobile styles if needed
-    if (window.innerWidth <= 768) {
+    if (window.innerWidth <= 1199) {
       noteElement.style.cssText = `
 position: fixed;
 top: 0;

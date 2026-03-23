@@ -244,15 +244,35 @@
     }
 }
 
-/* Medium screen optimization */
-@media (max-width: 1200px) {
-    /* Three notes: 2 on top, 1 on bottom */
+/* Tablet and below: max 2 columns */
+@media (max-width: 1199px) {
     .notes-container.note-count-3 {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr 1fr !important;
+        grid-template-rows: auto !important;
     }
-    
+
     .notes-container.note-count-3 .note:nth-child(3) {
-        grid-column: 1 / 3;
+        grid-column: 1 / span 2 !important;
+    }
+
+    .notes-container.note-count-4,
+    .notes-container.note-count-5,
+    .notes-container.note-count-6,
+    .notes-container.note-count-7,
+    .notes-container.note-count-8,
+    .notes-container.note-count-9 {
+        grid-template-columns: 1fr 1fr !important;
+        grid-template-rows: auto !important;
+    }
+
+    .notes-container.note-count-many {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    /* Reset any 3-col nth-child spans */
+    .notes-container.note-count-5 .note:nth-child(4),
+    .notes-container.note-count-5 .note:nth-child(5) {
+        grid-column: auto !important;
     }
 }
 
@@ -304,7 +324,7 @@
     .notes-container.note-count-8 .note,
     .notes-container.note-count-9 .note,
     .notes-container.note-count-many .note {
-        min-height: 35vh !important;
+        min-height: 45vh !important;
     }
 }
 
