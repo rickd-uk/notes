@@ -133,6 +133,14 @@ body.dark-mode .settings-danger-btn:hover {
     margin: 0 auto 16px;
 }
 
+.settings-section-label--danger {
+    color: #f44336;
+}
+
+body.dark-mode .settings-section-label--danger {
+    color: #ff6b6b;
+}
+
 /* Mobile: bottom sheet */
 @media (max-width: 768px) {
     #settingsModal {

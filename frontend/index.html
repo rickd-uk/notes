@@ -117,7 +117,7 @@
       </div>
       <div class="sidebar-footer">
         <button id="logoutBtn" class="logout-btn">Logout</button>
-        <button id="settingsBtn" class="settings-btn" title="Settings">⚙</button>
+        <button id="settingsBtn" class="settings-btn" aria-label="Settings" title="Settings">⚙</button>
       </div>
     </div>
 
@@ -291,12 +291,12 @@
     </div>
 
     <!-- Settings Modal -->
-    <div class="modal" id="settingsModal">
+    <div class="modal" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
       <div class="modal-content">
         <div class="modal-drag-handle"></div>
         <div class="settings-modal-header">
-          <span class="settings-modal-title">⚙ Settings</span>
-          <button class="settings-modal-close" id="settingsModalCloseBtn">✕</button>
+          <span class="settings-modal-title" id="settingsModalTitle">⚙ Settings</span>
+          <button class="settings-modal-close" id="settingsModalCloseBtn" aria-label="Close settings">✕</button>
         </div>
 
         <!-- Appearance -->
@@ -319,7 +319,7 @@
 
         <!-- Danger Zone -->
         <div class="settings-section">
-          <div class="settings-section-label" style="color: #f44336;">Danger Zone</div>
+          <div class="settings-section-label settings-section-label--danger">Danger Zone</div>
           <button id="deleteAllCategoriesBtn" class="settings-danger-btn">🗑 Delete All Categories</button>
         </div>
       </div>
