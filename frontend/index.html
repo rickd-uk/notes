@@ -70,9 +70,15 @@
     <link rel="stylesheet" href="css/multi-category-modal.css" />
     <link rel="stylesheet" href="css/note-controls.css" />
     <link rel="stylesheet" href="css/settings-modal.css" />
+    <link rel="stylesheet" href="css/sidebar-collapse.css" />
   </head>
   <body>
     <div class="sidebar">
+      <script>
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+          document.currentScript.parentElement.classList.add('collapsed');
+        }
+      </script>
       <div class="frontpage-image">
         <!--  <img src="images/simple-notes.png" alt="Simple Notes"
         onerror="this.outerHTML='<div class=\'fallback-text\'>Welcome to Simple Notes!</div>'" > 
@@ -114,6 +120,10 @@
             <span class="slider"></span>
           </label>
         </div>
+      </div>
+      <div class="sidebar-collapse-controls">
+        <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" title="Collapse sidebar">&#8249;</button>
+        <button class="sidebar-expand-btn" id="sidebarExpandBtn" title="Expand sidebar">&#8250;</button>
       </div>
       <div class="sidebar-footer">
         <button id="logoutBtn" class="logout-btn">Logout</button>
