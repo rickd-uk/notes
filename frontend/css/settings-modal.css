@@ -1,0 +1,162 @@
+/* settings-modal.css - Settings modal / bottom-sheet */
+
+/* Gear icon button in sidebar footer */
+.settings-btn {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 22px;
+    cursor: pointer;
+    padding: 6px 8px;
+    opacity: 0.65;
+    transition: opacity 0.2s;
+    line-height: 1;
+}
+
+.settings-btn:hover {
+    opacity: 1;
+}
+
+/* Modal header row */
+.settings-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.settings-modal-title {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.settings-modal-close {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.settings-modal-close:hover {
+    color: var(--text-color);
+}
+
+/* Section */
+.settings-section {
+    margin-bottom: 20px;
+}
+
+.settings-section-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+.settings-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+}
+
+/* Account link button */
+.settings-link-btn {
+    display: block;
+    width: 100%;
+    padding: 10px 12px;
+    background-color: transparent;
+    color: var(--text-color);
+    border: 1px solid #e0e0e0;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    text-align: left;
+    font-size: 14px;
+    text-decoration: none;
+    transition: background-color 0.2s;
+    box-sizing: border-box;
+}
+
+.settings-link-btn:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* Danger zone button */
+.settings-danger-btn {
+    width: 100%;
+    padding: 10px 12px;
+    background-color: transparent;
+    color: #f44336;
+    border: 1px solid #f44336;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.settings-danger-btn:hover {
+    background-color: rgba(244, 67, 54, 0.05);
+}
+
+/* Dark mode overrides */
+body.dark-mode .settings-link-btn {
+    border-color: #444;
+}
+
+body.dark-mode .settings-link-btn:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .settings-danger-btn {
+    color: #ff6b6b;
+    border-color: #ff6b6b;
+}
+
+body.dark-mode .settings-danger-btn:hover {
+    background-color: rgba(255, 107, 107, 0.1);
+}
+
+/* Desktop: standard centered modal — .modal-content defaults from modals.css apply */
+#settingsModal .modal-content {
+    max-width: 360px;
+}
+
+/* Drag handle bar — hidden on desktop, shown on mobile */
+.modal-drag-handle {
+    display: none;
+    width: 36px;
+    height: 4px;
+    background-color: #555;
+    border-radius: 2px;
+    margin: 0 auto 16px;
+}
+
+/* Mobile: bottom sheet */
+@media (max-width: 768px) {
+    #settingsModal {
+        align-items: flex-end;
+    }
+
+    #settingsModal .modal-content {
+        max-width: 100%;
+        width: 100%;
+        border-radius: 12px 12px 0 0;
+        transform: translateY(40px);
+        padding-bottom: 28px;
+    }
+
+    #settingsModal.active .modal-content {
+        transform: translateY(0);
+    }
+
+    .modal-drag-handle {
+        display: block;
+    }
+}
