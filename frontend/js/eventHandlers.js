@@ -129,11 +129,23 @@ export function setupEventListeners() {
     });
   }
 
+  // Logout button
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      logout();
+    });
+  }
+
+  // Settings modal elements — declared here so the Escape handler can close over them
+  const settingsBtn = document.getElementById("settingsBtn");
+  const settingsModal = document.getElementById("settingsModal");
+  const settingsModalCloseBtn = document.getElementById("settingsModalCloseBtn");
+  const deleteAllCategoriesBtn = document.getElementById("deleteAllCategoriesBtn");
+
   // Keyboard shortcuts
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       // Close settings modal
-      const settingsModal = document.getElementById("settingsModal");
       if (settingsModal && settingsModal.classList.contains("active")) {
         settingsModal.classList.remove("active");
         return;
@@ -157,18 +169,7 @@ export function setupEventListeners() {
     }
   });
 
-  // Logout button
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
-      logout();
-    });
-  }
-
-  // Settings modal
-  const settingsBtn = document.getElementById("settingsBtn");
-  const settingsModal = document.getElementById("settingsModal");
-  const settingsModalCloseBtn = document.getElementById("settingsModalCloseBtn");
-  const deleteAllCategoriesBtn = document.getElementById("deleteAllCategoriesBtn");
+  // Settings modal wiring (settingsModal, settingsBtn, etc. already declared above)
 
   if (settingsBtn && settingsModal) {
     settingsBtn.addEventListener("click", () => {

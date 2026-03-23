@@ -29,7 +29,6 @@ export const elements = {
   toast: document.getElementById('toast'),
   logoutBtn: document.getElementById('logoutBtn'),
   darkModeToggle: document.getElementById('darkModeToggle'),
-  sidebarFooter: document.querySelector('.sidebar-footer'),
 
   usernameDisplay: document.getElementById('usernameDisplay')
 };
