@@ -18,19 +18,27 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    padding: 8px 0;
-    background: none;
-    border: none;
+    gap: 6px;
+    width: calc(100% - 24px);
+    margin: 4px 12px;
+    padding: 6px 10px;
+    background: rgba(128, 128, 128, 0.1);
+    border: 1px solid rgba(128, 128, 128, 0.2);
+    border-radius: 6px;
     cursor: pointer;
     color: var(--text-color);
-    opacity: 0.5;
-    font-size: 20px;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    opacity: 0.6;
+    font-size: 12px;
+  }
+
+  .sidebar-collapse-btn::before {
+    content: '‹';
+    font-size: 16px;
   }
 
   .sidebar-collapse-btn:hover {
     opacity: 1;
+    background: rgba(128, 128, 128, 0.18);
   }
 
   /* Expand arrow — hidden by default, shown when collapsed */
