@@ -6,14 +6,14 @@
   background: none;
   border: none;
   cursor: pointer;
-  width: 32px;
-  height: 32px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 4px;
-  font-size: 16px;
+  font-size: 18px;
   color: var(--text-color);
   transition:
     background-color 0.2s,
@@ -34,10 +34,11 @@
 .header-controls-group {
   display: flex;
   align-items: center;
-  margin-right: 16px; /* Space between controls and add button */
-  background-color: rgba(0, 0, 0, 0.03);
-  padding: 4px 8px;
+  margin-right: 12px;
+  background-color: rgba(128, 128, 128, 0.08);
+  padding: 4px 6px;
   border-radius: 10px;
+  gap: 2px;
 }
 
 /* Container for expanded note controls */
@@ -243,11 +244,11 @@ body.dark-mode .header-controls-group {
   }
 
   .header-control-btn {
-    width: 28px;
-    height: 28px;
+    width: 38px;
+    height: 38px;
     margin-right: 3px;
     margin-left: 3px;
-    font-size: 14px;
+    font-size: 18px;
   }
 
   .header-controls-group {
@@ -281,14 +282,14 @@ body.dark-mode .header-controls-group {
   }
 
   .header-control-btn {
-    width: 24px;
-    height: 24px;
+    width: 38px;
+    height: 38px;
     margin-right: 2px;
     margin-left: 2px;
-    font-size: 12px;
+    font-size: 18px;
   }
 
-  `` /* On very small screens, hide the optional buttons to save space */
+  /* On very small screens, hide the optional buttons to save space */
   #searchButton,
   #sortButton {
     display: none;

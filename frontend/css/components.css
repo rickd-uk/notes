@@ -223,7 +223,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 150px;
+    max-width: 160px;
 }
 
 /* Mobile styles */
@@ -244,16 +244,16 @@
     }
     
     .username-display {
-        font-size: 12px;
-        padding: 4px 8px;
-        max-width: 100px;
+        font-size: 13px;
+        padding: 5px 10px;
+        max-width: 120px;
     }
 }
 
 /* Very small screens */
 @media (max-width: 480px) {
     .username-display {
-        max-width: 80px;
+        max-width: 100px;
     }
 }
 
