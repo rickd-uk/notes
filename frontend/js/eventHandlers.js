@@ -297,7 +297,6 @@ export function setupEventListeners() {
   updateEncryptionUI();
 
   const setEncryptionPasswordBtn = document.getElementById('setEncryptionPasswordBtn');
-  const changeEncryptionPasswordBtn = document.getElementById('changeEncryptionPasswordBtn');
   const cancelSetEncryptionBtn = document.getElementById('cancelSetEncryptionBtn');
   const confirmSetEncryptionBtn = document.getElementById('confirmSetEncryptionBtn');
   const setEncryptionModal = document.getElementById('setEncryptionModal');
@@ -311,7 +310,6 @@ export function setupEventListeners() {
   }
 
   if (setEncryptionPasswordBtn) setEncryptionPasswordBtn.addEventListener('click', openSetEncryptionModal);
-  if (changeEncryptionPasswordBtn) changeEncryptionPasswordBtn.addEventListener('click', openSetEncryptionModal);
   if (cancelSetEncryptionBtn) cancelSetEncryptionBtn.addEventListener('click', () => setEncryptionModal.classList.remove('active'));
 
   if (confirmSetEncryptionBtn) {
