@@ -52,6 +52,46 @@ import {
   updateNoteCategoryDisplay,
   changeNoteCategory,
 } from "./noteCategoryManager.js";
+import {
+  loadEncryptionSetup, hasEncryptionPassword, isUnlocked,
+  setEncryptionPassword, removeEncryptionPassword, unlockWithPassword,
+  unlockWithRecoveryKey
+} from './encryptionManager.js';
+// NOTE: saveEncryptionPassword and removeEncryptionPasswordApi are called internally
+// by encryptionManager.js — do NOT import them here.
+
+export function showUnlockModal(onSuccess) {
+  const modal = document.getElementById('unlockEncryptionModal');
+  document.getElementById('unlockPasswordInput').value = '';
+  modal.classList.add('active');
+
+  // Re-query inside cleanup to avoid stale references after replaceWith.
+  const cleanup = () => {
+    modal.classList.remove('active');
+    const cb = document.getElementById('confirmUnlockBtn');
+    const cancel = document.getElementById('cancelUnlockBtn');
+    if (cb) cb.replaceWith(cb.cloneNode(true));
+    if (cancel) cancel.replaceWith(cancel.cloneNode(true));
+  };
+
+  document.getElementById('cancelUnlockBtn').addEventListener('click', cleanup);
+
+  document.getElementById('confirmUnlockBtn').addEventListener('click', async () => {
+    const input = document.getElementById('unlockPasswordInput').value.trim();
+    if (!input) { showToast('Please enter your password or recovery key'); return; }
+
+    let ok = await unlockWithPassword(input);
+    if (!ok) ok = await unlockWithRecoveryKey(input);
+
+    if (ok) {
+      cleanup();
+      showToast('Notes unlocked for this session');
+      if (onSuccess) onSuccess();
+    } else {
+      showToast('Incorrect password or recovery key');
+    }
+  });
+}
 
 // Setup all event listeners with null check for cancelCategoryBtn
 export function setupEventListeners() {
@@ -243,6 +283,101 @@ export function setupEventListeners() {
     deleteAllCategoriesBtn.addEventListener("click", handleDeleteAllCategories);
   }
 
+  // Load encryption setup and update UI
+  async function updateEncryptionUI() {
+    await loadEncryptionSetup();
+    const noPassword = document.getElementById('encryptionNoPassword');
+    const hasPassword = document.getElementById('encryptionHasPassword');
+    if (noPassword && hasPassword) {
+      const has = hasEncryptionPassword();
+      noPassword.style.display = has ? 'none' : '';
+      hasPassword.style.display = has ? '' : 'none';
+    }
+  }
+  updateEncryptionUI();
+
+  const setEncryptionPasswordBtn = document.getElementById('setEncryptionPasswordBtn');
+  const changeEncryptionPasswordBtn = document.getElementById('changeEncryptionPasswordBtn');
+  const cancelSetEncryptionBtn = document.getElementById('cancelSetEncryptionBtn');
+  const confirmSetEncryptionBtn = document.getElementById('confirmSetEncryptionBtn');
+  const setEncryptionModal = document.getElementById('setEncryptionModal');
+
+  function openSetEncryptionModal() {
+    const settingsModal = document.getElementById('settingsModal');
+    if (settingsModal) settingsModal.classList.remove('active');
+    document.getElementById('encNewPassword').value = '';
+    document.getElementById('encConfirmPassword').value = '';
+    setEncryptionModal.classList.add('active');
+  }
+
+  if (setEncryptionPasswordBtn) setEncryptionPasswordBtn.addEventListener('click', openSetEncryptionModal);
+  if (changeEncryptionPasswordBtn) changeEncryptionPasswordBtn.addEventListener('click', openSetEncryptionModal);
+  if (cancelSetEncryptionBtn) cancelSetEncryptionBtn.addEventListener('click', () => setEncryptionModal.classList.remove('active'));
+
+  if (confirmSetEncryptionBtn) {
+    confirmSetEncryptionBtn.addEventListener('click', async () => {
+      const pwd = document.getElementById('encNewPassword').value;
+      const confirm = document.getElementById('encConfirmPassword').value;
+      if (!pwd) { showToast('Please enter a password'); return; }
+      if (pwd !== confirm) { showToast('Passwords do not match'); return; }
+      if (pwd.length < 6) { showToast('Password must be at least 6 characters'); return; }
+
+      confirmSetEncryptionBtn.disabled = true;
+      confirmSetEncryptionBtn.textContent = 'Setting up…';
+      try {
+        const recoveryKey = await setEncryptionPassword(pwd);
+        setEncryptionModal.classList.remove('active');
+        document.getElementById('recoveryKeyDisplay').textContent = recoveryKey;
+        document.getElementById('recoveryKeyModal').classList.add('active');
+        updateEncryptionUI();
+      } catch (err) {
+        showToast('Error setting encryption password');
+        console.error(err);
+      } finally {
+        confirmSetEncryptionBtn.disabled = false;
+        confirmSetEncryptionBtn.textContent = 'Set Password';
+      }
+    });
+  }
+
+  document.getElementById('copyRecoveryKeyBtn')?.addEventListener('click', () => {
+    const key = document.getElementById('recoveryKeyDisplay').textContent;
+    navigator.clipboard.writeText(key).then(() => showToast('Recovery key copied'));
+  });
+
+  document.getElementById('savedRecoveryKeyBtn')?.addEventListener('click', () => {
+    document.getElementById('recoveryKeyModal').classList.remove('active');
+    showToast('Encryption password set');
+  });
+
+  document.getElementById('removeEncryptionPasswordBtn')?.addEventListener('click', async () => {
+    const settingsModal = document.getElementById('settingsModal');
+    if (settingsModal) settingsModal.classList.remove('active');
+
+    const confirmed = await confirmDialog(
+      'This will decrypt all your encrypted notes and remove the encryption password. Are you sure?',
+      'Remove Encryption Password',
+      'Remove'
+    );
+    if (!confirmed) return;
+
+    if (!isUnlocked()) {
+      showToast('Please unlock your notes first before removing encryption');
+      showUnlockModal();
+      return;
+    }
+
+    try {
+      await removeEncryptionPassword();
+      await loadNotes();
+      updateEncryptionUI();
+      showToast('Encryption password removed');
+    } catch (err) {
+      showToast('Error removing encryption password');
+      console.error(err);
+    }
+  });
+
   // Handle window resize
   window.addEventListener("resize", updateButtonPlacement);
 
@@ -267,7 +402,7 @@ export async function createNewNote() {
 
   if (createdNote) {
     addNoteToState(createdNote);
-    renderNotes();
+    await renderNotes();
 
     // Focus on the new note - now uses Quill
     setTimeout(() => {
@@ -329,7 +464,7 @@ export async function handleNoteDelete(noteId) {
     destroyQuillEditor(noteId);
 
     removeNoteFromState(noteId);
-    renderNotes();
+    await renderNotes();
     showToast("Note deleted");
   }
 }
@@ -454,7 +589,7 @@ export async function handleBulkDelete() {
       }
 
       // Render empty notes container
-      renderNotes();
+      await renderNotes();
 
       // Show success message with count if available
       if (result.count !== undefined) {
