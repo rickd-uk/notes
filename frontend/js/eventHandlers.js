@@ -20,10 +20,12 @@ import {
   deleteNote,
   deleteAllNotesInCategory,
   deleteAllCategories,
+  deleteEmptyCategories,
   createCategory,
   updateCategory,
   deleteCategory,
   loadNotes,
+  loadCategories,
   logout,
 } from "./api.js";
 import { renderNotes, renderCategories, toggleNoteExpansion } from "./ui.js";
@@ -45,7 +47,6 @@ import {
 import { toggleDarkMode } from "./darkMode.js";
 import {
   showNoteCategoryModal,
-  hideNoteCategoryModal,
   handleNoteCategoryConfirm,
   updateNoteCategoryDisplay,
   changeNoteCategory,
@@ -174,6 +175,7 @@ export function setupEventListeners() {
   const settingsModal = document.getElementById("settingsModal");
   const settingsModalCloseBtn = document.getElementById("settingsModalCloseBtn");
   const deleteAllCategoriesBtn = document.getElementById("deleteAllCategoriesBtn");
+  const deleteEmptyCategoriesBtn = document.getElementById("deleteEmptyCategoriesBtn");
 
   // Keyboard shortcuts
   document.addEventListener("keydown", (e) => {
@@ -220,6 +222,10 @@ export function setupEventListeners() {
         settingsModal.classList.remove("active");
       }
     });
+  }
+
+  if (deleteEmptyCategoriesBtn) {
+    deleteEmptyCategoriesBtn.addEventListener("click", handleDeleteEmptyCategories);
   }
 
   if (deleteAllCategoriesBtn) {
@@ -465,11 +471,13 @@ export async function handleCategoryCreate() {
     addCategoryToState(newCategory);
     renderCategories();
 
-    // Hide the used icon immediately in the modal
+    // Hide the used icon immediately in the modal (auto-selects next icon)
     hideIconInModal(icon);
 
-    // Clear the input field for next category
-    elements.categoryInput.value = "";
+    // Fill name for the next auto-selected icon
+    const nextIcon = elements.categoryIconInput.value;
+    const nextIconEl = nextIcon ? document.querySelector(`.icon-item[data-icon="${nextIcon}"]`) : null;
+    elements.categoryInput.value = nextIconEl?.dataset.name || '';
 
     // Focus on the input field for next category
     elements.categoryInput.focus();
@@ -494,11 +502,6 @@ export async function handleCategoryUpdate() {
   if (!icon) {
     icon = "📁";
   }
-
-  // Get the original category to check if icon is changing
-  const categories = getCategories();
-  const originalCategory = categories.find((cat) => cat.id.toString() === id);
-  const originalIcon = originalCategory ? originalCategory.icon : null;
 
   const updatedCategory = await updateCategory(id, name, icon);
 
@@ -572,6 +575,42 @@ export async function handleDeleteAllCategories() {
       } else {
         showToast("All categories deleted");
       }
+    }
+  }
+}
+
+// Handle deletion of empty categories
+export async function handleDeleteEmptyCategories() {
+  const settingsModal = document.getElementById("settingsModal");
+  if (settingsModal) settingsModal.classList.remove("active");
+
+  const categories = getCategories();
+  if (categories.length === 0) {
+    showToast("No categories to remove");
+    return;
+  }
+
+  const confirmed = await confirmDialog(
+    "Remove all categories that have no notes?",
+    "Remove Empty Categories",
+    "Remove",
+  );
+
+  if (confirmed) {
+    const result = await deleteEmptyCategories();
+
+    if (!result.error) {
+      if (result.count === 0) {
+        showToast("No empty categories found");
+        return;
+      }
+
+      // Switch to all-notes view first, then reload fresh data from server
+      setCurrentCategoryId("all");
+      await loadCategories();
+      await loadNotes();
+
+      showToast(`Removed ${result.count} empty categor${result.count === 1 ? "y" : "ies"}`);
     }
   }
 }

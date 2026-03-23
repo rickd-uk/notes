@@ -99,6 +99,7 @@
     font-size: 14px;
     font-weight: 600;
     transition: background-color 0.2s;
+    margin-bottom: 10px;
 }
 
 .settings-danger-btn:hover {

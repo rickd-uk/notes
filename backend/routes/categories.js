@@ -92,6 +92,48 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+// Delete categories with no notes for the current user
+router.delete('/empty', async (req, res) => {
+  const client = await db.getClient();
+  try {
+    const userId = req.user.userId;
+    const numericUserId = userId === 'admin' ? null : parseInt(userId, 10);
+
+    await client.query('BEGIN');
+
+    let deleteResult;
+    if (userId === 'admin') {
+      deleteResult = await client.query(
+        `DELETE FROM categories
+         WHERE id NOT IN (
+           SELECT DISTINCT category_id FROM notes WHERE category_id IS NOT NULL
+         )
+         RETURNING id`
+      );
+    } else {
+      deleteResult = await client.query(
+        `DELETE FROM categories
+         WHERE user_id = $1
+           AND id NOT IN (
+             SELECT DISTINCT category_id FROM notes
+             WHERE user_id = $1 AND category_id IS NOT NULL
+           )
+         RETURNING id`,
+        [numericUserId]
+      );
+    }
+
+    await client.query('COMMIT');
+    res.json({ message: 'Empty categories deleted', count: deleteResult.rowCount });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error('Error deleting empty categories:', err);
+    res.status(500).json({ error: 'Server error' });
+  } finally {
+    client.release();
+  }
+});
+
 // Delete all categories for the current user and update related notes
 router.delete('/all', async (req, res) => {
   // Use a client from the pool for transaction

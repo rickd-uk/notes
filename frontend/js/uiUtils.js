@@ -180,7 +180,7 @@ export function showCategoryModal(isEdit = false, categoryId = null, categoryNam
       categoryIconInput.value = firstVisibleIcon.dataset.icon;
     }
     
-    categoryInput.value = '';
+    categoryInput.value = firstVisibleIcon?.dataset.name || '';
     categoryEditId.value = '';
   }
   
