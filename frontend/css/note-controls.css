@@ -322,7 +322,7 @@ body.dark-mode .header-controls-group {
   }
   .notes-header .username-display {
     display: inline-block; /* Or block if it needs to be on its own line when long */
-    max-width: 150px; /* Example: Adjust as needed */
+    max-width: 100px; /* Example: Adjust as needed */
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
