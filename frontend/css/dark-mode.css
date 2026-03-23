@@ -119,9 +119,8 @@ body.dark-mode .add-category-btn:hover {
     background-color: rgba(187, 134, 252, 0.1);
 }
 
-body.dark-mode .empty-icon,
 body.dark-mode .empty-message {
-    color: #757575;
+    color: #888;
 }
 
 /* Dark mode icons */

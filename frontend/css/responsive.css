@@ -114,13 +114,8 @@
   }
 
   .header-controls-group {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10; /* Was already in note-controls.css */
-    /* margin-left and margin-right are overridden by absolute positioning */
-    padding: 4px 6px; /* Keep from note-controls.css */
-    /* background-color, border-radius from base style in note-controls.css will apply */
+    /* Sits in the flex flow on the right, before add-note-btn */
+    /* Centering is reserved for .current-category only */
   }
 
   .notes-container {

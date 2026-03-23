@@ -36,10 +36,10 @@ export function renderNotes() {
   if (notes.length === 0) {
     notesContainer.innerHTML = `
 <div class="empty-state">
-  <div class="empty-icon">📝</div>
-  <div class="empty-message">No notes in this category</div>
-  <div>  </div>
-  <button class="empty-action" id="emptyAddNoteBtn">Create a note</button>
+  <div class="empty-icon">🗒️</div>
+  <div class="empty-title">Nothing here yet</div>
+  <div class="empty-message">Your ideas deserve a home — add your first note!</div>
+  <button class="empty-action" id="emptyAddNoteBtn">✏️ Write your first note</button>
 </div>
 `;
     document

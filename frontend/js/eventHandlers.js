@@ -81,19 +81,52 @@ export function setupEventListeners() {
     darkModeToggle.addEventListener("change", handleDarkModeToggle);
   }
 
+  // Suggested names for icons (used when name input is empty)
+  const ICON_NAMES = {
+    '🛒': 'Shop', '🏋️': 'Fitness', '📚': 'Study', '💻': 'Dev', '💡': 'Ideas',
+    '💼': 'Work', '✈️': 'Travel', '💰': 'Finance', '🎵': 'Music', '🎮': 'Gaming',
+    '🍔': 'Food', '❤️': 'Health', '📝': 'Notes', '🏠': 'Home', '📱': 'Mobile',
+    '🎬': 'Movies', '🔬': 'Science', '🎓': 'School', '🚗': 'Cars', '⭐': 'Favorites',
+    '🏆': 'Goals', '🧠': 'Brain', '🍕': 'Pizza', '🚀': 'Space', '🌍': 'World',
+    '📋': 'Tasks', '⏰': 'Schedule', '💪': 'Strength', '🌱': 'Garden', '📷': 'Photos',
+    '🎸': 'Guitar', '☕': 'Coffee', '🏖️': 'Beach', '🔒': 'Private', '🎯': 'Goals',
+  };
+
   // Icon selection
   document.querySelectorAll(".icon-item").forEach((iconItem) => {
     iconItem.addEventListener("click", () => {
-      // Remove selected class from all icons
       document.querySelectorAll(".icon-item").forEach((item) => {
         item.classList.remove("selected");
       });
-
-      // Add selected class to clicked icon
+      document.querySelectorAll(".suggestion-item").forEach((s) => {
+        s.classList.remove("selected");
+      });
       iconItem.classList.add("selected");
-
-      // Update hidden input value
       elements.categoryIconInput.value = iconItem.dataset.icon;
+      // Auto-fill name from icon's data-name
+      const nameInput = elements.categoryInput;
+      if (nameInput) {
+        const suggested = iconItem.dataset.name || ICON_NAMES[iconItem.dataset.icon];
+        if (suggested) nameInput.value = suggested;
+      }
+    });
+  });
+
+  // Suggestion chip selection
+  document.querySelectorAll(".suggestion-item").forEach((suggestion) => {
+    suggestion.addEventListener("click", () => {
+      const icon = suggestion.dataset.icon;
+      const name = suggestion.dataset.name;
+      // Select matching icon in grid (if visible)
+      document.querySelectorAll(".icon-item").forEach((item) => {
+        item.classList.toggle("selected", item.dataset.icon === icon && item.style.display !== 'none');
+      });
+      document.querySelectorAll(".suggestion-item").forEach((s) => s.classList.remove("selected"));
+      suggestion.classList.add("selected");
+      if (elements.categoryIconInput) elements.categoryIconInput.value = icon;
+      // Always fill name when picking a suggestion
+      if (elements.categoryInput) elements.categoryInput.value = name;
+      elements.categoryInput?.focus();
     });
   });
 

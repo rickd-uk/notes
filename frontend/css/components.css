@@ -26,10 +26,19 @@
     background-color: var(--primary-color);
     color: white;
     border: none;
-    padding: 8px 16px;
-    border-radius: var(--border-radius);
+    padding: 14px 32px;
+    border-radius: 24px;
     cursor: pointer;
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 16px;
+    margin-top: 12px;
+    box-shadow: 0 4px 14px rgba(98, 0, 238, 0.35);
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.empty-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(98, 0, 238, 0.45);
 }
 
 .logout-btn {

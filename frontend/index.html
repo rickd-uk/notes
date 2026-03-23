@@ -156,108 +156,57 @@
           placeholder="Category name"
         />
         <div class="icon-selector">
-          <div class="icon-selector-label">Select an icon:</div>
+          <div class="icon-selector-label">Quick picks</div>
+          <div class="icon-suggestions">
+            <button type="button" class="suggestion-item" data-icon="🛒" data-name="Shop">🛒 Shop</button>
+            <button type="button" class="suggestion-item" data-icon="🏋️" data-name="Fitness">🏋️ Fitness</button>
+            <button type="button" class="suggestion-item" data-icon="📚" data-name="Study">📚 Study</button>
+            <button type="button" class="suggestion-item" data-icon="💻" data-name="Dev">💻 Dev</button>
+            <button type="button" class="suggestion-item" data-icon="💡" data-name="Ideas">💡 Ideas</button>
+            <button type="button" class="suggestion-item" data-icon="💼" data-name="Work">💼 Work</button>
+            <button type="button" class="suggestion-item" data-icon="✈️" data-name="Travel">✈️ Travel</button>
+            <button type="button" class="suggestion-item" data-icon="💰" data-name="Finance">💰 Finance</button>
+            <button type="button" class="suggestion-item" data-icon="🎵" data-name="Music">🎵 Music</button>
+            <button type="button" class="suggestion-item" data-icon="🎮" data-name="Gaming">🎮 Gaming</button>
+            <button type="button" class="suggestion-item" data-icon="🍔" data-name="Food">🍔 Food</button>
+            <button type="button" class="suggestion-item" data-icon="❤️" data-name="Health">❤️ Health</button>
+          </div>
           <div class="icon-grid" id="iconGrid">
-            <div class="icon-item selected" data-icon="📁">📁</div>
-            <!-- Original icons -->
-            <div class="icon-item selected" data-icon="📁">📁</div>
-            <div class="icon-item" data-icon="📝">📝</div>
-            <div class="icon-item" data-icon="📌">📌</div>
-            <div class="icon-item" data-icon="💼">💼</div>
-            <div class="icon-item" data-icon="🏠">🏠</div>
-            <div class="icon-item" data-icon="🔖">🔖</div>
-            <div class="icon-item" data-icon="📚">📚</div>
-            <div class="icon-item" data-icon="💡">💡</div>
+            <div class="icon-item selected" data-icon="📁" data-name="Folder">📁</div>
+            <div class="icon-item" data-icon="📝" data-name="Notes">📝</div>
+            <div class="icon-item" data-icon="📌" data-name="Pinned">📌</div>
+            <div class="icon-item" data-icon="🔖" data-name="Bookmarks">🔖</div>
+            <div class="icon-item" data-icon="💡" data-name="Ideas">💡</div>
+            <div class="icon-item" data-icon="📋" data-name="Tasks">📋</div>
+            <div class="icon-item" data-icon="⏰" data-name="Schedule">⏰</div>
+            <div class="icon-item" data-icon="🔒" data-name="Private">🔒</div>
 
-            <!-- Technology Icons -->
-            <div class="icon-item" data-icon="💻">💻</div>
-            <div class="icon-item" data-icon="📱">📱</div>
-            <div class="icon-item" data-icon="⌨️">⌨️</div>
-            <div class="icon-item" data-icon="🖥️">🖥️</div>
-            <div class="icon-item" data-icon="🖨️">🖨️</div>
-            <div class="icon-item" data-icon="📲">📲</div>
-            <div class="icon-item" data-icon="🔌">🔌</div>
-            <div class="icon-item" data-icon="🔋">🔋</div>
+            <div class="icon-item" data-icon="💼" data-name="Work">💼</div>
+            <div class="icon-item" data-icon="📚" data-name="Study">📚</div>
+            <div class="icon-item" data-icon="🎓" data-name="School">🎓</div>
+            <div class="icon-item" data-icon="💻" data-name="Dev">💻</div>
+            <div class="icon-item" data-icon="📱" data-name="Mobile">📱</div>
+            <div class="icon-item" data-icon="📊" data-name="Stats">📊</div>
+            <div class="icon-item" data-icon="📷" data-name="Photos">📷</div>
+            <div class="icon-item" data-icon="🔬" data-name="Science">🔬</div>
 
-            <!-- Movie/Entertainment Icons -->
-            <div class="icon-item" data-icon="🎬">🎬</div>
-            <div class="icon-item" data-icon="🎞️">🎞️</div>
-            <div class="icon-item" data-icon="🎥">🎥</div>
-            <div class="icon-item" data-icon="📺">📺</div>
-            <div class="icon-item" data-icon="🍿">🍿</div>
-            <div class="icon-item" data-icon="🎭">🎭</div>
-            <div class="icon-item" data-icon="📽️">📽️</div>
-            <div class="icon-item" data-icon="🎦">🎦</div>
+            <div class="icon-item" data-icon="🏠" data-name="Home">🏠</div>
+            <div class="icon-item" data-icon="❤️" data-name="Health">❤️</div>
+            <div class="icon-item" data-icon="🌱" data-name="Garden">🌱</div>
+            <div class="icon-item" data-icon="💪" data-name="Fitness">💪</div>
+            <div class="icon-item" data-icon="🧠" data-name="Brain">🧠</div>
+            <div class="icon-item" data-icon="🎵" data-name="Music">🎵</div>
+            <div class="icon-item" data-icon="🎬" data-name="Movies">🎬</div>
+            <div class="icon-item" data-icon="🎮" data-name="Gaming">🎮</div>
 
-            <!-- Music Icons -->
-            <div class="icon-item" data-icon="🎵">🎵</div>
-            <div class="icon-item" data-icon="🎶">🎶</div>
-            <div class="icon-item" data-icon="🎸">🎸</div>
-            <div class="icon-item" data-icon="🎹">🎹</div>
-            <div class="icon-item" data-icon="🎷">🎷</div>
-            <div class="icon-item" data-icon="🎺">🎺</div>
-            <div class="icon-item" data-icon="🎻">🎻</div>
-            <div class="icon-item" data-icon="🥁">🥁</div>
-
-            <!-- Science Icons -->
-            <div class="icon-item" data-icon="🔬">🔬</div>
-            <div class="icon-item" data-icon="🔭">🔭</div>
-            <div class="icon-item" data-icon="⚗️">⚗️</div>
-            <div class="icon-item" data-icon="🧪">🧪</div>
-            <div class="icon-item" data-icon="🧬">🧬</div>
-            <div class="icon-item" data-icon="🧫">🧫</div>
-            <div class="icon-item" data-icon="🧮">🧮</div>
-            <div class="icon-item" data-icon="⚛️">⚛️</div>
-
-            <!-- Previous icons continued -->
-            <div class="icon-item" data-icon="🎓">🎓</div>
-            <div class="icon-item" data-icon="🎯">🎯</div>
-            <div class="icon-item" data-icon="📊">📊</div>
-            <div class="icon-item" data-icon="📅">📅</div>
-            <div class="icon-item" data-icon="❤️">❤️</div>
-            <div class="icon-item" data-icon="🍎">🍎</div>
-            <div class="icon-item" data-icon="🚗">🚗</div>
-            <div class="icon-item" data-icon="✈️">✈️</div>
-
-            <!-- Additional icons from previous version -->
-            <div class="icon-item" data-icon="⭐">⭐</div>
-            <div class="icon-item" data-icon="🔥">🔥</div>
-            <div class="icon-item" data-icon="💰">💰</div>
-            <div class="icon-item" data-icon="🏆">🏆</div>
-            <div class="icon-item" data-icon="🎮">🎮</div>
-            <div class="icon-item" data-icon="🌟">🌟</div>
-            <div class="icon-item" data-icon="🏋️">🏋️</div>
-            <div class="icon-item" data-icon="🧠">🧠</div>
-
-            <!-- Food and Drink Icons -->
-            <div class="icon-item" data-icon="🍔">🍔</div>
-            <div class="icon-item" data-icon="🍕">🍕</div>
-            <div class="icon-item" data-icon="🍷">🍷</div>
-            <div class="icon-item" data-icon="🍰">🍰</div>
-            <div class="icon-item" data-icon="🍲">🍲</div>
-            <div class="icon-item" data-icon="🍺">🍺</div>
-            <div class="icon-item" data-icon="☕">☕</div>
-            <div class="icon-item" data-icon="🍩">🍩</div>
-
-            <!-- Travel Icons -->
-            <div class="icon-item" data-icon="🚀">🚀</div>
-            <div class="icon-item" data-icon="🌍">🌍</div>
-            <div class="icon-item" data-icon="🏝️">🏝️</div>
-            <div class="icon-item" data-icon="🏔️">🏔️</div>
-            <div class="icon-item" data-icon="🗺️">🗺️</div>
-            <div class="icon-item" data-icon="🧳">🧳</div>
-            <div class="icon-item" data-icon="🏖️">🏖️</div>
-            <div class="icon-item" data-icon="🚆">🚆</div>
-
-            <!-- Misc Useful Icons -->
-            <div class="icon-item" data-icon="🔒">🔒</div>
-            <div class="icon-item" data-icon="💭">💭</div>
-            <div class="icon-item" data-icon="📋">📋</div>
-            <div class="icon-item" data-icon="⏰">⏰</div>
-            <div class="icon-item" data-icon="💪">💪</div>
-            <div class="icon-item" data-icon="🏡">🏡</div>
-            <div class="icon-item" data-icon="🌱">🌱</div>
-            <div class="icon-item" data-icon="📷">📷</div>
+            <div class="icon-item" data-icon="💰" data-name="Finance">💰</div>
+            <div class="icon-item" data-icon="🏆" data-name="Goals">🏆</div>
+            <div class="icon-item" data-icon="🎯" data-name="Focus">🎯</div>
+            <div class="icon-item" data-icon="☕" data-name="Coffee">☕</div>
+            <div class="icon-item" data-icon="🍔" data-name="Food">🍔</div>
+            <div class="icon-item" data-icon="✈️" data-name="Travel">✈️</div>
+            <div class="icon-item" data-icon="🌍" data-name="World">🌍</div>
+            <div class="icon-item" data-icon="🔥" data-name="Hot">🔥</div>
           </div>
         </div>
         <input type="hidden" id="categoryIconInput" value="📁" />

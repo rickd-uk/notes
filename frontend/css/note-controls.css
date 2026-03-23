@@ -294,17 +294,13 @@ body.dark-mode .header-controls-group {
   .header-controls-group {
     margin-right: 5px;
     padding: 2px 4px;
-    position: static; /* Reset position to avoid overlapping issues */
-    margin-bottom: 5px;
-    margin-left: 180px;
   }
 
   /* Ensure the notes header has proper layout */
   .notes-header {
-    flex-wrap: wrap; /* Prevent wrapping that could cause overlap */
-    justify-content: flex-end; /* Push elements to the right */
+    flex-wrap: wrap;
+    justify-content: flex-end;
     padding: 10px 10px;
-    margin-bottom: 30px;
   }
 
   /* Ensure user-info doesn't take up all space if it wraps */
