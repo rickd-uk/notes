@@ -103,17 +103,19 @@ Add `<link rel="stylesheet" href="css/sidebar-collapse.css" />` as the **last** 
 
 ### localStorage restoration — avoiding layout flash
 
-Add an **inline synchronous `<script>` block** in `index.html` as the first child of `<body>`, immediately before `<div class="sidebar">`. This script reads localStorage and adds `.collapsed` before the browser paints — eliminating the flash:
+Add an **inline synchronous `<script>` block** as the **first child inside `<div class="sidebar">`**. This is the only placement where `.sidebar` is guaranteed to be in the DOM at script parse time. Use `document.currentScript.parentElement` to reference it directly — no `querySelector`, no `DOMContentLoaded`:
 
 ```html
-<script>
-  if (localStorage.getItem('sidebarCollapsed') === 'true') {
-    document.querySelector('.sidebar').classList.add('collapsed');
-  }
-</script>
+<div class="sidebar">
+  <script>
+    if (localStorage.getItem('sidebarCollapsed') === 'true') {
+      document.currentScript.parentElement.classList.add('collapsed');
+    }
+  </script>
+  <div class="frontpage-image">
 ```
 
-The async ES module (`sidebarCollapse.js`) handles click events only — not initial state restoration.
+This runs synchronously as the browser parses `.sidebar`, before any layout paint and before ES modules execute. The async ES module (`sidebarCollapse.js`) handles click events only — not initial state restoration.
 
 ### Category icon click delegation
 
@@ -131,7 +133,7 @@ No cross-fade required. The collapse button (shown in expanded state) gets `disp
 |------|--------|
 | `frontend/js/quillEditor.js` | Replace `quillToolbarOptions` array |
 | `frontend/css/base.css` | Add `--sidebar-collapsed-width: 48px` CSS custom property |
-| `frontend/index.html` | Add collapse button to sidebar footer; add expand arrow (hidden by default, shown when collapsed); add inline script before `.sidebar`; add `<link>` for `sidebar-collapse.css` as last stylesheet |
+| `frontend/index.html` | Add collapse button to sidebar footer; add expand arrow (hidden by default, shown when collapsed); add inline script as first child inside `.sidebar`; add `<link>` for `sidebar-collapse.css` as last stylesheet |
 | `frontend/js/sidebarCollapse.js` | New file — collapse/expand logic, localStorage sync |
 | `frontend/js/main.js` | Import and init `sidebarCollapse.js` |
 | `frontend/css/sidebar-collapse.css` | New file — collapsed state styles |
