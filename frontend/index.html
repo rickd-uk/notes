@@ -262,6 +262,18 @@
           </div>
         </div>
 
+        <!-- Encryption -->
+        <div class="settings-section" id="encryptionSection">
+          <div class="settings-section-label">Encryption</div>
+          <div id="encryptionNoPassword">
+            <button id="setEncryptionPasswordBtn" class="settings-link-btn">🔐 Set Encryption Password</button>
+          </div>
+          <div id="encryptionHasPassword" style="display:none">
+            <button id="changeEncryptionPasswordBtn" class="settings-link-btn" style="margin-bottom:8px">🔑 Change Encryption Password</button>
+            <button id="removeEncryptionPasswordBtn" class="settings-danger-btn" style="margin-bottom:0">🗑 Remove Encryption Password</button>
+          </div>
+        </div>
+
         <!-- Account -->
         <div class="settings-section">
           <div class="settings-section-label">Account</div>
@@ -277,6 +289,61 @@
           </div>
           <button id="deleteAllCategoriesBtn" class="settings-danger-btn">🗑 Delete All Categories</button>
           <button id="deleteEverythingBtn" class="settings-danger-btn settings-danger-btn--nuclear">💣 Delete Everything</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Set Encryption Password Modal -->
+    <div class="modal" id="setEncryptionModal" role="dialog" aria-modal="true">
+      <div class="modal-content" style="max-width:380px">
+        <div class="modal-header">🔐 Set Encryption Password</div>
+        <p style="font-size:13px;color:#888;margin-bottom:16px">
+          This password encrypts your notes in the browser. It is <strong>never sent to the server</strong>.
+          If you forget it, only your recovery key can help — so save it carefully.
+        </p>
+        <input type="password" id="encNewPassword" class="modal-input" placeholder="New encryption password" autocomplete="new-password" />
+        <input type="password" id="encConfirmPassword" class="modal-input" placeholder="Confirm password" autocomplete="new-password" style="margin-top:8px" />
+        <div class="modal-actions">
+          <button class="modal-btn modal-btn-cancel" id="cancelSetEncryptionBtn">Cancel</button>
+          <button class="modal-btn modal-btn-confirm" id="confirmSetEncryptionBtn">Set Password</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recovery Key Display Modal -->
+    <div class="modal" id="recoveryKeyModal" role="dialog" aria-modal="true">
+      <div class="modal-content" style="max-width:420px">
+        <div class="modal-header">⚠️ Save Your Recovery Key</div>
+        <p style="font-size:13px;color:#888;margin-bottom:12px">
+          If you forget your encryption password, this key is your <strong>only</strong> way to recover encrypted notes.
+          Store it somewhere safe. It will not be shown again.
+        </p>
+        <div id="recoveryKeyDisplay" style="
+          font-family:monospace;font-size:15px;font-weight:600;
+          background:rgba(98,0,238,0.07);border-radius:8px;
+          padding:14px 16px;letter-spacing:1px;text-align:center;
+          word-break:break-all;margin-bottom:12px
+        "></div>
+        <button id="copyRecoveryKeyBtn" class="settings-link-btn" style="margin-bottom:16px">📋 Copy to clipboard</button>
+        <div class="modal-actions">
+          <button class="modal-btn modal-btn-confirm" id="savedRecoveryKeyBtn">I've saved my recovery key</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Unlock Encryption Modal -->
+    <div class="modal" id="unlockEncryptionModal" role="dialog" aria-modal="true">
+      <div class="modal-content" style="max-width:360px">
+        <div class="modal-header">🔐 Unlock Encrypted Notes</div>
+        <p style="font-size:13px;color:#888;margin-bottom:16px">
+          Enter your encryption password (or recovery key) to decrypt notes this session.
+        </p>
+        <input type="password" id="unlockPasswordInput" class="modal-input"
+               placeholder="Encryption password or recovery key"
+               autocomplete="current-password" />
+        <div class="modal-actions">
+          <button class="modal-btn modal-btn-cancel" id="cancelUnlockBtn">Cancel</button>
+          <button class="modal-btn modal-btn-confirm" id="confirmUnlockBtn">Unlock</button>
         </div>
       </div>
     </div>
