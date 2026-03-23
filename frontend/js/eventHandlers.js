@@ -497,6 +497,10 @@ export function handleCategoryModalCancel() {
 
 // Handle deletion of all categories
 export async function handleDeleteAllCategories() {
+  // Close settings modal before showing confirm dialog (never stack modals)
+  const settingsModal = document.getElementById("settingsModal");
+  if (settingsModal) settingsModal.classList.remove("active");
+
   const confirmed = await confirmDialog(
     "Are you sure?",
     "Delete All Categories",

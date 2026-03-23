@@ -1,8 +1,4 @@
 /* Confirm Modal Styles */
-#confirmModal {
-    z-index: 1010; /* Above settings modal (1000) */
-}
-
 #confirmModal .modal-content {
     max-width: 450px;
 }
