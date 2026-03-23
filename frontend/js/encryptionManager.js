@@ -9,7 +9,6 @@ import {
   setNoteEncryptedContent, setNoteReadOnly
 } from './api.js';
 import { getNotes } from './state.js';
-import { showToast } from './uiUtils.js';
 
 // In-memory session key — never persisted, cleared on page refresh
 let _sessionKey = null;
