@@ -119,7 +119,7 @@ export function addExpandedNoteControls(noteElement) {
     const encryptBtn = document.createElement('button');
     encryptBtn.className = `expanded-control-btn${isEncrypted ? ' active' : ''}`;
     encryptBtn.innerHTML = `
-      <span>${isEncrypted ? '🔐' : '🔓🔐'}</span>
+      <span>🔐</span>
       <span class="tooltip">${isEncrypted ? 'Decrypt note' : 'Encrypt note'}</span>
     `;
 
@@ -127,6 +127,7 @@ export function addExpandedNoteControls(noteElement) {
       const nowEncrypted = noteElement.dataset.encrypted !== 'true';
 
       if (!isUnlocked()) {
+        showToast('Enter your encryption password to continue');
         // Dynamic import to avoid static cycle: eventHandlers → ui → (dynamic) noteControls → eventHandlers
         const { showUnlockModal } = await import('./eventHandlers.js');
         showUnlockModal(async () => {
@@ -140,10 +141,18 @@ export function addExpandedNoteControls(noteElement) {
         const quill = (await import('./quillEditor.js')).getQuillEditor(noteId);
         if (nowEncrypted) {
           const content = quill ? quill.root.innerHTML : '';
-          await encryptNote(noteId, content);
+          const ciphertext = await encryptNote(noteId, content);
           noteElement.dataset.encrypted = 'true';
           noteElement.dataset.readOnly = 'true';
           noteElement.classList.add('note--encrypted', 'note--locked');
+          // Store ciphertext so decrypt can use it without a page reload
+          noteElement.dataset.encryptedContent = ciphertext;
+          // Replace editor content with placeholder so user sees it's encrypted
+          if (quill) {
+            quill.enable(true);
+            quill.clipboard.dangerouslyPasteHTML('<p style="opacity:0.4;font-style:italic">🔐 Encrypted — click 🔐 to decrypt</p>');
+            quill.enable(false);
+          }
           setEditorReadOnly(noteId, true);
           // Update lock button state too
           lockBtn.classList.add('active');
@@ -170,7 +179,7 @@ export function addExpandedNoteControls(noteElement) {
           lockBtn.querySelector('span:first-child').textContent = '🔓';
         }
         encryptBtn.classList.toggle('active', nowEncrypted);
-        encryptBtn.querySelector('span:first-child').textContent = nowEncrypted ? '🔐' : '🔓🔐';
+        encryptBtn.querySelector('span:first-child').textContent = '🔐';
         encryptBtn.querySelector('.tooltip').textContent = nowEncrypted ? 'Decrypt note' : 'Encrypt note';
       } catch (err) {
         showToast('Encryption error: ' + err.message);

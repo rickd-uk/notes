@@ -108,6 +108,7 @@ export async function encryptNote(noteId, plainContent) {
   const ciphertext = await encryptText(_sessionKey, plainContent);
   await setNoteEncryptedContent(noteId, ciphertext, true);
   await setNoteReadOnly(noteId, true);
+  return ciphertext;
 }
 
 // Decrypt a note's content (does not save — just returns plaintext for display)

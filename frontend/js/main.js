@@ -13,7 +13,7 @@ import { initToolbarToggle } from "./toolbarToggle.js";
 import { applyToolbarVisibilityToAll } from "./quillEditor.js";
 import { initSpellCheck, applySpellCheckToAll } from "./noteControls.js";
 import { initSidebarToggles } from "./sidebarToggles.js";
-import { loadEncryptionSetup } from "./encryptionManager.js";
+import { loadEncryptionSetup, hasEncryptionPassword } from "./encryptionManager.js";
 
 // Function to update the username display
 async function updateUsernameDisplay() {
@@ -76,8 +76,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await updateUsernameDisplay();
 
-  // Load encryption setup
+  // Load encryption setup — prompt for password upfront if one is set,
+  // so encrypt/decrypt both work seamlessly without mid-action interruptions
   await loadEncryptionSetup();
+  if (hasEncryptionPassword()) {
+    const { showUnlockModal } = await import('./eventHandlers.js');
+    showUnlockModal();
+  }
 
   // Load initial data
   await loadCategories();
