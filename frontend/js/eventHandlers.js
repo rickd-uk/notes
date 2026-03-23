@@ -178,6 +178,7 @@ export function setupEventListeners() {
   const deleteAllCategoriesBtn = document.getElementById("deleteAllCategoriesBtn");
   const deleteEmptyCategoriesBtn = document.getElementById("deleteEmptyCategoriesBtn");
   const deleteEmptyNotesBtn = document.getElementById("deleteEmptyNotesBtn");
+  const deleteEverythingBtn = document.getElementById("deleteEverythingBtn");
 
   // Keyboard shortcuts
   document.addEventListener("keydown", (e) => {
@@ -228,6 +229,10 @@ export function setupEventListeners() {
 
   if (deleteEmptyNotesBtn) {
     deleteEmptyNotesBtn.addEventListener("click", handleDeleteEmptyNotes);
+  }
+
+  if (deleteEverythingBtn) {
+    deleteEverythingBtn.addEventListener("click", handleDeleteEverything);
   }
 
   if (deleteEmptyCategoriesBtn) {
@@ -582,6 +587,32 @@ export async function handleDeleteAllCategories() {
         showToast("All categories deleted");
       }
     }
+  }
+}
+
+// Handle deletion of everything — all notes and all categories
+export async function handleDeleteEverything() {
+  const settingsModal = document.getElementById("settingsModal");
+  if (settingsModal) settingsModal.classList.remove("active");
+
+  const confirmed = await confirmDialog(
+    "This will permanently delete ALL your notes and ALL categories. This cannot be undone.",
+    "Delete Everything",
+    "Delete Everything",
+  );
+
+  if (confirmed) {
+    showToast("Deleting everything…");
+
+    await deleteAllNotesInCategory("all");
+    await deleteAllCategories();
+
+    setCategories([]);
+    setCurrentCategoryId("all");
+    await loadCategories();
+    await loadNotes();
+
+    showToast("Everything deleted");
   }
 }
 

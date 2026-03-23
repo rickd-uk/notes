@@ -89,21 +89,54 @@
 /* Danger zone button */
 .settings-danger-btn {
     width: 100%;
-    padding: 10px 12px;
+    padding: 9px 12px;
     background-color: transparent;
     color: #f44336;
     border: 1px solid #f44336;
     border-radius: var(--border-radius);
     cursor: pointer;
     text-align: left;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     transition: background-color 0.2s;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .settings-danger-btn:hover {
     background-color: rgba(244, 67, 54, 0.05);
+}
+
+/* Two small buttons side by side */
+.settings-danger-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.settings-danger-btn--small {
+    width: 100%;
+    margin-bottom: 0;
+    font-size: 12px;
+    padding: 8px 10px;
+    text-align: center;
+}
+
+/* Nuclear — solid red, stands apart */
+.settings-danger-btn--nuclear {
+    margin-top: 4px;
+    margin-bottom: 0;
+    padding: 12px;
+    font-size: 14px;
+    text-align: center;
+    background-color: #f44336;
+    color: #fff;
+    border-color: #f44336;
+}
+
+.settings-danger-btn--nuclear:hover {
+    background-color: #d32f2f;
+    border-color: #d32f2f;
 }
 
 /* Dark mode overrides */
@@ -118,6 +151,17 @@ body.dark-mode .settings-danger-btn {
 
 body.dark-mode .settings-danger-btn:hover {
     background-color: rgba(255, 107, 107, 0.1);
+}
+
+body.dark-mode .settings-danger-btn--nuclear {
+    background-color: #c62828;
+    color: #fff;
+    border-color: #c62828;
+}
+
+body.dark-mode .settings-danger-btn--nuclear:hover {
+    background-color: #b71c1c;
+    border-color: #b71c1c;
 }
 
 /* Desktop: standard centered modal — .modal-content defaults from modals.css apply */
