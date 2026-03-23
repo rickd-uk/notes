@@ -5,7 +5,11 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(100),
     password_hash VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_login TIMESTAMP
+    last_login TIMESTAMP,
+    encryption_salt VARCHAR(64),
+    encryption_verifier TEXT,
+    encryption_recovery_verifier TEXT,
+    has_encryption_password BOOLEAN DEFAULT FALSE
 );
 
 -- Create categories table
@@ -25,7 +29,8 @@ CREATE TABLE IF NOT EXISTS notes (
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    read_only BOOLEAN DEFAULT FALSE
+    read_only BOOLEAN DEFAULT FALSE,
+    encrypted BOOLEAN DEFAULT FALSE
 );
 
 -- Create index for faster queries
