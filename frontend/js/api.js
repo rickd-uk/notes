@@ -413,6 +413,65 @@ export async function setNoteReadOnly(noteId, readOnly) {
   }
 }
 
+export async function getEncryptionSetup() {
+  try {
+    const apiUrl = getApiUrl();
+    const response = await fetch(`${apiUrl}/auth/encryption-setup`);
+    if (!response.ok) return { has_encryption_password: false };
+    return await response.json();
+  } catch {
+    return { has_encryption_password: false };
+  }
+}
+
+export async function saveEncryptionPassword(salt, verifier, recovery_verifier) {
+  try {
+    const apiUrl = getApiUrl();
+    const response = await fetch(`${apiUrl}/auth/encryption-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ salt, verifier, recovery_verifier }),
+    });
+    if (!response.ok) throw new Error('Failed to save encryption password');
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+    showToast('Error saving encryption password');
+    return null;
+  }
+}
+
+export async function removeEncryptionPasswordApi() {
+  try {
+    const apiUrl = getApiUrl();
+    const response = await fetch(`${apiUrl}/auth/encryption-password`, { method: 'DELETE' });
+    if (!response.ok) throw new Error('Failed to remove encryption password');
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+    showToast('Error removing encryption password');
+    return null;
+  }
+}
+
+export async function setNoteEncryptedContent(noteId, content, encrypted) {
+  try {
+    const apiUrl = getApiUrl();
+    const response = await fetch(`${apiUrl}/notes/${noteId}/encrypted`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content, encrypted }),
+    });
+    if (!response.ok) throw new Error('Failed to update note encryption');
+    clearAllCaches();
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+    showToast('Error updating note');
+    return null;
+  }
+}
+
 export async function deleteEmptyNotes() {
   try {
     const apiUrl = getApiUrl();
