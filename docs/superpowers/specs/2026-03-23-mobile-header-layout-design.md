@@ -41,13 +41,28 @@ Several mobile and responsive layout issues degrade usability:
 
 **Current:** Dynamically created in `responsive.js`, appended to `<body>`, fixed position `top: 10px; left: 10px`. Overlaps open sidebar.
 
-**New:** Static HTML button `#navToggleBtn` placed as the **first child** of `.notes-header` in `index.html`. Shown on mobile and tablet (≤ 1199px), hidden on desktop (≥ 1200px) via CSS. Remove dynamic creation from `responsive.js` entirely — wire the click handler to `#navToggleBtn` by ID instead.
+**New:** Static HTML button placed as the **first child** of `.notes-header` in `index.html`:
+
+```html
+<button class="nav-toggle" id="navToggleBtn" aria-label="Toggle sidebar">&#9776;</button>
+```
+
+- Shown on mobile and tablet (≤ 1199px), hidden on desktop (≥ 1200px) via CSS
+- Base rule: `display: none` (desktop default)
+- Shown via: `@media (max-width: 1199px) { .nav-toggle { display: flex; } }` — single rule in `responsive.css`, canonical location
+- Remove the `.nav-toggle` block entirely from `components.css` (both base and the `@media (max-width: 768px)` override)
+
+**`responsive.js` changes:**
+- Remove the dynamic button creation block (`setupMobileNavigation` creates and appends the button — remove that part only)
+- Wire the click handler to `document.getElementById('navToggleBtn')` instead
+- Update `handleScreenResize()`: it currently checks `window.innerWidth <= 768` and calls `navToggle.style.display` with inline styles — change the breakpoint check to `<= 1199px` and **remove the `style.display` manipulation entirely** (CSS handles show/hide; inline styles would override it)
+- The resize handler's sidebar-reset logic (closing sidebar when window widens) should trigger at `>= 1200px` instead of `> 768px`
 
 ### Search & sort buttons
 
 Currently small and inconsistently styled. Both are injected into `.notes-header` by `searchNotes.js` and `sortNotes.js`.
 
-**New:** 38×38px circular buttons with `background: rgba(255,255,255,0.07)` background, 17px icon size. Applied via CSS targeting their existing classes/IDs — no JS changes required.
+**New:** 38×38px circular buttons with `background: rgba(255,255,255,0.07)`, `border-radius: 50%`, 17–18px icon/font size. Applied via CSS targeting their existing classes/IDs in `responsive.css` — no JS changes required.
 
 ### Username badge
 
@@ -57,7 +72,7 @@ Currently `font-size: 12px`, `max-width: 100px` on mobile, heavily truncated.
 
 ### Header height
 
-Increase `.notes-header` height to **56px** on all screen sizes (currently varies). Consistent and touch-friendly.
+Increase `.notes-header` min-height to **56px** on all screen sizes. Consistent and touch-friendly.
 
 ---
 
@@ -69,7 +84,10 @@ Increase `.notes-header` height to **56px** on all screen sizes (currently varie
 | 769px – 1199px | **2 columns max** | Was allowing 3 |
 | ≥ 1200px | 3 columns max | Unchanged |
 
-All `note-count-*` classes that currently set 3 columns (e.g. `note-count-5`, `note-count-6`, `note-count-7` etc.) must be overridden with 2-column layouts in a new `@media (max-width: 1199px)` block in `layout.css`.
+**Implementation:** Replace the existing `@media (max-width: 1200px)` block in `layout.css` (which only partially addresses this) with a `@media (max-width: 1199px)` block that caps **all** multi-column note-count classes at 2 columns, including `note-count-many` which uses `repeat(auto-fill, minmax(...))` and must also be capped. The existing block at `max-width: 1200px` must be removed to avoid the 1px edge case at exactly 1200px.
+
+Classes to cap at 2 columns in the `@media (max-width: 1199px)` block:
+`note-count-3`, `note-count-4`, `note-count-5`, `note-count-6`, `note-count-7`, `note-count-8`, `note-count-9`, `note-count-many`
 
 ---
 
@@ -84,10 +102,10 @@ The `note-count-1` special case (single note fills screen at `min-height: 60vh`)
 ## Implementation Scope
 
 - Modify `frontend/index.html` — add `#navToggleBtn` as first child of `.notes-header`
-- Modify `frontend/js/responsive.js` — remove dynamic button creation; wire click handler to `#navToggleBtn` by ID
-- Modify `frontend/css/responsive.css` — hamburger show/hide by breakpoint; header height; search/sort/username sizing; remove old fixed-position nav-toggle rules
-- Modify `frontend/css/components.css` — remove `.nav-toggle` fixed-position styles (now handled in responsive.css); update `.username-display` sizes
-- Modify `frontend/css/layout.css` — add `@media (max-width: 1199px)` block capping all note-count grids at 2 columns; change mobile `min-height` from 35vh to 45vh
+- Modify `frontend/js/responsive.js` — remove dynamic button creation; wire click handler to `#navToggleBtn`; update `handleScreenResize()` to use 1199px breakpoint and remove inline `style.display` manipulation
+- Modify `frontend/css/responsive.css` — single `@media (max-width: 1199px)` rule for hamburger `display: flex`; header min-height 56px; search/sort 38px circular buttons; username badge sizing
+- Modify `frontend/css/components.css` — remove entire `.nav-toggle` block (base + 768px override); update `.username-display` base sizes
+- Modify `frontend/css/layout.css` — replace existing `@media (max-width: 1200px)` block with `@media (max-width: 1199px)` capping all note-count classes at 2 columns including `note-count-many`; change mobile `min-height` from 35vh to 45vh
 
 ### Out of Scope
 - Spec B features (toolbar trim, sidebar collapse)
@@ -100,8 +118,8 @@ The `note-count-1` special case (single note fills screen at `min-height: 60vh`)
 
 | File | Change |
 |------|--------|
-| `frontend/index.html` | Add `#navToggleBtn` button inside `.notes-header` |
-| `frontend/js/responsive.js` | Remove dynamic button creation; wire to `#navToggleBtn` |
-| `frontend/css/responsive.css` | Breakpoint show/hide for hamburger; header sizing; search/sort/username sizing |
-| `frontend/css/components.css` | Remove `.nav-toggle` fixed-position block; update `.username-display` |
-| `frontend/css/layout.css` | 2-column cap below 1200px; 45vh mobile note height |
+| `frontend/index.html` | Add `#navToggleBtn` as first child of `.notes-header` with `aria-label` and `&#9776;` content |
+| `frontend/js/responsive.js` | Remove dynamic creation; wire to `#navToggleBtn`; fix `handleScreenResize()` breakpoint to 1199px; remove inline style.display calls |
+| `frontend/css/responsive.css` | Single hamburger show rule at ≤1199px; header min-height 56px; search/sort/username sizing |
+| `frontend/css/components.css` | Remove entire `.nav-toggle` block; update `.username-display` sizes |
+| `frontend/css/layout.css` | Replace `max-width: 1200px` block with `max-width: 1199px`; cap all note-count classes at 2 cols; 45vh mobile note height |
