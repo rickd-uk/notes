@@ -13,6 +13,7 @@ import { initToolbarToggle } from "./toolbarToggle.js";
 import { applyToolbarVisibilityToAll } from "./quillEditor.js";
 import { initSpellCheck, applySpellCheckToAll } from "./noteControls.js";
 import { initSidebarToggles } from "./sidebarToggles.js";
+import { loadEncryptionSetup } from "./encryptionManager.js";
 
 // Function to update the username display
 async function updateUsernameDisplay() {
@@ -74,6 +75,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupMobileNavigation();
 
   await updateUsernameDisplay();
+
+  // Load encryption setup
+  await loadEncryptionSetup();
 
   // Load initial data
   await loadCategories();
