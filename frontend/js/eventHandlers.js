@@ -21,6 +21,7 @@ import {
   deleteAllNotesInCategory,
   deleteAllCategories,
   deleteEmptyCategories,
+  deleteEmptyNotes,
   createCategory,
   updateCategory,
   deleteCategory,
@@ -176,6 +177,7 @@ export function setupEventListeners() {
   const settingsModalCloseBtn = document.getElementById("settingsModalCloseBtn");
   const deleteAllCategoriesBtn = document.getElementById("deleteAllCategoriesBtn");
   const deleteEmptyCategoriesBtn = document.getElementById("deleteEmptyCategoriesBtn");
+  const deleteEmptyNotesBtn = document.getElementById("deleteEmptyNotesBtn");
 
   // Keyboard shortcuts
   document.addEventListener("keydown", (e) => {
@@ -222,6 +224,10 @@ export function setupEventListeners() {
         settingsModal.classList.remove("active");
       }
     });
+  }
+
+  if (deleteEmptyNotesBtn) {
+    deleteEmptyNotesBtn.addEventListener("click", handleDeleteEmptyNotes);
   }
 
   if (deleteEmptyCategoriesBtn) {
@@ -575,6 +581,32 @@ export async function handleDeleteAllCategories() {
       } else {
         showToast("All categories deleted");
       }
+    }
+  }
+}
+
+// Handle deletion of empty notes
+export async function handleDeleteEmptyNotes() {
+  const settingsModal = document.getElementById("settingsModal");
+  if (settingsModal) settingsModal.classList.remove("active");
+
+  const confirmed = await confirmDialog(
+    "Remove all notes that are empty or contain only whitespace?",
+    "Remove Empty Notes",
+    "Remove",
+  );
+
+  if (confirmed) {
+    const result = await deleteEmptyNotes();
+
+    if (!result.error) {
+      if (result.count === 0) {
+        showToast("No empty notes found");
+        return;
+      }
+
+      await loadNotes();
+      showToast(`Removed ${result.count} empty note${result.count === 1 ? "" : "s"}`);
     }
   }
 }

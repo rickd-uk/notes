@@ -129,6 +129,28 @@ router.delete("/category/:id", async (req, res) => {
   }
 });
 
+// Delete all empty notes for the current user
+router.delete("/empty", async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    let result;
+    if (userId === "admin") {
+      result = await db.query(
+        "DELETE FROM notes WHERE content IS NULL OR TRIM(content) = '' OR content = '<p><br></p>' RETURNING id"
+      );
+    } else {
+      result = await db.query(
+        "DELETE FROM notes WHERE user_id = $1 AND (content IS NULL OR TRIM(content) = '' OR content = '<p><br></p>') RETURNING id",
+        [userId]
+      );
+    }
+    res.json({ message: "Empty notes deleted", count: result.rowCount });
+  } catch (err) {
+    console.error("Error deleting empty notes:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 // Create a new note for the current user
 // Apply content size validation middleware
 router.post("/", validateNoteContentSize, async (req, res) => {

@@ -395,6 +395,20 @@ export async function deleteCategory(id) {
 
 // Add to api.js - Function to delete all categories
 
+export async function deleteEmptyNotes() {
+  try {
+    const apiUrl = getApiUrl();
+    const response = await fetch(`${apiUrl}/notes/empty`, { method: "DELETE" });
+    if (!response.ok) throw new Error("Failed to delete empty notes");
+    clearAllCaches();
+    return await response.json();
+  } catch (error) {
+    console.error("Error deleting empty notes:", error);
+    showToast("Error deleting empty notes");
+    return { error: true };
+  }
+}
+
 export async function deleteEmptyCategories() {
   try {
     const apiUrl = getApiUrl();
