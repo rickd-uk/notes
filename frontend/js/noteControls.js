@@ -1,9 +1,10 @@
 // noteControls.js - Controls for expanded note mode
-import { getQuillEditor, getAllQuillEditors } from "./quillEditor.js";
+import { getQuillEditor, getAllQuillEditors, setEditorReadOnly } from "./quillEditor.js";
 import {
   toggleToolbars,
   getToolbarsVisible,
 } from "./toolbarToggle.js";
+import { setNoteReadOnly } from "./api.js";
 
 // Track spell check state globally - default to enabled
 let spellCheckEnabled = false;
@@ -15,7 +16,7 @@ let savedSpellCheckState = null;
  * Create and add controls to an expanded note
  * @param {HTMLElement} noteElement - The expanded note element
  */
-export function addExpandedNoteControls(_noteElement) {
+export function addExpandedNoteControls(noteElement) {
   // Create controls container
   const controlsContainer = document.querySelector(".expanded-note-controls");
 
@@ -64,9 +65,44 @@ export function addExpandedNoteControls(_noteElement) {
     spellCheckBtn.classList.toggle("active", spellCheckEnabled);
   });
 
+  // Add lock/unlock toggle button
+  const noteId = noteElement.dataset.id;
+  const isReadOnly = noteElement.dataset.readOnly === "true";
+
+  const lockBtn = document.createElement("button");
+  lockBtn.className = `expanded-control-btn${isReadOnly ? " active" : ""}`;
+  lockBtn.innerHTML = `
+    <span>${isReadOnly ? "🔒" : "🔓"}</span>
+    <span class="tooltip">${isReadOnly ? "Unlock note" : "Lock note"}</span>
+  `;
+  lockBtn.addEventListener("click", async () => {
+    const nowReadOnly = noteElement.dataset.readOnly !== "true";
+    const result = await setNoteReadOnly(noteId, nowReadOnly);
+    if (result) {
+      noteElement.dataset.readOnly = nowReadOnly ? "true" : "false";
+      noteElement.classList.toggle("note--locked", nowReadOnly);
+      // Update lock badge on card
+      const existing = noteElement.querySelector(".note-lock-badge");
+      if (nowReadOnly && !existing) {
+        const badge = document.createElement("div");
+        badge.className = "note-lock-badge";
+        badge.title = "Read-only";
+        badge.textContent = "🔒";
+        noteElement.appendChild(badge);
+      } else if (!nowReadOnly && existing) {
+        existing.remove();
+      }
+      setEditorReadOnly(noteId, nowReadOnly);
+      lockBtn.classList.toggle("active", nowReadOnly);
+      lockBtn.querySelector("span:first-child").textContent = nowReadOnly ? "🔒" : "🔓";
+      lockBtn.querySelector(".tooltip").textContent = nowReadOnly ? "Unlock note" : "Lock note";
+    }
+  });
+
   // Add buttons to container
   controlsContainer.appendChild(toolbarToggleBtn);
   controlsContainer.appendChild(spellCheckBtn);
+  controlsContainer.appendChild(lockBtn);
 
   // Add container to the document body - needs to be at body level because note is positioned fixed
   document.body.appendChild(controlsContainer);

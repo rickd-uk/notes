@@ -395,6 +395,24 @@ export async function deleteCategory(id) {
 
 // Add to api.js - Function to delete all categories
 
+export async function setNoteReadOnly(noteId, readOnly) {
+  try {
+    const apiUrl = getApiUrl();
+    const response = await fetch(`${apiUrl}/notes/${noteId}/readonly`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ read_only: readOnly }),
+    });
+    if (!response.ok) throw new Error("Failed to update note");
+    clearAllCaches();
+    return await response.json();
+  } catch (error) {
+    console.error("Error toggling read-only:", error);
+    showToast("Error updating note");
+    return null;
+  }
+}
+
 export async function deleteEmptyNotes() {
   try {
     const apiUrl = getApiUrl();

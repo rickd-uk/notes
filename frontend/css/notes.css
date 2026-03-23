@@ -299,3 +299,39 @@ button.note-delete:hover {
     background-color: rgba(255, 255, 255, 0.9) !important;
   }
 }
+
+/* ── Read-only / locked notes ─────────────────────────────── */
+
+.note-lock-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-size: 13px;
+  line-height: 1;
+  opacity: 0.55;
+  pointer-events: none;
+  user-select: none;
+}
+
+.note--locked {
+  cursor: default;
+}
+
+.note--locked .ql-editor {
+  cursor: default;
+  user-select: text; /* allow copying */
+}
+
+/* Subtle tint on locked note cards */
+.note--locked::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1.5px solid rgba(98, 0, 238, 0.18);
+  pointer-events: none;
+}
+
+body.dark-mode .note--locked::after {
+  border-color: rgba(187, 134, 252, 0.2);
+}

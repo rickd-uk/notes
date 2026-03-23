@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS notes (
     category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    read_only BOOLEAN DEFAULT FALSE
 );
 
 -- Create index for faster queries

@@ -196,6 +196,12 @@ router.put("/:id", validateNoteContentSize, async (req, res) => {
     const { content, category_id } = req.body;
     const userId = req.user.userId;
 
+    // Block writes to read-only notes
+    const check = await db.query("SELECT read_only FROM notes WHERE id = $1", [id]);
+    if (check.rows.length > 0 && check.rows[0].read_only) {
+      return res.status(403).json({ error: "Note is read-only" });
+    }
+
     // Handle admin user from .env file (backward compatibility)
     if (userId === "admin") {
       const result = await db.query(
@@ -233,6 +239,36 @@ router.put("/:id", validateNoteContentSize, async (req, res) => {
       });
     }
 
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Toggle read-only on a note (must be before /:id to avoid wildcard match)
+router.patch("/:id/readonly", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { read_only } = req.body;
+    const userId = req.user.userId;
+
+    let result;
+    if (userId === "admin") {
+      result = await db.query(
+        "UPDATE notes SET read_only = $1 WHERE id = $2 RETURNING *",
+        [read_only, id]
+      );
+    } else {
+      result = await db.query(
+        "UPDATE notes SET read_only = $1 WHERE id = $2 AND user_id = $3 RETURNING *",
+        [read_only, id, userId]
+      );
+    }
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Note not found or unauthorized" });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 });

@@ -20,6 +20,7 @@ import {
   clearQuillEditors,
   focusQuillEditor,
   updateQuillEditorLayout,
+  setEditorReadOnly,
 } from "./quillEditor.js";
 import { hideAllNoteButtons, recreateAllNoteButtons } from "./uiUtils.js";
 import { showNoteCategoryModal } from "./noteCategoryManager.js";
@@ -51,8 +52,9 @@ export function renderNotes() {
 
     notes.forEach((note) => {
       const noteElement = document.createElement("div");
-      noteElement.className = "note";
+      noteElement.className = "note" + (note.read_only ? " note--locked" : "");
       noteElement.dataset.id = note.id;
+      noteElement.dataset.readOnly = note.read_only ? "true" : "false";
 
       const date = new Date(note.updated_at);
       const formattedDate = date.toLocaleString(undefined, {
@@ -84,9 +86,9 @@ export function renderNotes() {
   <div class="note-timestamp">${formattedDate}</div>
   <div class="note-category" data-category-id="${categoryId || "null"}">
     <div class="note-category-icon">${categoryIcon}</div>
-    <!-- <div class="note-category-name">${categoryName}</div>  -->
   </div>
 </div>
+${note.read_only ? '<div class="note-lock-badge" title="Read-only">🔒</div>' : ""}
 <button class="note-delete" title="Delete note">🗑️</button>
 <div class="note-expand" title="Expand/collapse note">
   <span class="expand-icon">⤢</span>
@@ -111,6 +113,9 @@ export function renderNotes() {
 
       // Create Quill editor for this note
       createQuillEditor(noteElement, noteId, content);
+      if (noteElement.dataset.readOnly === "true") {
+        setEditorReadOnly(noteId, true);
+      }
 
       // Add event listeners
       const deleteBtn = noteElement.querySelector(".note-delete");

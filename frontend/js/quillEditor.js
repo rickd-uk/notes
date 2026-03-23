@@ -245,6 +245,19 @@ export function createQuillEditor(noteElement, noteId, initialContent) {
   return quill;
 }
 
+// Enable or disable editing for a note's Quill editor
+export function setEditorReadOnly(noteId, readOnly) {
+  const quill = quillEditors[noteId];
+  if (!quill) return;
+  quill.enable(!readOnly);
+  // Hide toolbar when read-only
+  const noteEl = document.querySelector(`.note[data-id="${noteId}"]`);
+  if (noteEl) {
+    const toolbar = noteEl.querySelector(".ql-toolbar");
+    if (toolbar) toolbar.style.display = readOnly ? "none" : "";
+  }
+}
+
 // Apply current toolbar visibility to a specific editor
 export function applyToolbarVisibility(noteId) {
   const toolbarsVisible = getToolbarsVisible();
