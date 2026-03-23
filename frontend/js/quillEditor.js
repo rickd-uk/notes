@@ -19,13 +19,10 @@ let quillEditors = {};
 
 // Configure Quill toolbar options
 const quillToolbarOptions = [
-  ["bold", "italic", "underline", "strike"],
-  ["blockquote", "code-block"],
+  ["bold", "italic", "underline"],
   [{ header: 1 }, { header: 2 }],
-  [{ list: "ordered" }, { list: "bullet" }],
-  [{ color: [] }, { background: [] }],
-  ["link"],
-  ["clean"],
+  [{ list: "ordered" }],
+  [{ color: [] }],
 ];
 
 // Show a temporary warning message
