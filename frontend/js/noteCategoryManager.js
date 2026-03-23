@@ -153,26 +153,18 @@ export function hideNoteCategoryModal() {
   if (!categoryModal) return;
 
   categoryModal.classList.remove("active");
-
-  // CRUCIAL FIX: Clear the mode
-  categoryModal.removeAttribute("data-mode");
-
-  // Restore potentially hidden elements for other modal uses
-  if (categoryInput) categoryInput.style.display = "";
-  if (iconSelector) iconSelector.style.display = "";
-  if (confirmCategoryBtn) confirmCategoryBtn.style.display = "";
-
-  // Remove the category selection list content
-  const categorySelectionDiv = document.getElementById("categorySelectionList");
-  if (categorySelectionDiv) {
-    categorySelectionDiv.innerHTML = "";
-  }
-
-  // Clear the current edit note ID
+  categoryModal.onclick = null;
   currentEditNoteId = null;
 
-  // Remove click handler to prevent memory leaks
-  categoryModal.onclick = null;
+  // Restore hidden elements AFTER the fade-out transition (200ms) to avoid flash
+  setTimeout(() => {
+    categoryModal.removeAttribute("data-mode");
+    if (categoryInput) categoryInput.style.display = "";
+    if (iconSelector) iconSelector.style.display = "";
+    if (confirmCategoryBtn) confirmCategoryBtn.style.display = "";
+    const categorySelectionDiv = document.getElementById("categorySelectionList");
+    if (categorySelectionDiv) categorySelectionDiv.innerHTML = "";
+  }, 200);
 }
 
 // Change a note's category
