@@ -204,6 +204,30 @@ export function renderNotes() {
     notesContainer.classList.add("note-count-many");
     notesContainer.classList.add("notes-count-many");
   }
+
+  // Toggle view-all class for category badge visibility
+  if (getCurrentCategoryId() === 'all') {
+    notesContainer.classList.add('view-all');
+  } else {
+    notesContainer.classList.remove('view-all');
+  }
+
+  updateCurrentCategoryDisplay();
+}
+
+export function updateCurrentCategoryDisplay() {
+  const el = elements.currentCategoryElement;
+  if (!el) return;
+  const categoryId = getCurrentCategoryId();
+  if (categoryId === 'all') {
+    el.textContent = '📄 All Notes';
+  } else if (categoryId === 'uncategorized') {
+    el.textContent = '📌 Uncategorized';
+  } else {
+    const cats = getCategories();
+    const cat = cats.find(c => String(c.id) === String(categoryId));
+    el.textContent = cat ? `${cat.icon || '📁'} ${cat.name}` : '';
+  }
 }
 
 // Render categories in the UI

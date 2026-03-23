@@ -13,7 +13,6 @@ import { initToolbarToggle } from "./toolbarToggle.js";
 import { applyToolbarVisibilityToAll } from "./quillEditor.js";
 import { initSpellCheck, applySpellCheckToAll } from "./noteControls.js";
 import { initSidebarToggles } from "./sidebarToggles.js";
-import { initSidebarCollapse } from "./sidebarCollapse.js";
 
 // Function to update the username display
 async function updateUsernameDisplay() {
@@ -73,9 +72,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Set up mobile navigation
   setupMobileNavigation();
-
-  // Initialize desktop sidebar collapse (buttons exist in HTML at parse time)
-  initSidebarCollapse();
 
   await updateUsernameDisplay();
 

@@ -99,7 +99,7 @@ body.dark-mode .ql-editor.ql-blank::before {
 
 body.dark-mode .note {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    border: 1px solid #2e2e2e;
+    border: 1px solid #4a4a4a;
 }
 
 body.dark-mode .note:hover {

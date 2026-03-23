@@ -42,18 +42,29 @@
   grid-column: 3 / 4 !important;
 }
 
-/* Four to six notes - 2 rows of 3 (or fewer) */
-.notes-container.note-count-4,
-.notes-container.note-count-5,
-.notes-container.note-count-6 {
+/* Four notes */
+.notes-container.note-count-4 {
   grid-template-columns: 1fr 1fr 1fr !important;
-  grid-template-rows: 1fr 1fr !important;
+  grid-template-rows: minmax(40vh, 1fr) minmax(40vh, 1fr) !important;
 }
 
-.notes-container.note-count-4 .note,
-.notes-container.note-count-5 .note,
-.notes-container.note-count-6 .note {
+.notes-container.note-count-4 .note {
   min-height: 40vh !important;
+}
+
+/* Five to six notes — flex wrap avoids grid row height issues with definite container */
+.notes-container.note-count-5,
+.notes-container.note-count-6 {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-content: flex-start !important;
+}
+
+.notes-container.note-count-5 > .note,
+.notes-container.note-count-6 > .note {
+  flex: 0 0 calc(33.333% - 14px) !important;
+  min-height: 40vh !important;
+  height: auto !important;
 }
 
 /* Fixed layout for 4 notes - 2x2 grid */
@@ -100,18 +111,18 @@
     grid-column: 3 / 4 !important;
   }
   
-  /* Make 4-6 notes fit in 2 rows */
-  .notes-container.note-count-4,
-  .notes-container.note-count-5,
-  .notes-container.note-count-6 {
-    grid-template-columns: 1fr 1fr 1fr !important;
-    grid-template-rows: 1fr 1fr !important;
-  }
-  
   /* Make 4 notes fit in 2 rows of 2 */
   .notes-container.note-count-4 {
     grid-template-columns: 1fr 1fr !important;
     grid-template-rows: 1fr 1fr !important;
+  }
+}
+
+/* Tablet: 2-column layout for 5-6 notes */
+@media (max-width: 1399px) {
+  .notes-container.note-count-5 > .note,
+  .notes-container.note-count-6 > .note {
+    flex: 0 0 calc(50% - 10px) !important;
   }
 }
 
@@ -153,6 +164,14 @@
   /* Last note shouldn't have bottom margin */
   .notes-container .note:last-child {
     margin-bottom: 0 !important;
+  }
+
+  /* Reset flex-basis for 5-6 notes on mobile (column direction, basis = height) */
+  .notes-container.note-count-5 > .note,
+  .notes-container.note-count-6 > .note {
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    min-height: 45vh !important;
   }
 }
 

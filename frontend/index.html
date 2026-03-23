@@ -74,11 +74,6 @@
   </head>
   <body>
     <div class="sidebar">
-      <script>
-        if (localStorage.getItem('sidebarCollapsed') === 'true') {
-          document.currentScript.parentElement.classList.add('collapsed');
-        }
-      </script>
       <div class="frontpage-image">
         <!--  <img src="images/simple-notes.png" alt="Simple Notes"
         onerror="this.outerHTML='<div class=\'fallback-text\'>Welcome to Simple Notes!</div>'" > 
@@ -121,10 +116,6 @@
           </label>
         </div>
       </div>
-      <div class="sidebar-collapse-controls">
-        <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" title="Collapse sidebar">Collapse</button>
-        <button class="sidebar-expand-btn" id="sidebarExpandBtn" title="Expand sidebar">&#8250;</button>
-      </div>
       <div class="sidebar-footer">
         <button id="logoutBtn" class="logout-btn">Logout</button>
         <button id="settingsBtn" class="settings-btn" aria-label="Settings" title="Settings">⚙</button>
@@ -134,6 +125,7 @@
     <div class="main">
       <div class="notes-header">
         <button class="nav-toggle" id="navToggleBtn" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="current-category"></div>
         <div class="user-info">
           <span class="username-display" id="usernameDisplay">Loading...</span>
         </div>

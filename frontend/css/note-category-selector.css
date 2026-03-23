@@ -1,5 +1,10 @@
 /* note-category-selector.css - Styling for note categories and category selection */
 
+/* Hide category badge when not in All Notes view */
+.notes-container:not(.view-all) .note-category {
+  display: none;
+}
+
 /* ===== Note Category Label Styling ===== */
 .note-category {
   display: flex;
