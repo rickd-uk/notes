@@ -28,12 +28,8 @@
     align-items: center;
 }
 
-/* Responsive styles */
-@media (max-width: 768px) {
-  body {
-    flex-direction: column;
-  }
-
+/* Tablet and mobile: sidebar is a hidden drawer */
+@media (max-width: 1199px) {
   .sidebar {
     position: fixed;
     left: -100%;
@@ -53,6 +49,29 @@
   .main {
     width: 100%;
     margin-left: 0;
+  }
+
+  /* Overlay for when sidebar is open */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 98;
+  }
+
+  .sidebar-overlay.active {
+    display: block;
+  }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  body {
+    flex-direction: column;
   }
 
   /* Makes sure Title is centered & burger bar on left */
@@ -107,22 +126,6 @@
 
   .note {
     min-height: 120px;
-  }
-
-  /* Overlay for when sidebar is open */
-  .sidebar-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 98;
-  }
-
-  .sidebar-overlay.active {
-    display: block;
   }
 
   /* Adjust expanded note for mobile */
