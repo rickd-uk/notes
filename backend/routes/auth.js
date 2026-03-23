@@ -404,6 +404,9 @@ router.post('/encryption-password', authenticate, async (req, res) => {
     if (!salt || !verifier || !recovery_verifier) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
+    if (salt.length > 100 || verifier.length > 500 || recovery_verifier.length > 500) {
+      return res.status(400).json({ error: 'Invalid field lengths' });
+    }
     await db.query(
       `UPDATE users SET
         encryption_salt = $1,
