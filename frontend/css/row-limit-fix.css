@@ -169,6 +169,33 @@
   }
 }
 
+/* Tablet and below: max 2 columns — overrides unconditional 3-col rules above */
+@media (max-width: 1399px) {
+  .notes-container.note-count-3 {
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: auto !important;
+  }
+
+  .notes-container.note-count-3 .note:nth-child(3) {
+    grid-column: 1 / span 2 !important;
+  }
+
+  .notes-container.note-count-4,
+  .notes-container.note-count-5,
+  .notes-container.note-count-6,
+  .notes-container.note-count-7,
+  .notes-container.note-count-8,
+  .notes-container.note-count-9 {
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: auto !important;
+  }
+
+  .notes-container.note-count-many {
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-rows: auto !important;
+  }
+}
+
 /* For larger screens, ensure notes look good */
 @media (min-width: 1520px) {
   .notes-container.note-count-1 .note {
