@@ -339,7 +339,7 @@ export function updateButtonPlacement() {
   const addNoteBtn = document.getElementById('addNoteBtn');
   
   if (bulkDeleteBtn && notesHeader && addNoteBtn) {
-    if (window.innerWidth <= 768) {
+    if (window.innerWidth <= 1199) {
       // Move to left side on mobile
       notesHeader.insertBefore(bulkDeleteBtn, notesHeader.firstChild);
     } else {
