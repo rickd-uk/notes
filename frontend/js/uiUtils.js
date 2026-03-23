@@ -25,7 +25,7 @@ export function hideAllNoteButtons() {
 
 // Function to recreate delete buttons when modals are closed
 export function recreateAllNoteButtons() {
-  document.querySelectorAll('.note').forEach(note => {
+  document.querySelectorAll('.note:not(.expanded)').forEach(note => {
     // Only add if doesn't exist
     if (!note.querySelector('.note-delete')) {
       const newBtn = document.createElement('button');

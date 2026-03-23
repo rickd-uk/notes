@@ -1,9 +1,6 @@
 // searchNotes.js - Live search with floating results panel
 import { getNotes } from "./state.js";
-import { renderNotes } from "./ui.js";
 
-let currentSearchTerm = "";
-let originalNotes = null;
 let selectedIndex = -1;
 let showMoreContext = false;
 
@@ -197,8 +194,6 @@ function openPanel() {
 function closePanel() {
   const panel = document.getElementById("liveSearchPanel");
   if (panel) panel.classList.remove("active");
-  currentSearchTerm = "";
-  originalNotes = null;
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────

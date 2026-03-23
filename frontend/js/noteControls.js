@@ -3,7 +3,6 @@ import { getQuillEditor, getAllQuillEditors } from "./quillEditor.js";
 import {
   toggleToolbars,
   getToolbarsVisible,
-  setToolbarsVisible,
 } from "./toolbarToggle.js";
 
 // Track spell check state globally - default to enabled
@@ -12,9 +11,7 @@ let spellCheckEnabled = false;
  * Create and add controls to an expanded note
  * @param {HTMLElement} noteElement - The expanded note element
  */
-export function addExpandedNoteControls(noteElement) {
-  const noteId = noteElement.dataset.id;
-
+export function addExpandedNoteControls(_noteElement) {
   // Create controls container
   const controlsContainer = document.querySelector(".expanded-note-controls");
 
@@ -27,12 +24,6 @@ export function addExpandedNoteControls(noteElement) {
 
   // Clear any previous buttons from the container to prevent duplicates
   controlsContainer.innerHTML = "";
-
-  // Get current states - ensure toolbar is visible by default in expanded view
-  const wasVisible = getToolbarsVisible();
-  if (!wasVisible) {
-    setToolbarsVisible(true); // Turn on toolbars when expanding
-  }
 
   // Add toolbar toggle button with improved icon
   const toolbarToggleBtn = document.createElement("button");
@@ -71,12 +62,6 @@ export function addExpandedNoteControls(noteElement) {
 
   // Add container to the document body - needs to be at body level because note is positioned fixed
   document.body.appendChild(controlsContainer);
-
-  // Ensure spell check is on when expanding a note
-  if (!spellCheckEnabled) {
-    toggleSpellCheck();
-    //spellCheckBtn.classList.add("active");
-  }
 
   // Apply current spell check state to all editors for consistency
   applySpellCheckToAll(spellCheckEnabled);
