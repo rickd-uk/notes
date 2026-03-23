@@ -25,7 +25,6 @@ export function showNoteCategoryModal(noteId) {
   const categoryModal = document.getElementById("categoryModal");
   const categoryModalHeader = document.getElementById("categoryModalHeader");
   const confirmCategoryBtn = document.getElementById("confirmCategoryBtn");
-  const cancelCategoryBtn = document.getElementById("cancelCategoryBtn");
 
   // Set modal title and mode
   categoryModalHeader.textContent = "Choose Category";

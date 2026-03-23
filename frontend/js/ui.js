@@ -429,10 +429,13 @@ background-color: var(--surface-color);
     // Allow scrolling on main container again
     document.body.style.overflow = "";
 
-    // Hide the expanded note controls toolbar
+    // Hide the expanded note controls toolbar and restore saved settings
     if (expandedNoteControls) {
       expandedNoteControls.classList.remove("active");
     }
+    import("./noteControls.js").then((module) => {
+      module.removeExpandedNoteControls();
+    });
 
     // RESTORE ALL DELETE BUTTONS
     setTimeout(recreateAllNoteButtons, 50);

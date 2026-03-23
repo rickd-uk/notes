@@ -7,6 +7,10 @@ import {
 
 // Track spell check state globally - default to enabled
 let spellCheckEnabled = false;
+
+// Sidebar settings saved before entering expanded view — restored on collapse
+let savedToolbarState = null;
+let savedSpellCheckState = null;
 /**
  * Create and add controls to an expanded note
  * @param {HTMLElement} noteElement - The expanded note element
@@ -21,6 +25,10 @@ export function addExpandedNoteControls(_noteElement) {
     );
     return;
   }
+
+  // Save sidebar settings so we can restore them when the note is collapsed
+  savedToolbarState = getToolbarsVisible();
+  savedSpellCheckState = spellCheckEnabled;
 
   // Clear any previous buttons from the container to prevent duplicates
   controlsContainer.innerHTML = "";
@@ -73,7 +81,19 @@ export function addExpandedNoteControls(_noteElement) {
 export function removeExpandedNoteControls() {
   const controlsContainer = document.querySelector(".expanded-note-controls");
   if (controlsContainer) {
-    controlsContainer.innerHTML = ""; // Clear the buttons
+    controlsContainer.innerHTML = "";
+  }
+
+  // Restore toolbar and spell check to whatever the sidebar had before expanding
+  if (savedToolbarState !== null) {
+    toggleToolbars(savedToolbarState);
+    savedToolbarState = null;
+  }
+  if (savedSpellCheckState !== null) {
+    spellCheckEnabled = savedSpellCheckState;
+    localStorage.setItem("spellCheckEnabled", spellCheckEnabled.toString());
+    applySpellCheckToAll(spellCheckEnabled);
+    savedSpellCheckState = null;
   }
 }
 
