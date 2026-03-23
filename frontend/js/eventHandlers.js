@@ -169,8 +169,6 @@ export function setupEventListeners() {
     }
   });
 
-  // Settings modal wiring (settingsModal, settingsBtn, etc. already declared above)
-
   if (settingsBtn && settingsModal) {
     settingsBtn.addEventListener("click", () => {
       settingsModal.classList.add("active");
