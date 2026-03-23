@@ -245,7 +245,7 @@
 }
 
 /* Tablet and below: max 2 columns */
-@media (max-width: 1199px) {
+@media (max-width: 1399px) {
     .notes-container.note-count-3 {
         grid-template-columns: 1fr 1fr !important;
         grid-template-rows: auto !important;
