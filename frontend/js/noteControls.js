@@ -5,6 +5,14 @@ import {
   getToolbarsVisible,
 } from "./toolbarToggle.js";
 import { setNoteReadOnly } from "./api.js";
+import {
+  hasEncryptionPassword, isUnlocked, encryptNote, decryptAndSaveNote
+} from './encryptionManager.js';
+import { showToast } from './uiUtils.js';
+// NOTE: showUnlockModal is NOT imported statically. eventHandlers.js imports ui.js,
+// ui.js dynamically imports noteControls.js — a static import here would create a
+// cycle that causes showUnlockModal to be undefined at module init time.
+// Use a dynamic import inside the click handler instead (see encrypt button).
 
 // Track spell check state globally - default to enabled
 let spellCheckEnabled = false;
@@ -103,6 +111,75 @@ export function addExpandedNoteControls(noteElement) {
   controlsContainer.appendChild(toolbarToggleBtn);
   controlsContainer.appendChild(spellCheckBtn);
   controlsContainer.appendChild(lockBtn);
+
+  // Add encrypt button — only visible if user has set an encryption password
+  if (hasEncryptionPassword()) {
+    const isEncrypted = noteElement.dataset.encrypted === 'true';
+
+    const encryptBtn = document.createElement('button');
+    encryptBtn.className = `expanded-control-btn${isEncrypted ? ' active' : ''}`;
+    encryptBtn.innerHTML = `
+      <span>${isEncrypted ? '🔐' : '🔓🔐'}</span>
+      <span class="tooltip">${isEncrypted ? 'Decrypt note' : 'Encrypt note'}</span>
+    `;
+
+    encryptBtn.addEventListener('click', async () => {
+      const nowEncrypted = noteElement.dataset.encrypted !== 'true';
+
+      if (!isUnlocked()) {
+        // Dynamic import to avoid static cycle: eventHandlers → ui → (dynamic) noteControls → eventHandlers
+        const { showUnlockModal } = await import('./eventHandlers.js');
+        showUnlockModal(async () => {
+          // retry after unlock
+          encryptBtn.click();
+        });
+        return;
+      }
+
+      try {
+        const quill = (await import('./quillEditor.js')).getQuillEditor(noteId);
+        if (nowEncrypted) {
+          const content = quill ? quill.root.innerHTML : '';
+          await encryptNote(noteId, content);
+          noteElement.dataset.encrypted = 'true';
+          noteElement.dataset.readOnly = 'true';
+          noteElement.classList.add('note--encrypted', 'note--locked');
+          setEditorReadOnly(noteId, true);
+          // Update lock button state too
+          lockBtn.classList.add('active');
+          lockBtn.querySelector('span:first-child').textContent = '🔒';
+        } else {
+          // dataset.encryptedContent is set by ui.js renderNotes (Task 10).
+          // If it's absent (note was just encrypted this session), fall back to
+          // quill content, which IS the ciphertext the server just stored.
+          const ciphertext = noteElement.dataset.encryptedContent || quill?.root.innerHTML || '';
+          if (!ciphertext.startsWith('ENC:')) {
+            showToast('No encrypted content found — reload and try again');
+            return;
+          }
+          const plaintext = await decryptAndSaveNote(noteId, ciphertext);
+          noteElement.dataset.encrypted = 'false';
+          noteElement.dataset.readOnly = 'false';
+          noteElement.classList.remove('note--encrypted', 'note--locked');
+          if (quill) {
+            quill.enable(true);
+            quill.clipboard.dangerouslyPasteHTML(plaintext);
+          }
+          setEditorReadOnly(noteId, false);
+          lockBtn.classList.remove('active');
+          lockBtn.querySelector('span:first-child').textContent = '🔓';
+        }
+        encryptBtn.classList.toggle('active', nowEncrypted);
+        encryptBtn.querySelector('span:first-child').textContent = nowEncrypted ? '🔐' : '🔓🔐';
+        encryptBtn.querySelector('.tooltip').textContent = nowEncrypted ? 'Decrypt note' : 'Encrypt note';
+      } catch (err) {
+        showToast('Encryption error: ' + err.message);
+        console.error(err);
+      }
+    });
+
+    controlsContainer.appendChild(encryptBtn);
+  }
 
   // Add container to the document body - needs to be at body level because note is positioned fixed
   document.body.appendChild(controlsContainer);
