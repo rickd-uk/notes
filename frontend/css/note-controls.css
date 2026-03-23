@@ -114,10 +114,6 @@
   visibility: visible;
 }
 
-.nav-toggle {
-  margin-bottom: 30px;
-}
-
 /* Global spell check toggle in sidebar */
 .spell-check-toggle {
   display: flex;
