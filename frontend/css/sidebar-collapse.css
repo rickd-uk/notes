@@ -1,5 +1,10 @@
 /* sidebar-collapse.css — Desktop-only sidebar collapse (icon strip mode) */
-/* All rules scoped to min-width: 1200px — no effect on tablet/mobile */
+
+/* Hide collapse/expand buttons on tablet and mobile */
+.sidebar-collapse-btn,
+.sidebar-expand-btn {
+  display: none;
+}
 
 @media (min-width: 1200px) {
   /* Enable smooth width transition; overflow:hidden clips content during animation */
