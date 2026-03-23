@@ -46,8 +46,8 @@ body.dark-mode #confirmModal .modal-btn-delete:hover {
 
 /* Animation for modal */
 @keyframes modalFadeIn {
-    from { opacity: 0; transform: translate(-50%, -60%); }
-    to { opacity: 1; transform: translate(-50%, -50%); }
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 #confirmModal.active .modal-content {
