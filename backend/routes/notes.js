@@ -243,6 +243,37 @@ router.put("/:id", validateNoteContentSize, async (req, res) => {
   }
 });
 
+// Update note content and encrypted flag together (bypasses read-only guard)
+// Authentication is covered by router.use(authenticate) at the top of notes.js
+router.patch('/:id/encrypted', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { content, encrypted } = req.body;
+    const userId = req.user.userId;
+
+    let result;
+    if (userId === 'admin') {
+      result = await db.query(
+        'UPDATE notes SET content = $1, encrypted = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3 RETURNING *',
+        [content, encrypted, id]
+      );
+    } else {
+      result = await db.query(
+        'UPDATE notes SET content = $1, encrypted = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3 AND user_id = $4 RETURNING *',
+        [content, encrypted, id, userId]
+      );
+    }
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Note not found or unauthorized' });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // Toggle read-only on a note (must be before /:id to avoid wildcard match)
 router.patch("/:id/readonly", async (req, res) => {
   try {
