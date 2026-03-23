@@ -60,7 +60,6 @@ export function setupEventListeners() {
     categoryInput,
     cancelCategoryBtn, // This might be null
     confirmCategoryBtn,
-    sidebarFooter,
     logoutBtn,
     darkModeToggle,
   } = elements;
@@ -132,52 +131,67 @@ export function setupEventListeners() {
 
   // Keyboard shortcuts
   document.addEventListener("keydown", (e) => {
-    // Close modal with Escape key
-    if (
-      e.key === "Escape" &&
-      categoryModal &&
-      categoryModal.classList.contains("active")
-    ) {
-      handleCategoryModalCancel();
-    }
-
-    // Close expanded note with Escape key
     if (e.key === "Escape") {
+      // Close settings modal
+      const settingsModal = document.getElementById("settingsModal");
+      if (settingsModal && settingsModal.classList.contains("active")) {
+        settingsModal.classList.remove("active");
+        return;
+      }
+
+      // Close category modal
+      if (
+        categoryModal &&
+        categoryModal.classList.contains("active")
+      ) {
+        handleCategoryModalCancel();
+        return;
+      }
+
+      // Close expanded note
       const expandedNote = document.querySelector(".note.expanded");
       if (expandedNote) {
         toggleNoteExpansion(expandedNote);
-        e.preventDefault(); // Prevent other escape key handlers
+        e.preventDefault();
       }
     }
   });
-
-  if (sidebarFooter) {
-    // Check if the button already exists
-    if (!document.getElementById("deleteAllCategoriesBtn")) {
-      const deleteAllCategoriesBtn = document.createElement("button");
-      deleteAllCategoriesBtn.id = "deleteAllCategoriesBtn";
-      deleteAllCategoriesBtn.className = "delete-all-btn";
-      deleteAllCategoriesBtn.innerHTML = "Delete All Categories";
-      deleteAllCategoriesBtn.addEventListener(
-        "click",
-        handleDeleteAllCategories,
-      );
-
-      // Add the button to the sidebar footer
-      const logoutBtnElement = document.getElementById("logoutBtn");
-      if (logoutBtnElement) {
-        sidebarFooter.insertBefore(deleteAllCategoriesBtn, logoutBtnElement);
-      } else {
-        sidebarFooter.appendChild(deleteAllCategoriesBtn);
-      }
-    }
-  }
 
   // Logout button
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
       logout();
     });
+  }
+
+  // Settings modal
+  const settingsBtn = document.getElementById("settingsBtn");
+  const settingsModal = document.getElementById("settingsModal");
+  const settingsModalCloseBtn = document.getElementById("settingsModalCloseBtn");
+  const deleteAllCategoriesBtn = document.getElementById("deleteAllCategoriesBtn");
+
+  if (settingsBtn && settingsModal) {
+    settingsBtn.addEventListener("click", () => {
+      settingsModal.classList.add("active");
+    });
+  }
+
+  if (settingsModalCloseBtn && settingsModal) {
+    settingsModalCloseBtn.addEventListener("click", () => {
+      settingsModal.classList.remove("active");
+    });
+  }
+
+  if (settingsModal) {
+    settingsModal.addEventListener("click", (e) => {
+      if (e.target === settingsModal) {
+        settingsModal.classList.remove("active");
+      }
+    });
+  }
+
+  if (deleteAllCategoriesBtn) {
+    deleteAllCategoriesBtn.addEventListener("click", handleDeleteAllCategories);
   }
 
   // Handle window resize
