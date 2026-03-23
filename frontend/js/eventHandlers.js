@@ -498,9 +498,9 @@ export function handleCategoryModalCancel() {
 // Handle deletion of all categories
 export async function handleDeleteAllCategories() {
   const confirmed = await confirmDialog(
-    "Are you sure you want to delete ALL categories? All notes will be moved to Uncategorized. This action cannot be undone.",
+    "Are you sure?",
     "Delete All Categories",
-    "Delete All",
+    "Yes",
   );
 
   if (confirmed) {
