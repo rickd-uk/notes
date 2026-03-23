@@ -300,6 +300,12 @@ export function handleNoteInput(noteId, content) {
 
 // Handle note deletion
 export async function handleNoteDelete(noteId) {
+  const noteEl = document.querySelector(`.note[data-id="${noteId}"]`);
+  if (noteEl && noteEl.dataset.readOnly === "true") {
+    showToast("Unlock the note before deleting it");
+    return;
+  }
+
   const success = await deleteNote(noteId);
 
   if (success) {

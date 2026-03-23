@@ -315,6 +315,7 @@ button.note-delete:hover {
 
 .note--locked {
   cursor: default;
+  border: 2px solid rgba(98, 0, 238, 0.45) !important;
 }
 
 .note--locked .ql-editor {
@@ -322,16 +323,6 @@ button.note-delete:hover {
   user-select: text; /* allow copying */
 }
 
-/* Subtle tint on locked note cards */
-.note--locked::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  border: 1.5px solid rgba(98, 0, 238, 0.18);
-  pointer-events: none;
-}
-
-body.dark-mode .note--locked::after {
-  border-color: rgba(187, 134, 252, 0.2);
+body.dark-mode .note--locked {
+  border-color: rgba(187, 134, 252, 0.5) !important;
 }

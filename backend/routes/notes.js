@@ -279,6 +279,12 @@ router.delete("/:id", async (req, res) => {
     const { id } = req.params;
     const userId = req.user.userId;
 
+    // Block deletion of read-only notes
+    const check = await db.query("SELECT read_only FROM notes WHERE id = $1", [id]);
+    if (check.rows.length > 0 && check.rows[0].read_only) {
+      return res.status(403).json({ error: "Note is read-only" });
+    }
+
     // Handle admin user from .env file (backward compatibility)
     if (userId === "admin") {
       await db.query("DELETE FROM notes WHERE id = $1", [id]);
