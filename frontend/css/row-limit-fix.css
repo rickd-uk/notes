@@ -145,6 +145,7 @@
   .notes-container.note-count-many {
     display: flex !important;
     flex-direction: column !important;
+    flex-wrap: nowrap !important;
     grid-template-columns: 1fr !important;
     grid-template-rows: auto !important;
     max-height: none !important;
