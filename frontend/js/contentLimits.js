@@ -3,13 +3,13 @@
 // ===== CONFIGURATION =====
 // Maximum content size in characters (500KB of HTML ~ 500,000 characters)
 // This is a reasonable limit that works well with most browsers and databases
-const MAX_CONTENT_SIZE = 500000; // 500KB
+const MAX_CONTENT_SIZE = 5000000; // 5MB
 
 // Warning threshold (80% of max) - when to warn users they're approaching the limit
-const WARNING_THRESHOLD = MAX_CONTENT_SIZE * 0.8; // 400KB
+const WARNING_THRESHOLD = MAX_CONTENT_SIZE * 0.8; // 4MB
 
-// Smaller limit for paste operations to ensure they complete successfully
-const MAX_PASTE_SIZE = 250000; // 250KB for individual paste operations
+// Paste limit — same as overall content limit
+const MAX_PASTE_SIZE = 5000000; // 5MB
 
 // ===== UTILITY FUNCTIONS =====
 
