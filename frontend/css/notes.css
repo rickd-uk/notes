@@ -3,7 +3,7 @@
 .note {
   background-color: var(--surface-color);
   border-radius: var(--border-radius);
-  padding: 15px;
+  padding: 10px 10px 6px 10px;
   display: flex;
   flex-direction: column;
   min-height: 150px;
@@ -66,12 +66,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 10px;
-  font-size: 12px;
+  margin-top: 4px;
+  font-size: 11px;
   color: #757575;
   position: relative;
-  min-height: 20px;
-  flex-shrink: 0; /* Prevent shrinking */
+  height: 18px;
+  min-height: unset;
+  flex-shrink: 0;
   width: 100%;
 }
 
