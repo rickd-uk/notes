@@ -1,5 +1,6 @@
 // searchNotes.js - Live search with floating results panel
 import { getNotes } from "./state.js";
+import { getQuillEditor } from "./quillEditor.js";
 
 let selectedIndex = -1;
 let showMoreContext = false;
@@ -25,16 +26,29 @@ function highlight(plainText, term) {
 }
 
 function getPreview(note, expanded) {
-  const text = getPlainText(note.content);
-  if (!text) return "(empty note)";
-  return text.slice(0, expanded ? 220 : 90);
+  const text = getNoteSearchText(note);
+  if (!text || !text.trim()) return "(empty note)";
+  return text.trim().slice(0, expanded ? 220 : 90);
+}
+
+function getNoteSearchText(note) {
+  // For encrypted notes, prefer the live editor content (decrypted when "Show Encrypted" is ON)
+  if (note.encrypted) {
+    const quill = getQuillEditor(String(note.id));
+    if (quill) {
+      const editorText = quill.getText();
+      // If the editor has real content (not just a newline), use it
+      if (editorText && editorText.trim().length > 0) return editorText;
+    }
+  }
+  return getPlainText(note.content);
 }
 
 function matchNotes(term) {
   if (!term || !term.trim()) return [];
   const lower = term.toLowerCase().trim();
   return getNotes().filter(note =>
-    getPlainText(note.content).toLowerCase().includes(lower)
+    getNoteSearchText(note).toLowerCase().includes(lower)
   );
 }
 
@@ -95,7 +109,15 @@ function createPanel() {
     }
   });
 
-  closeBtn.addEventListener("click", () => closePanel());
+  closeBtn.addEventListener("click", () => {
+    if (input.value) {
+      input.value = "";
+      renderResults("");
+      input.focus();
+    } else {
+      closePanel();
+    }
+  });
 
   expandCheck.addEventListener("change", e => {
     showMoreContext = e.target.checked;
