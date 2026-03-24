@@ -250,11 +250,14 @@ export function setEditorReadOnly(noteId, readOnly) {
   const quill = quillEditors[noteId];
   if (!quill) return;
   quill.enable(!readOnly);
-  // Hide toolbar when read-only
   const noteEl = document.querySelector(`.note[data-id="${noteId}"]`);
   if (noteEl) {
+    // Hide toolbar when read-only
     const toolbar = noteEl.querySelector(".ql-toolbar");
     if (toolbar) toolbar.style.display = readOnly ? "none" : "";
+    // Update placeholder to reflect read-only state
+    const editor = noteEl.querySelector(".ql-editor");
+    if (editor) editor.dataset.placeholder = readOnly ? "Empty note." : "Start writing...";
   }
 }
 

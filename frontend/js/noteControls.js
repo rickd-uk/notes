@@ -253,31 +253,24 @@ export function addExpandedNoteControls(noteElement) {
   // Apply current spell check state to all editors for consistency
   applySpellCheckToAll(spellCheckEnabled);
 
-  // ── Mobile nav bar ────────────────────────────────────────
-  // Only inject on mobile viewports to avoid unnecessary DOM on desktop.
-  // Note: viewport width is sampled at expansion time. If the window is resized
-  // while a note is expanded (desktop→mobile or vice versa), the nav bar will not
-  // update. This is an acceptable edge case for a mobile-first feature.
-  if (window.innerWidth <= 768) {
-    _injectMobileNav(noteElement);
-  }
+  // ── Nav bar ────────────────────────────────────────────────
+  _injectMobileNav(noteElement);
 }
 
 /**
- * Inject the mobile top nav bar into an expanded note.
- * Called only at mobile viewport widths (≤768px).
+ * Inject the top nav bar into an expanded note.
  * @param {HTMLElement} noteElement
  */
 function _injectMobileNav(noteElement) {
   // Remove any stale nav from a previous expansion
-  noteElement.querySelector('.mobile-note-nav')?.remove();
+  noteElement.querySelector('.note-nav')?.remove();
 
   const noteId = noteElement.dataset.id;
   const isReadOnly = noteElement.dataset.readOnly === 'true';
   const isEncrypted = noteElement.dataset.encrypted === 'true';
 
   const nav = document.createElement('div');
-  nav.className = 'mobile-note-nav';
+  nav.className = 'note-nav';
 
   // Helper to create a nav button
   function navBtn(content, label, extraClass = '') {
@@ -401,8 +394,8 @@ export function removeExpandedNoteControls() {
 
   // Remove mobile nav bar if present.
   // Note: .expanded is already removed from the note by the time this runs,
-  // so we query document-wide — only one .mobile-note-nav can exist at a time.
-  document.querySelector('.mobile-note-nav')?.remove();
+  // so we query document-wide — only one .note-nav can exist at a time.
+  document.querySelector('.note-nav')?.remove();
 }
 
 /**
