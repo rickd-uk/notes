@@ -361,10 +361,9 @@ function _injectMobileNav(noteElement) {
 
   // 🗑 — Delete button (far right)
   const deleteBtn = navBtn('🗑', 'Delete note', 'mobile-nav-delete');
-  deleteBtn.addEventListener('click', () => {
-    // Delegate to the note's own delete button which has confirm-dialog wiring.
-    const noteDeleteBtn = noteElement.querySelector('button.note-delete');
-    if (noteDeleteBtn) noteDeleteBtn.click();
+  deleteBtn.addEventListener('click', async () => {
+    const { handleNoteDelete } = await import('./eventHandlers.js');
+    handleNoteDelete(noteId);
   });
 
   // Assemble: ← | T | Aa | ✏️ | [🔐] | → | 🗑
