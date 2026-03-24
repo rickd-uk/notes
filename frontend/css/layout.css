@@ -138,104 +138,52 @@ body.dark-mode .empty-title {
     min-height: 70vh;
 }
 
-/* Two notes - side by side */
+/* ── Multi-note layouts — all use a fixed row height so content never distorts the grid ── */
+
 .notes-container.note-count-2 {
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr;
+    grid-auto-rows: 300px;
 }
 
-.notes-container.note-count-2 .note {
-    width: 100%;
-    height: 100%;
-    min-height: 50vh;
-}
-
-/* Three notes - 2 columns on top, 1 full width at bottom */
 .notes-container.note-count-3 {
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    max-width: none; /* Use full width */
-    margin: 0; /* No margin */
+    grid-auto-rows: 300px;
 }
 
 .notes-container.note-count-3 .note:nth-child(3) {
     grid-column: 1 / span 2;
 }
 
-.notes-container.note-count-3 .note {
-    width: 100%;
-    height: 100%;
-    min-height: 40vh;
-}
-
-/* Four notes - EXPLICIT 2×2 grid */
 .notes-container.note-count-4 {
-    grid-template-columns: 1fr 1fr !important; /* Force 2 columns */
-    grid-template-rows: 1fr 1fr !important; /* Force 2 rows */
-    max-width: none; /* Use full width */
-    margin: 0; /* No margin */
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: 300px;
 }
 
-.notes-container.note-count-4 .note {
-    width: 100%;
-    height: 100%;
-    min-height: 40vh;
-}
-
-/* Five notes - 3+2 grid */
-.notes-container.note-count-5 {
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-}
-
-.notes-container.note-count-5 .note:nth-child(4),
-.notes-container.note-count-5 .note:nth-child(5) {
-    grid-column: span 1;
-}
-
-.notes-container.note-count-5 .note {
-    width: 100%;
-    height: 100%;
-    min-height: 35vh;
-}
-
-/* Six notes - 3×2 grid */
+.notes-container.note-count-5,
 .notes-container.note-count-6 {
     grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
+    grid-auto-rows: 300px;
 }
 
-.notes-container.note-count-6 .note {
-    width: 100%;
-    height: 100%;
-    min-height: 35vh;
-}
-
-/* 7-9 notes - 3×3 grid */
 .notes-container.note-count-7,
 .notes-container.note-count-8,
 .notes-container.note-count-9 {
     grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr;
-}
-
-.notes-container.note-count-7 .note,
-.notes-container.note-count-8 .note,
-.notes-container.note-count-9 .note {
-    width: 100%;
-    height: 100%;
-    min-height: 30vh;
-}
-
-/* For all screen sizes, never use more than 3 columns */
-.notes-container.note-count-many {
-    grid-template-columns: repeat(auto-fill, minmax(calc((100% - 40px) / 3), 1fr)) !important;
     grid-auto-rows: 300px;
 }
 
-.notes-container.note-count-many .note {
-    min-height: 250px;
+/* 10+ notes */
+.notes-container.note-count-many {
+    grid-template-columns: repeat(3, 1fr) !important;
+    grid-auto-rows: 300px;
+}
+
+/* All notes in multi-note grids get a fixed height */
+.notes-container:not(.note-count-1) .note {
+    height: 300px;
+    min-height: unset;
     max-height: 300px;
+    overflow: hidden;
 }
 
 /* Wider screen optimization */
@@ -276,7 +224,6 @@ body.dark-mode .empty-title {
 @media (max-width: 1399px) {
     .notes-container.note-count-3 {
         grid-template-columns: 1fr 1fr !important;
-        grid-template-rows: auto !important;
     }
 
     .notes-container.note-count-3 .note:nth-child(3) {
@@ -288,13 +235,9 @@ body.dark-mode .empty-title {
     .notes-container.note-count-6,
     .notes-container.note-count-7,
     .notes-container.note-count-8,
-    .notes-container.note-count-9 {
-        grid-template-columns: 1fr 1fr !important;
-        grid-template-rows: auto !important;
-    }
-
+    .notes-container.note-count-9,
     .notes-container.note-count-many {
-        grid-template-columns: repeat(2, 1fr) !important;
+        grid-template-columns: 1fr 1fr !important;
     }
 
     /* Reset any 3-col nth-child spans */
@@ -343,16 +286,10 @@ body.dark-mode .empty-title {
         min-height: 60vh;
     }
     
-    .notes-container.note-count-2 .note,
-    .notes-container.note-count-3 .note,
-    .notes-container.note-count-4 .note,
-    .notes-container.note-count-5 .note,
-    .notes-container.note-count-6 .note,
-    .notes-container.note-count-7 .note,
-    .notes-container.note-count-8 .note,
-    .notes-container.note-count-9 .note,
-    .notes-container.note-count-many .note {
-        min-height: 45vh !important;
+    .notes-container:not(.note-count-1) .note {
+        height: 240px !important;
+        max-height: 240px !important;
+        min-height: unset !important;
     }
 }
 
@@ -364,8 +301,10 @@ body.dark-mode .empty-title {
     }
     
     /* Make notes shorter on very small screens */
-    .notes-container .note {
-        min-height: 30vh !important;
+    .notes-container:not(.note-count-1) .note {
+        height: 200px !important;
+        max-height: 200px !important;
+        min-height: unset !important;
         margin: 0 0 10px 0 !important;
     }
 }
@@ -390,38 +329,3 @@ body.dark-mode .empty-title {
 
 
 
-/* Three notes layout fix for larger screens */
-
-/* Base layout for three notes - 2 on top, 1 on bottom */
-.notes-container.note-count-3 {
-    grid-template-columns: 1fr 1fr !important;
-    grid-template-rows: 1fr 1fr !important;
-    max-width: none !important; /* Remove any max-width constraints */
-    margin: 0 !important; /* Remove any margin */
-    width: 100% !important; /* Force full width */
-    padding: 20px !important; /* Consistent padding */
-}
-
-/* Make the third note span full width on the bottom row */
-.notes-container.note-count-3 .note:nth-child(3) {
-    grid-column: 1 / span 2 !important;
-}
-
-/* For wider screens, make the notes fill the available space */
-@media (min-width: 1520px) {
-    .notes-container.note-count-3 {
-        grid-template-columns: 1fr 1fr !important;
-        grid-template-rows: 1fr 1fr !important;
-    }
-    
-    .notes-container.note-count-3 .note:nth-child(3) {
-        grid-column: 1 / span 2 !important;
-    }
-    
-    /* Give notes good height */
-    .notes-container.note-count-3 .note {
-        width: 100% !important;
-        height: 100% !important;
-        min-height: 40vh !important;
-    }
-}

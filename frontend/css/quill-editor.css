@@ -68,11 +68,7 @@
     padding-right: 45px;
 }
 
-/* Clip content in grid cards — pasted images/tables must not break column layout */
-.note:not(.expanded) {
-    overflow: hidden;
-}
-
+/* Prevent pasted images/tables from overflowing note cards */
 .note:not(.expanded) .ql-editor img,
 .note:not(.expanded) .ql-editor table {
     max-width: 100%;

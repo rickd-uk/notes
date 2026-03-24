@@ -155,7 +155,7 @@ export function addExpandedNoteControls(noteElement) {
           // Replace editor content with placeholder so user sees it's encrypted
           if (quill) {
             quill.enable(true);
-            quill.clipboard.dangerouslyPasteHTML('<p style="opacity:0.4;font-style:italic">🔐 Encrypted — click 🔐 to decrypt</p>');
+            quill.clipboard.dangerouslyPasteHTML('<p style="text-align:center;font-size:48px;margin:0;padding:20px 0;opacity:0.5;line-height:1">🔐</p>');
             quill.enable(false);
           }
           setEditorReadOnly(noteId, true);

@@ -126,7 +126,7 @@ ${note.encrypted ? '' : '<button class="note-delete" title="Delete note">🗑️
           }
           noteElement.dataset.encryptedContent = decodeURIComponent(placeholder?.dataset.content || '');
         } else {
-          content = '<p style="opacity:0.4;font-style:italic">🔐 Encrypted — expand and unlock to view</p>';
+          content = '<p style="text-align:center;font-size:48px;margin:0;padding:20px 0;opacity:0.5;line-height:1">🔐</p>';
           noteElement.dataset.encryptedContent = decodeURIComponent(placeholder?.dataset.content || '');
         }
       }
