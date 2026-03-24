@@ -226,7 +226,7 @@ body.dark-mode .no-categories-message {
 
 body.dark-mode .note:not(.expanded) .note-delete {
   background-color: transparent !important;
-  color: #DADCE0 !important;
+  color: #f44336 !important;
   border: none !important;
 }
 

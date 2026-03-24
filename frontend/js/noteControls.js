@@ -228,11 +228,19 @@ export function addExpandedNoteControls(noteElement) {
             quill.clipboard.dangerouslyPasteHTML(plaintext);
           }
           setEditorReadOnly(noteId, false);
-          // Note is now decrypted — show the edit/view-only toggle
+          // Note is now decrypted — show the edit/view-only toggle (desktop controls)
           lockBtn.style.display = '';
           lockBtn.classList.remove('active');
           lockBtn.querySelector('span:first-child').textContent = '✏️';
           lockBtn.querySelector('.tooltip').textContent = 'Make view-only';
+          // Sync nav bar lock button
+          const navLockBtn = noteElement.querySelector('.note-nav [data-action="lock"]');
+          if (navLockBtn) {
+            navLockBtn.style.display = '';
+            navLockBtn.classList.remove('active');
+            navLockBtn.querySelector('span[aria-hidden]').textContent = '✏️';
+            navLockBtn.setAttribute('aria-label', 'Make view-only');
+          }
           showToast('Note decrypted');
         }
         encryptBtn.classList.toggle('active', nowEncrypted);
@@ -303,6 +311,7 @@ function _injectMobileNav(noteElement) {
 
   // ✏️ / 👁 — Lock toggle (hidden for encrypted notes)
   const lockBtn = navBtn(isReadOnly ? '👁' : '✏️', isReadOnly ? 'Make editable' : 'Make view-only');
+  lockBtn.dataset.action = 'lock';
   if (isReadOnly) lockBtn.classList.add('active');
   if (isEncrypted) lockBtn.style.display = 'none';
   lockBtn.addEventListener('click', async () => {

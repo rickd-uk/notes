@@ -123,7 +123,7 @@ export async function renderNotes() {
 </div>
 ${note.read_only && !note.encrypted ? '<div class="note-lock-badge" title="View-only">👁</div>' : ''}
 ${note.encrypted ? '<div class="note-encrypted-badge" title="Encrypted — expand the note and click 🔐 to decrypt for editing">🔐</div>' : ''}
-${note.encrypted ? '' : '<button class="note-delete" title="Delete note">🗑</button>'}
+${note.encrypted ? '' : '<button class="note-delete" title="Delete note">🗑\uFE0E</button>'}
 <div class="note-expand" title="Expand/collapse note">
   <span class="expand-icon">⤢</span>
 </div>
@@ -143,26 +143,12 @@ ${note.encrypted ? '' : '<button class="note-delete" title="Delete note">🗑</b
       );
       let content = placeholder ? decodeURIComponent(placeholder.dataset.content) : '';
 
-      let showEncryptedOverlay = false;
-      if (noteElement.dataset.encrypted === 'true') {
-        // Dynamic import to avoid circular dependency risk
-        const { isUnlocked, decryptNoteContent } = await import('./encryptionManager.js');
+      // Encrypted notes always show the padlock overlay in card view.
+      // Content is only decrypted in the expanded view when the user clicks 🔐.
+      const showEncryptedOverlay = noteElement.dataset.encrypted === 'true';
+      if (showEncryptedOverlay) {
         noteElement.dataset.encryptedContent = decodeURIComponent(placeholder?.dataset.content || '');
-        if (isUnlocked()) {
-          const decrypted = await decryptNoteContent(content);
-          if (decrypted) {
-            content = decrypted;
-          } else {
-            // Render-time decryption failure — show overlay, don't pollute note content.
-            // The user can try manually via expand + 🔐. Only mark permanently failed
-            // if the manual decrypt in the expanded view also fails.
-            content = '';
-            showEncryptedOverlay = true;
-          }
-        } else {
-          content = '';
-          showEncryptedOverlay = true;
-        }
+        content = '';
       }
 
       // Create Quill editor for this note

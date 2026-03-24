@@ -497,6 +497,10 @@ export async function handleNoteDelete(noteId) {
     showToast("Decrypt the note before deleting it");
     return;
   }
+  if (noteEl && noteEl.dataset.readOnly === "true") {
+    showToast("Cannot delete a read-only note");
+    return;
+  }
 
   const success = await deleteNote(noteId);
 
