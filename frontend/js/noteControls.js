@@ -124,6 +124,7 @@ export function addExpandedNoteControls(noteElement) {
 
     const encryptBtn = document.createElement('button');
     encryptBtn.className = `expanded-control-btn${isEncrypted ? ' active' : ''}`;
+    encryptBtn.dataset.action = 'encrypt';
     encryptBtn.innerHTML = `
       <span>🔐</span>
       <span class="tooltip">${isEncrypted ? 'Decrypt note' : 'Encrypt note'}</span>
@@ -254,6 +255,9 @@ export function addExpandedNoteControls(noteElement) {
 
   // ── Mobile nav bar ────────────────────────────────────────
   // Only inject on mobile viewports to avoid unnecessary DOM on desktop.
+  // Note: viewport width is sampled at expansion time. If the window is resized
+  // while a note is expanded (desktop→mobile or vice versa), the nav bar will not
+  // update. This is an acceptable edge case for a mobile-first feature.
   if (window.innerWidth <= 768) {
     _injectMobileNav(noteElement);
   }
@@ -326,7 +330,7 @@ function _injectMobileNav(noteElement) {
       }
       setEditorReadOnly(noteId, nowReadOnly);
       lockBtn.classList.toggle('active', nowReadOnly);
-      lockBtn.querySelector('span').textContent = nowReadOnly ? '👁' : '✏️';
+      lockBtn.querySelector('span[aria-hidden]').textContent = nowReadOnly ? '👁' : '✏️';
       lockBtn.setAttribute('aria-label', nowReadOnly ? 'Make editable' : 'Make view-only');
     }
   });
@@ -338,11 +342,20 @@ function _injectMobileNav(noteElement) {
     if (isEncrypted) encryptBtn.classList.add('active');
     // Delegate to the desktop encrypt button — it has all the state mutation logic.
     // display:none on mobile doesn't prevent programmatic .click().
-    encryptBtn.addEventListener('click', () => {
+    encryptBtn.addEventListener('click', async () => {
       const desktopEncryptBtn = document.querySelector(
-        '.expanded-note-controls .expanded-control-btn:last-child'
+        '.expanded-note-controls [data-action="encrypt"]'
       );
-      if (desktopEncryptBtn) desktopEncryptBtn.click();
+      if (!desktopEncryptBtn) return;
+      desktopEncryptBtn.click();
+      // Wait for the desktop handler's async work to settle, then sync mobile UI
+      await new Promise(r => setTimeout(r, 50));
+      const nowEncrypted = noteElement.dataset.encrypted === 'true';
+      encryptBtn.classList.toggle('active', nowEncrypted);
+      encryptBtn.setAttribute('aria-label', nowEncrypted ? 'Decrypt note' : 'Encrypt note');
+      encryptBtn.querySelector('span').textContent = '🔐';
+      // Lock button: encrypted notes hide the lock button
+      lockBtn.style.display = nowEncrypted ? 'none' : '';
     });
   }
 
