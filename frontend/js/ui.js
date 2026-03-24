@@ -25,6 +25,28 @@ import {
 import { hideAllNoteButtons, recreateAllNoteButtons, showToast } from "./uiUtils.js";
 import { showNoteCategoryModal } from "./noteCategoryManager.js";
 
+/**
+ * Format a date string as a human-readable relative time.
+ * @param {string} dateString - ISO date string (e.g. note.updated_at)
+ * @returns {string} e.g. "just now", "5 min ago", "yesterday", "Mar 15", "Mar 15, 2024"
+ */
+function formatRelativeDate(dateString) {
+  const now = new Date();
+  const date = new Date(dateString);
+  const diff = Math.floor((now - date) / 1000); // seconds
+
+  if (diff < 60)           return 'just now';
+  if (diff < 3600)         return `${Math.floor(diff / 60)} min ago`;
+  if (diff < 86400)        return `${Math.floor(diff / 3600)} hour${Math.floor(diff / 3600) === 1 ? '' : 's'} ago`;
+  if (diff < 172800)       return 'yesterday';
+  if (diff < 604800)       return `${Math.floor(diff / 86400)} days ago`;
+  if (diff < 2592000)      return `${Math.floor(diff / 604800)} week${Math.floor(diff / 604800) === 1 ? '' : 's'} ago`;
+
+  const opts = { month: 'short', day: 'numeric' };
+  if (date.getFullYear() !== now.getFullYear()) opts.year = 'numeric';
+  return date.toLocaleDateString(undefined, opts);
+}
+
 export function addEncryptedOverlay(noteElement) {
   removeEncryptedOverlay(noteElement);
   const overlay = document.createElement('div');
@@ -71,13 +93,7 @@ export async function renderNotes() {
       noteElement.dataset.readOnly = note.read_only ? "true" : "false";
       noteElement.dataset.encrypted = note.encrypted ? 'true' : 'false';
 
-      const date = new Date(note.updated_at);
-      const formattedDate = date.toLocaleString(undefined, {
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+      const formattedDate = formatRelativeDate(note.updated_at);
 
       // Get category information for this note
       let categoryName = "Uncategorized";
