@@ -4,42 +4,58 @@ import {
   generateSalt, generateRecoveryKey, deriveKey, deriveKeyFromRecoveryKey,
   encryptText, decryptText, createVerifier, verifyKey, exportKey, importKey
 } from './crypto.js';
-
-const SESSION_KEY_STORAGE = 'enc_session_key';
-
-async function persistSessionKey(key) {
-  try {
-    sessionStorage.setItem(SESSION_KEY_STORAGE, await exportKey(key));
-  } catch { /* ignore */ }
-}
-
-function clearPersistedSessionKey() {
-  sessionStorage.removeItem(SESSION_KEY_STORAGE);
-}
-
-export async function restoreSessionKey() {
-  try {
-    const stored = sessionStorage.getItem(SESSION_KEY_STORAGE);
-    if (stored) {
-      _sessionKey = await importKey(stored);
-    }
-  } catch {
-    sessionStorage.removeItem(SESSION_KEY_STORAGE);
-  }
-}
 import {
   getEncryptionSetup, saveEncryptionPassword, removeEncryptionPasswordApi,
   setNoteEncryptedContent, setNoteReadOnly
 } from './api.js';
 import { getNotes } from './state.js';
 
-// In-memory session key — never persisted, cleared on page refresh
+// In-memory session key — never persisted to disk, cleared on tab close
 let _sessionKey = null;
-let _encryptionSetup = null; // { has_encryption_password, encryption_salt }
+let _encryptionSetup = null; // { has_encryption_password, encryption_salt, encryption_verifier }
+
+const SESSION_KEY_STORAGE = 'enc_session_key';
+
+// ── Session persistence (survives page refresh, not tab close) ────────────────
+
+async function persistSessionKey(key) {
+  try {
+    sessionStorage.setItem(SESSION_KEY_STORAGE, await exportKey(key));
+  } catch { /* ignore — non-fatal */ }
+}
+
+function clearPersistedSessionKey() {
+  sessionStorage.removeItem(SESSION_KEY_STORAGE);
+}
+
+// Restore session key from sessionStorage and verify it still matches the server verifier.
+// If the verifier check fails (e.g. password was changed elsewhere), the key is discarded.
+export async function restoreSessionKey() {
+  try {
+    const stored = sessionStorage.getItem(SESSION_KEY_STORAGE);
+    if (!stored) return;
+    const key = await importKey(stored);
+    // Always verify against the current server verifier before trusting
+    const setup = await getEncryptionSetup();
+    if (setup?.encryption_verifier) {
+      const ok = await verifyKey(key, setup.encryption_verifier);
+      if (ok) {
+        _sessionKey = key;
+      } else {
+        // Key is stale — password was likely changed on another session
+        clearPersistedSessionKey();
+      }
+    } else {
+      // No verifier stored yet; trust the key as-is
+      _sessionKey = key;
+    }
+  } catch {
+    clearPersistedSessionKey();
+  }
+}
 
 // ── Setup ────────────────────────────────────────────────────────────────────
 
-// Load and cache encryption setup from server
 export async function loadEncryptionSetup() {
   _encryptionSetup = await getEncryptionSetup();
   return _encryptionSetup;
@@ -55,17 +71,15 @@ export function isUnlocked() {
 
 // ── Unlock ───────────────────────────────────────────────────────────────────
 
-// Unlock with master password — returns true on success
 export async function unlockWithPassword(password) {
   if (!_encryptionSetup?.encryption_salt) return false;
-  const setup = await getEncryptionSetup(); // get fresh verifier
+  const setup = await getEncryptionSetup(); // fresh verifier
   const key = await deriveKey(password, setup.encryption_salt);
   const ok = await verifyKey(key, setup.encryption_verifier);
   if (ok) { _sessionKey = key; await persistSessionKey(key); }
   return ok;
 }
 
-// Unlock with recovery key — returns true on success
 export async function unlockWithRecoveryKey(recoveryKey) {
   if (!_encryptionSetup?.encryption_salt) return false;
   const setup = await getEncryptionSetup();
@@ -75,7 +89,6 @@ export async function unlockWithRecoveryKey(recoveryKey) {
   return ok;
 }
 
-// Lock session (forget key)
 export function lockSession() {
   _sessionKey = null;
   clearPersistedSessionKey();
@@ -83,7 +96,6 @@ export function lockSession() {
 
 // ── Set / remove password ────────────────────────────────────────────────────
 
-// Set a new encryption password. Returns the recovery key string to show the user.
 export async function setEncryptionPassword(password) {
   const salt = generateSalt();
   const recoveryKey = generateRecoveryKey();
@@ -104,11 +116,9 @@ export async function setEncryptionPassword(password) {
   return recoveryKey;
 }
 
-// Remove encryption password. Decrypts all encrypted notes first.
 export async function removeEncryptionPassword() {
   if (!_sessionKey) throw new Error('Session not unlocked');
 
-  // Decrypt all encrypted notes before removing password
   const notes = getNotes();
   const encryptedNotes = notes.filter(n => n.encrypted);
 
@@ -122,31 +132,38 @@ export async function removeEncryptionPassword() {
 
   await removeEncryptionPasswordApi();
   _sessionKey = null;
+  clearPersistedSessionKey();
   _encryptionSetup = { has_encryption_password: false, encryption_salt: null };
 }
 
 // ── Per-note encrypt / decrypt ───────────────────────────────────────────────
 
-// Encrypt a note's content and mark it as encrypted + read-only
+// Encrypt a note and immediately verify the result is decryptable.
+// Throws if the round-trip check fails so the caller can surface the error.
 export async function encryptNote(noteId, plainContent) {
   if (!_sessionKey) throw new Error('Session not unlocked');
   const ciphertext = await encryptText(_sessionKey, plainContent);
+
+  // Verify we can decrypt before committing to the DB
+  const check = await decryptText(_sessionKey, ciphertext);
+  if (check === null) throw new Error('Encryption verification failed — note was not saved');
+
   await setNoteEncryptedContent(noteId, ciphertext, true);
   await setNoteReadOnly(noteId, true);
   return ciphertext;
 }
 
-// Decrypt a note's content (does not save — just returns plaintext for display)
+// Decrypt for display only — does not save
 export async function decryptNoteContent(encryptedContent) {
   if (!_sessionKey) return null;
   return decryptText(_sessionKey, encryptedContent);
 }
 
-// Decrypt a note and save it back as plaintext, removing encryption flag
+// Decrypt and save back as plaintext
 export async function decryptAndSaveNote(noteId, encryptedContent) {
   if (!_sessionKey) throw new Error('Session not unlocked');
   const plaintext = await decryptText(_sessionKey, encryptedContent);
-  if (plaintext === null) throw new Error('Decryption failed — wrong key?');
+  if (plaintext === null) throw new Error('Decryption failed — the key may have changed');
   await setNoteEncryptedContent(noteId, plaintext, false);
   await setNoteReadOnly(noteId, false);
   return plaintext;
