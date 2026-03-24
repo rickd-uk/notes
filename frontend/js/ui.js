@@ -31,8 +31,10 @@ import { showNoteCategoryModal } from "./noteCategoryManager.js";
  * @returns {string} e.g. "just now", "5 min ago", "yesterday", "Mar 15", "Mar 15, 2024"
  */
 function formatRelativeDate(dateString) {
+  if (!dateString) return '';
   const now = new Date();
   const date = new Date(dateString);
+  if (isNaN(date.getTime())) return '';
   const diff = Math.floor((now - date) / 1000); // seconds
 
   if (diff < 60)           return 'just now';

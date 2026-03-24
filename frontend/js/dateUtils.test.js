@@ -1,8 +1,10 @@
 // Standalone test for formatRelativeDate — run with: node frontend/js/dateUtils.test.js
 
 function formatRelativeDate(dateString) {
+  if (!dateString) return '';
   const now = new Date();
   const date = new Date(dateString);
+  if (isNaN(date.getTime())) return '';
   const diff = Math.floor((now - date) / 1000); // seconds
 
   if (diff < 60)           return 'just now';
@@ -28,6 +30,7 @@ const now = new Date();
 const ms = (s) => new Date(now - s * 1000).toISOString();
 
 test('just now (30s)',            ms(30),          'just now');
+test('just now (59s)',            ms(59),          'just now');
 test('minutes ago (5m)',          ms(5 * 60),      '5 min ago');
 test('1 min boundary',            ms(60),          '1 min ago');
 test('hours ago (3h)',            ms(3 * 3600),    '3 hours ago');
@@ -39,9 +42,11 @@ test('2 day boundary',            ms(2 * 86400),   '2 days ago');
 test('weeks ago (2 weeks)',       ms(14 * 86400),  '2 weeks ago');
 test('7 day boundary',            ms(7 * 86400),   '1 week ago');
 // For the date-format tests we check the shape rather than exact value
-const oldSameYear = new Date(now.getFullYear(), 0, 5).toISOString(); // Jan 5 this year
+const oldSameYear = new Date(now.getFullYear(), now.getMonth() - 2, 1).toISOString(); // 2 months ago (always >30 days)
 const oldOtherYear = new Date(2020, 0, 5).toISOString();             // Jan 5, 2020
 const r1 = formatRelativeDate(oldSameYear);
 const r2 = formatRelativeDate(oldOtherYear);
-console.log(`${/^Jan \d+$/.test(r1) ? '✅' : '❌'} same-year old date: got "${r1}"`);
-console.log(`${/^Jan \d+, 20\d\d$/.test(r2) ? '✅' : '❌'} other-year old date: got "${r2}"`);
+console.log(`${/^[A-Z][a-z]+ \d+$/.test(r1) ? '✅' : '❌'} same-year old date: got "${r1}"`);
+console.log(`${/^[A-Z][a-z]+ \d+, 20\d\d$/.test(r2) ? '✅' : '❌'} other-year old date: got "${r2}"`);
+test('invalid input returns empty string', 'not-a-date', '');
+test('null-ish string returns empty string', '', '');
