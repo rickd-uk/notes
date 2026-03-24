@@ -69,17 +69,6 @@
 }
 
 /* Responsive styles */
-/* Centre the active-category label on all sub-desktop widths */
-@media (max-width: 1199px) {
-  .current-category {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-    z-index: 1;
-    pointer-events: none;
-  }
-}
 
 @media (max-width: 768px) {
   body {

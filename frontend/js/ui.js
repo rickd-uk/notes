@@ -99,7 +99,7 @@ export async function renderNotes() {
 
       // Get category information for this note
       let categoryName = "Uncategorized";
-      let categoryIcon = "📌";
+      let categoryIcon = "❓";
       let categoryId = null;
 
       if (note.category_id) {
@@ -284,7 +284,7 @@ export function updateCurrentCategoryDisplay() {
   if (categoryId === 'all') {
     el.textContent = '📄 All Notes';
   } else if (categoryId === 'uncategorized') {
-    el.textContent = '📌 Uncategorized';
+    el.textContent = '❓ Uncategorized';
   } else {
     const cats = getCategories();
     const cat = cats.find(c => String(c.id) === String(categoryId));
@@ -321,7 +321,7 @@ export function renderCategories() {
   <div class="category-name">All Notes</div>
 </div>
 <div class="category${currentCategoryId === "uncategorized" ? " active" : ""}" data-id="uncategorized">
-  <div class="category-icon">📌</div>
+  <div class="category-icon">❓</div>
   <div class="category-name">Uncategorized</div>
 </div>
 ${customCategoriesHTML}

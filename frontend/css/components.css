@@ -145,20 +145,6 @@
         padding: 12px 15px;
     }
     
-    /* Center category title */
-    .current-category {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        text-align: center;
-        z-index: 1;
-        pointer-events: none; /* Allow clicks to pass through */
-        max-width: 60%;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    
     /* Style for bulk delete button on mobile */
     .bulk-delete-btn {
         font-size: 0; /* Hide text on mobile */

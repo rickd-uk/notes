@@ -44,8 +44,10 @@
 
 /* Four notes */
 .notes-container.note-count-4 {
-  grid-template-columns: 1fr 1fr 1fr !important;
-  grid-template-rows: minmax(40vh, 1fr) minmax(40vh, 1fr) !important;
+  grid-template-columns: 1fr 1fr !important;
+  grid-template-rows: minmax(40vh, auto) minmax(40vh, auto) !important;
+  grid-auto-rows: auto !important;
+  align-content: start !important;
 }
 
 .notes-container.note-count-4 .note {
@@ -114,7 +116,8 @@
   /* Make 4 notes fit in 2 rows of 2 */
   .notes-container.note-count-4 {
     grid-template-columns: 1fr 1fr !important;
-    grid-template-rows: 1fr 1fr !important;
+    grid-template-rows: minmax(40vh, auto) minmax(40vh, auto) !important;
+    align-content: start !important;
   }
 }
 
@@ -199,7 +202,13 @@
     grid-column: 1 / span 2 !important;
   }
 
-  .notes-container.note-count-4,
+  .notes-container.note-count-4 {
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: minmax(40vh, auto) minmax(40vh, auto) !important;
+    grid-auto-rows: auto !important;
+    align-content: start !important;
+  }
+
   .notes-container.note-count-5,
   .notes-container.note-count-6,
   .notes-container.note-count-7,

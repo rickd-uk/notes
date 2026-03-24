@@ -65,7 +65,7 @@ export function showNoteCategoryModal(noteId) {
     !currentNoteCategoryId || currentNoteCategoryId === "null";
   categoryOptionsHTML += `
 <div class="category-option${isCurrentlyUncategorized ? " selected" : ""}" data-category-id="null">
-<div class="category-option-icon">📌</div>
+<div class="category-option-icon">❓</div>
 <div class="category-option-name">Uncategorized</div>
 </div>
 `;
@@ -292,11 +292,11 @@ export function updateNoteCategoryDisplay(noteElement, categoryId) {
 
   if (!categoryId || categoryId === "null") {
     categoryName = "Uncategorized";
-    categoryIcon = "📌";
+    categoryIcon = "❓";
   } else {
     const category = categories.find((c) => c.id.toString() === categoryId);
     categoryName = category ? category.name : "Uncategorized";
-    categoryIcon = category ? category.icon : "📌";
+    categoryIcon = category ? category.icon : "❓";
   }
 
   noteCategoryElement.innerHTML = `

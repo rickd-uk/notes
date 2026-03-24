@@ -110,7 +110,7 @@ export async function loadCategories() {
   <div class="category-name">All Notes</div>
 </div>
 <div class="category${getCurrentCategoryId() === "uncategorized" ? " active" : ""}" data-id="uncategorized">
-  <div class="category-icon">📌</div>
+  <div class="category-icon">❓</div>
   <div class="category-name">Uncategorized</div>
 </div>
 <div class="category" data-id="loading">

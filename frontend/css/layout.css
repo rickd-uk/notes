@@ -62,15 +62,26 @@
 .notes-header {
     padding: 20px;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     border-bottom: 1px solid #e0e0e0;
     background-color: var(--surface-color);
+    position: relative;
 }
 
 .current-category {
     font-size: 20px;
     font-weight: 600;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 1;
+    pointer-events: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60%;
 }
 
 /* Base notes container styling */
@@ -142,11 +153,13 @@ body.dark-mode .empty-title {
 
 .notes-container.note-count-2 {
     grid-template-columns: 1fr 1fr;
+    grid-template-rows: unset;
     grid-auto-rows: 300px;
 }
 
 .notes-container.note-count-3 {
     grid-template-columns: 1fr 1fr;
+    grid-template-rows: unset;
     grid-auto-rows: 300px;
 }
 
@@ -156,12 +169,14 @@ body.dark-mode .empty-title {
 
 .notes-container.note-count-4 {
     grid-template-columns: 1fr 1fr;
+    grid-template-rows: unset;
     grid-auto-rows: 300px;
 }
 
 .notes-container.note-count-5,
 .notes-container.note-count-6 {
     grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: unset;
     grid-auto-rows: 300px;
 }
 
@@ -169,12 +184,14 @@ body.dark-mode .empty-title {
 .notes-container.note-count-8,
 .notes-container.note-count-9 {
     grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: unset;
     grid-auto-rows: 300px;
 }
 
 /* 10+ notes */
 .notes-container.note-count-many {
     grid-template-columns: repeat(3, 1fr) !important;
+    grid-template-rows: unset;
     grid-auto-rows: 300px;
 }
 
