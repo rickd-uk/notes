@@ -19,7 +19,6 @@
   transition: background-color 0.2s;
   max-width: fit-content;
   position: relative;
-  margin-right: 25%;
 }
 
 .note-category:hover {
@@ -28,7 +27,7 @@
 
 .note-category-icon {
   margin-right: 4px;
-  font-size: 14px;
+  font-size: 20px;
 }
 
 .note-category-name {
@@ -58,11 +57,13 @@
 
 /* Position the timestamp */
 .note-timestamp {
-  font-size: 12px !important;
+  font-size: 14px !important;
   color: #757575 !important;
+  flex-grow: 0 !important;
   flex-shrink: 0 !important;
+  padding-right: 0 !important;
   display: inline-block !important;
-  text-align: right !important;
+  text-align: center !important;
 }
 
 /* ===== Button Positioning ===== */
@@ -264,7 +265,7 @@ body.dark-mode .note:not(.expanded) .note-delete {
   }
 
   .note-category-icon {
-    font-size: 12px;
+    font-size: 18px;
   }
 
   .note-category-name {

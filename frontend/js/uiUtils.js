@@ -33,7 +33,7 @@ export function recreateAllNoteButtons() {
       const newBtn = document.createElement('button');
       newBtn.className = 'note-delete';
       newBtn.title = 'Delete note';
-      newBtn.innerHTML = '🗑️';
+      newBtn.innerHTML = '🗑';
             
       const noteId = note.dataset.id;
       if (noteId) {

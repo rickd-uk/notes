@@ -123,7 +123,7 @@ export async function renderNotes() {
 </div>
 ${note.read_only && !note.encrypted ? '<div class="note-lock-badge" title="View-only">👁</div>' : ''}
 ${note.encrypted ? '<div class="note-encrypted-badge" title="Encrypted — expand the note and click 🔐 to decrypt for editing">🔐</div>' : ''}
-${note.encrypted ? '' : '<button class="note-delete" title="Delete note">🗑️</button>'}
+${note.encrypted ? '' : '<button class="note-delete" title="Delete note">🗑</button>'}
 <div class="note-expand" title="Expand/collapse note">
   <span class="expand-icon">⤢</span>
 </div>
