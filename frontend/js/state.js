@@ -4,7 +4,7 @@
 let state = {
   notes: [],
   categories: [],
-  currentCategoryId: 'all',
+  currentCategoryId: localStorage.getItem('currentCategoryId') || 'all',
   apiUrl: '/api', // Use relative path for same-origin requests
   darkMode: localStorage.getItem('darkMode') === 'true' // Track dark mode state
 };
@@ -86,6 +86,7 @@ export function setCategories(categories) {
 
 export function setCurrentCategoryId(categoryId) {
   state.currentCategoryId = categoryId;
+  localStorage.setItem('currentCategoryId', categoryId);
 }
 
 export function setDarkMode(isDark) {
