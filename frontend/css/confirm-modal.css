@@ -53,6 +53,41 @@ body.dark-mode #confirmModal .modal-btn-delete:hover {
     background-color: #ff3333 !important;
 }
 
+/* Delete-notes checkbox section */
+#confirmDeleteNotesSection {
+    border: 1px solid rgba(244, 67, 54, 0.3);
+    border-radius: 8px;
+    background: rgba(244, 67, 54, 0.05);
+    padding: 12px 14px;
+}
+
+#confirmDeleteNotesLabel {
+    font-size: 14px;
+    line-height: 1.5;
+    color: inherit;
+}
+
+#confirmDeleteNotesCheckbox {
+    accent-color: #f44336;
+    width: 15px;
+    height: 15px;
+}
+
+#confirmDeleteNotesWarning {
+    font-size: 12px;
+    color: #f44336;
+    font-weight: 500;
+}
+
+body.dark-mode #confirmDeleteNotesSection {
+    border-color: rgba(255, 107, 107, 0.35);
+    background: rgba(255, 107, 107, 0.07);
+}
+
+body.dark-mode #confirmDeleteNotesWarning {
+    color: #ff6b6b;
+}
+
 /* Animation for modal */
 @keyframes modalFadeIn {
     from { opacity: 0; transform: translateY(-10px); }

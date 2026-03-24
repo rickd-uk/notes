@@ -369,10 +369,13 @@ export async function updateCategory(id, name, icon) {
 }
 
 // Delete a category
-export async function deleteCategory(id) {
+export async function deleteCategory(id, deleteNotes = false) {
   try {
     const apiUrl = getApiUrl();
-    const response = await fetch(`${apiUrl}/categories/${id}`, {
+    const url = deleteNotes
+      ? `${apiUrl}/categories/${id}?deleteNotes=true`
+      : `${apiUrl}/categories/${id}`;
+    const response = await fetch(url, {
       method: "DELETE",
     });
 
@@ -381,6 +384,7 @@ export async function deleteCategory(id) {
     // Clear all notes caches since category assignments changed
     clearNotesCache("all");
     clearNotesCache("uncategorized");
+    clearNotesCache(id.toString());
     getCategories().forEach((cat) => {
       clearNotesCache(cat.id.toString());
     });

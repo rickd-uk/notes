@@ -322,6 +322,67 @@ export function confirmDialog(message, headerText = 'Confirm Delete', confirmBtn
   });
 }
 
+// Confirm dialog with an optional "also delete notes" checkbox.
+// Returns Promise<{ confirmed: boolean, deleteNotes: boolean }>
+export function confirmDialogWithCheckbox(message, headerText = 'Confirm Delete', confirmBtnText = 'Delete') {
+  return new Promise((resolve) => {
+    const confirmModal = document.getElementById('confirmModal');
+    const messageEl = document.getElementById('confirmModalMessage');
+    const headerEl = document.getElementById('confirmModalHeader');
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    const cancelBtn = document.getElementById('cancelConfirmBtn');
+    const checkboxSection = document.getElementById('confirmDeleteNotesSection');
+    const checkbox = document.getElementById('confirmDeleteNotesCheckbox');
+
+    // Set content
+    messageEl.textContent = message;
+    headerEl.textContent = headerText;
+    confirmBtn.textContent = confirmBtnText;
+
+    // Show checkbox section and reset it
+    checkbox.checked = false;
+    checkboxSection.style.display = 'block';
+
+    // Show modal
+    confirmModal.classList.add('active');
+
+    const cleanup = () => {
+      confirmModal.classList.remove('active');
+      checkboxSection.style.display = 'none';
+      checkbox.checked = false;
+      cancelBtn.removeEventListener('click', handleCancel);
+      confirmBtn.removeEventListener('click', handleConfirm);
+      document.removeEventListener('keydown', handleKeydown);
+      confirmModal.removeEventListener('click', handleOutsideClick);
+    };
+
+    const handleCancel = () => {
+      cleanup();
+      resolve({ confirmed: false, deleteNotes: false });
+    };
+
+    const handleConfirm = () => {
+      const deleteNotes = checkbox.checked;
+      cleanup();
+      resolve({ confirmed: true, deleteNotes });
+    };
+
+    const handleKeydown = (e) => {
+      if (e.key === 'Escape') handleCancel();
+      else if (e.key === 'Enter') handleConfirm();
+    };
+
+    const handleOutsideClick = (e) => {
+      if (e.target === confirmModal) handleCancel();
+    };
+
+    cancelBtn.addEventListener('click', handleCancel);
+    confirmBtn.addEventListener('click', handleConfirm);
+    document.addEventListener('keydown', handleKeydown);
+    confirmModal.addEventListener('click', handleOutsideClick);
+  });
+}
+
 // Get category name by ID
 export function getCategoryName(categoryId, categories) {
   if (categoryId === 'all') {

@@ -249,6 +249,18 @@
           Are you sure you want to delete ALL notes in this category? This
           action cannot be undone.
         </div>
+        <!-- Optional: delete notes with category -->
+        <div id="confirmDeleteNotesSection" style="display:none; margin-bottom: 20px;">
+          <label id="confirmDeleteNotesLabel" style="display:flex; align-items:flex-start; gap:10px; cursor:pointer;">
+            <input type="checkbox" id="confirmDeleteNotesCheckbox" style="margin-top: 3px; flex-shrink: 0;" />
+            <span>
+              Also delete all notes in this category
+              <span id="confirmDeleteNotesWarning" style="display:block; margin-top: 3px;">
+                ⚠ This cannot be undone
+              </span>
+            </span>
+          </label>
+        </div>
         <div class="modal-actions">
           <button class="modal-btn modal-btn-cancel" id="cancelConfirmBtn">
             Cancel

@@ -229,44 +229,54 @@ router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user.userId;
-    
+    const deleteNotes = req.query.deleteNotes === 'true';
+
     // Start transaction
     await client.query('BEGIN');
-    
+
     // Handle admin user from .env file (backward compatibility)
     if (userId === 'admin') {
-      // Set category_id to NULL for notes in this category
-      await client.query('UPDATE notes SET category_id = NULL WHERE category_id = $1', [id]);
-      
+      if (deleteNotes) {
+        await client.query('DELETE FROM notes WHERE category_id = $1', [id]);
+      } else {
+        await client.query('UPDATE notes SET category_id = NULL WHERE category_id = $1', [id]);
+      }
+
       // Delete the category
       await client.query('DELETE FROM categories WHERE id = $1', [id]);
-      
+
       // Commit transaction
       await client.query('COMMIT');
-      
+
       return res.json({ message: 'Category deleted' });
     }
-    
+
     // For regular users, verify ownership and handle related notes
     const numericUserId = parseInt(userId, 10);
-    
+
     // Check if category exists and belongs to user
     const categoryCheck = await client.query(
       'SELECT id FROM categories WHERE id = $1 AND user_id = $2',
       [id, numericUserId]
     );
-    
+
     if (categoryCheck.rows.length === 0) {
       await client.query('ROLLBACK');
       return res.status(404).json({ error: 'Category not found or unauthorized' });
     }
-    
-    // Set category_id to NULL for notes in this category that belong to the user
-    await client.query(
-      'UPDATE notes SET category_id = NULL WHERE category_id = $1 AND user_id = $2',
-      [id, numericUserId]
-    );
-    
+
+    if (deleteNotes) {
+      await client.query(
+        'DELETE FROM notes WHERE category_id = $1 AND user_id = $2',
+        [id, numericUserId]
+      );
+    } else {
+      await client.query(
+        'UPDATE notes SET category_id = NULL WHERE category_id = $1 AND user_id = $2',
+        [id, numericUserId]
+      );
+    }
+
     // Delete the category
     await client.query(
       'DELETE FROM categories WHERE id = $1 AND user_id = $2',

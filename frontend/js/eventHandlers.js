@@ -35,6 +35,7 @@ import {
   showCategoryModal,
   hideCategoryModal,
   confirmDialog,
+  confirmDialogWithCheckbox,
   getCategoryName,
   updateButtonPlacement,
   hideIconInModal,
@@ -572,27 +573,40 @@ export async function handleCategoryDelete(categoryId) {
   const categories = getCategories();
   const categoryName = getCategoryName(categoryId, categories);
 
-  const confirmed = await confirmDialog(
-    `Are you sure you want to delete ALL notes in "${categoryName}"? This action cannot be undone.`,
-    "Confirm Delete",
-    "Delete All",
+  const { confirmed, deleteNotes } = await confirmDialogWithCheckbox(
+    `Delete "${categoryName}"? Notes in this category will be moved to Uncategorized.`,
+    "Delete Category",
+    "Delete Category",
   );
 
-  if (confirmed) {
-    const success = await deleteCategory(categoryId);
+  if (!confirmed) return;
 
-    if (success) {
-      removeCategoryFromState(categoryId);
+  const success = await deleteCategory(categoryId, deleteNotes);
 
-      // If current category is being deleted, switch to all notes
-      if (getCurrentCategoryId() === categoryId) {
-        setCurrentCategoryId("all");
-      }
-
-      await loadNotes(); // Reload notes to get updated category assignments
-      renderCategories();
-      showToast("Category deleted");
+  if (success) {
+    // Update local state immediately — no round-trip needed
+    if (deleteNotes) {
+      setNotes(getNotes().filter(
+        (note) => note.category_id?.toString() !== categoryId
+      ));
+    } else {
+      getNotes().forEach((note) => {
+        if (note.category_id?.toString() === categoryId) {
+          note.category_id = null;
+        }
+      });
     }
+
+    removeCategoryFromState(categoryId);
+
+    // If viewing the deleted category, switch to all notes
+    if (getCurrentCategoryId() === categoryId) {
+      setCurrentCategoryId("all");
+    }
+
+    await renderNotes();
+    renderCategories();
+    showToast("Category deleted");
   }
 }
 
