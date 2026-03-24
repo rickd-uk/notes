@@ -20,6 +20,23 @@
   transform: translateY(-2px);
 }
 
+.encrypted-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 120px;
+  opacity: 0.35;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  z-index: 2;
+}
+
 .note-content {
   flex-grow: 1;
   resize: none;
@@ -309,6 +326,17 @@ button.note-delete:hover {
   font-size: 13px;
   line-height: 1;
   opacity: 0.55;
+  pointer-events: none;
+  user-select: none;
+}
+
+.note-encrypted-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 13px;
+  line-height: 1;
+  opacity: 0.7;
   pointer-events: none;
   user-select: none;
 }

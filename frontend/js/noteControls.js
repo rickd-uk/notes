@@ -9,6 +9,7 @@ import {
   hasEncryptionPassword, isUnlocked, encryptNote, decryptAndSaveNote
 } from './encryptionManager.js';
 import { showToast } from './uiUtils.js';
+import { addEncryptedOverlay, removeEncryptedOverlay } from './ui.js';
 import { getNotes } from './state.js';
 // NOTE: showUnlockModal is NOT imported statically. eventHandlers.js imports ui.js,
 // ui.js dynamically imports noteControls.js — a static import here would create a
@@ -152,13 +153,18 @@ export function addExpandedNoteControls(noteElement) {
           noteElement.classList.add('note--encrypted', 'note--locked');
           // Store ciphertext so decrypt can use it without a page reload
           noteElement.dataset.encryptedContent = ciphertext;
-          // Replace editor content with placeholder so user sees it's encrypted
-          if (quill) {
-            quill.enable(true);
-            quill.clipboard.dangerouslyPasteHTML('<p style="text-align:center;font-size:48px;margin:0;padding:20px 0;opacity:0.5;line-height:1">🔐</p>');
-            quill.enable(false);
-          }
+          // Clear editor and show overlay — don't use dangerouslyPasteHTML (Quill strips styles)
+          if (quill) { quill.enable(true); quill.setText(''); quill.enable(false); }
           setEditorReadOnly(noteId, true);
+          addEncryptedOverlay(noteElement);
+          // Add persistent badge so note is identifiable even when unlocked
+          if (!noteElement.querySelector('.note-encrypted-badge')) {
+            const badge = document.createElement('div');
+            badge.className = 'note-encrypted-badge';
+            badge.title = 'Encrypted';
+            badge.textContent = '🔐';
+            noteElement.appendChild(badge);
+          }
           // Keep lock button hidden (note is now encrypted)
           lockBtn.style.display = 'none';
           lockBtn.classList.add('active');
@@ -173,6 +179,8 @@ export function addExpandedNoteControls(noteElement) {
             noteElement.dataset.readOnly = 'false';
             noteElement.dataset.decryptionFailed = 'false';
             noteElement.classList.remove('note--encrypted', 'note--locked');
+            removeEncryptedOverlay(noteElement);
+            noteElement.querySelector('.note-encrypted-badge')?.remove();
             if (quill) {
               quill.enable(true);
               quill.clipboard.dangerouslyPasteHTML('');
@@ -203,6 +211,8 @@ export function addExpandedNoteControls(noteElement) {
           noteElement.dataset.encrypted = 'false';
           noteElement.dataset.readOnly = 'false';
           noteElement.classList.remove('note--encrypted', 'note--locked');
+          removeEncryptedOverlay(noteElement);
+          noteElement.querySelector('.note-encrypted-badge')?.remove();
           if (quill) {
             quill.enable(true);
             quill.clipboard.dangerouslyPasteHTML(plaintext);

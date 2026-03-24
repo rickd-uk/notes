@@ -68,6 +68,15 @@
     padding-right: 45px;
 }
 
+/* Encrypted notes: hide placeholder text and toolbar — neither makes sense */
+.note[data-encrypted="true"] .ql-editor.ql-blank::before {
+    display: none;
+}
+
+.note[data-encrypted="true"] .ql-toolbar {
+    display: none !important;
+}
+
 /* Prevent pasted images/tables from overflowing note cards */
 .note:not(.expanded) .ql-editor img,
 .note:not(.expanded) .ql-editor table {

@@ -22,8 +22,20 @@ import {
   updateQuillEditorLayout,
   setEditorReadOnly,
 } from "./quillEditor.js";
-import { hideAllNoteButtons, recreateAllNoteButtons } from "./uiUtils.js";
+import { hideAllNoteButtons, recreateAllNoteButtons, showToast } from "./uiUtils.js";
 import { showNoteCategoryModal } from "./noteCategoryManager.js";
+
+export function addEncryptedOverlay(noteElement) {
+  removeEncryptedOverlay(noteElement);
+  const overlay = document.createElement('div');
+  overlay.className = 'encrypted-overlay';
+  overlay.textContent = '🔐';
+  noteElement.appendChild(overlay);
+}
+
+export function removeEncryptedOverlay(noteElement) {
+  noteElement.querySelector('.encrypted-overlay')?.remove();
+}
 
 // Render notes in the UI
 export async function renderNotes() {
@@ -92,7 +104,7 @@ export async function renderNotes() {
   </div>
 </div>
 ${note.read_only && !note.encrypted ? '<div class="note-lock-badge" title="View-only">👁</div>' : ''}
-${note.encrypted ? '<div class="note-lock-badge" title="Encrypted">🔐</div>' : ''}
+${note.encrypted ? '<div class="note-encrypted-badge" title="Encrypted — expand the note and click 🔐 to decrypt for editing">🔐</div>' : ''}
 ${note.encrypted ? '' : '<button class="note-delete" title="Delete note">🗑️</button>'}
 <div class="note-expand" title="Expand/collapse note">
   <span class="expand-icon">⤢</span>
@@ -126,8 +138,9 @@ ${note.encrypted ? '' : '<button class="note-delete" title="Delete note">🗑️
           }
           noteElement.dataset.encryptedContent = decodeURIComponent(placeholder?.dataset.content || '');
         } else {
-          content = '<p style="text-align:center;font-size:48px;margin:0;padding:20px 0;opacity:0.5;line-height:1">🔐</p>';
+          content = '';
           noteElement.dataset.encryptedContent = decodeURIComponent(placeholder?.dataset.content || '');
+          // Add overlay after Quill is created (below)
         }
       }
 
@@ -135,6 +148,24 @@ ${note.encrypted ? '' : '<button class="note-delete" title="Delete note">🗑️
       createQuillEditor(noteElement, noteId, content);
       if (noteElement.dataset.readOnly === "true") {
         setEditorReadOnly(noteId, true);
+      }
+
+      // Show centered overlay for locked encrypted notes (not inside Quill — it strips styles)
+      if (noteElement.dataset.encrypted === 'true' && noteElement.dataset.decryptionFailed !== 'true') {
+        const { isUnlocked } = await import('./encryptionManager.js');
+        if (!isUnlocked()) {
+          addEncryptedOverlay(noteElement);
+        }
+      }
+
+      // Hint when user tries to type in a still-encrypted note
+      if (noteElement.dataset.encrypted === 'true') {
+        const editorEl = noteElement.querySelector('.ql-editor');
+        if (editorEl) {
+          editorEl.addEventListener('click', () => {
+            showToast('Expand the note and click 🔐 to decrypt it for editing');
+          });
+        }
       }
 
       // Add event listeners

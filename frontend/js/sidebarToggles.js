@@ -3,6 +3,7 @@
 import { toggleToolbars, getToolbarsVisible } from './toolbarToggle.js';
 import { toggleSpellCheck, isSpellCheckEnabled } from './noteControls.js';
 import { hasEncryptionPassword, lockSession, isUnlocked } from './encryptionManager.js';
+import { addEncryptedOverlay, removeEncryptedOverlay } from './ui.js';
 
 // ── Privacy mode ──────────────────────────────────────────────────────────────
 
@@ -23,6 +24,7 @@ async function applyDecryptionToAllNotes() {
   for (const noteEl of document.querySelectorAll('.note[data-encrypted="true"]')) {
     const noteId = noteEl.dataset.id;
     const ciphertext = noteEl.dataset.encryptedContent || '';
+    removeEncryptedOverlay(noteEl);
     if (!ciphertext.startsWith('ENC:')) {
       noteEl.dataset.decryptionFailed = 'true';
       continue;
@@ -50,8 +52,9 @@ function applyEncryptedPlaceholderToAllNotes() {
       const quill = getQuillEditor(noteEl.dataset.id);
       if (!quill) continue;
       quill.enable(true);
-      quill.clipboard.dangerouslyPasteHTML('<p style="opacity:0.4;font-style:italic">🔐 Encrypted — turn on Show Encrypted to view</p>');
+      quill.setText('');
       quill.enable(false);
+      addEncryptedOverlay(noteEl);
     }
   });
 }
