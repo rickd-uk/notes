@@ -261,6 +261,18 @@
             </span>
           </label>
         </div>
+        <!-- Optional: forgot encryption password -->
+        <div id="confirmForgotPasswordSection" style="display:none; margin-bottom: 20px;">
+          <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer;">
+            <input type="checkbox" id="confirmForgotPasswordCheckbox" style="margin-top: 3px; flex-shrink: 0;" />
+            <span>
+              I forgot my password — delete all encrypted notes instead
+              <span style="display:block; margin-top: 3px; color: #f44336; font-size: 13px;">
+                ⚠ Encrypted notes cannot be recovered
+              </span>
+            </span>
+          </label>
+        </div>
         <div class="modal-actions">
           <button class="modal-btn modal-btn-cancel" id="cancelConfirmBtn">
             Cancel

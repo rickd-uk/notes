@@ -383,6 +383,47 @@ export function confirmDialogWithCheckbox(message, headerText = 'Confirm Delete'
   });
 }
 
+export function confirmDialogWithForgotPassword(message, headerText = 'Remove Encryption Password', confirmBtnText = 'Remove') {
+  return new Promise((resolve) => {
+    const confirmModal = document.getElementById('confirmModal');
+    const messageEl = document.getElementById('confirmModalMessage');
+    const headerEl = document.getElementById('confirmModalHeader');
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    const cancelBtn = document.getElementById('cancelConfirmBtn');
+    const forgotSection = document.getElementById('confirmForgotPasswordSection');
+    const forgotCheckbox = document.getElementById('confirmForgotPasswordCheckbox');
+
+    messageEl.textContent = message;
+    headerEl.textContent = headerText;
+    confirmBtn.textContent = confirmBtnText;
+
+    forgotCheckbox.checked = false;
+    forgotSection.style.display = 'block';
+
+    confirmModal.classList.add('active');
+
+    const cleanup = () => {
+      confirmModal.classList.remove('active');
+      forgotSection.style.display = 'none';
+      forgotCheckbox.checked = false;
+      cancelBtn.removeEventListener('click', handleCancel);
+      confirmBtn.removeEventListener('click', handleConfirm);
+      document.removeEventListener('keydown', handleKeydown);
+      confirmModal.removeEventListener('click', handleOutsideClick);
+    };
+
+    const handleCancel = () => { cleanup(); resolve({ confirmed: false, forgotPassword: false }); };
+    const handleConfirm = () => { const fp = forgotCheckbox.checked; cleanup(); resolve({ confirmed: true, forgotPassword: fp }); };
+    const handleKeydown = (e) => { if (e.key === 'Escape') handleCancel(); else if (e.key === 'Enter') handleConfirm(); };
+    const handleOutsideClick = (e) => { if (e.target === confirmModal) handleCancel(); };
+
+    cancelBtn.addEventListener('click', handleCancel);
+    confirmBtn.addEventListener('click', handleConfirm);
+    document.addEventListener('keydown', handleKeydown);
+    confirmModal.addEventListener('click', handleOutsideClick);
+  });
+}
+
 // Get category name by ID
 export function getCategoryName(categoryId, categories) {
   if (categoryId === 'all') {

@@ -156,6 +156,23 @@ export async function removeEncryptionPassword() {
   _encryptionSetup = { has_encryption_password: false, encryption_salt: null };
 }
 
+// Remove encryption password when the user has forgotten it.
+// All encrypted notes are deleted (cannot be decrypted without the key).
+export async function removeEncryptionPasswordForgotten() {
+  const { deleteNote } = await import('./api.js');
+  const notes = getNotes();
+  const encryptedNotes = notes.filter(n => n.encrypted);
+
+  for (const note of encryptedNotes) {
+    await deleteNote(note.id);
+  }
+
+  await removeEncryptionPasswordApi();
+  _sessionKey = null;
+  clearPersistedSessionKey();
+  _encryptionSetup = { has_encryption_password: false, encryption_salt: null };
+}
+
 // ── Per-note encrypt / decrypt ───────────────────────────────────────────────
 
 // Encrypt a note and immediately verify the result is decryptable.

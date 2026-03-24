@@ -36,6 +36,7 @@ import {
   hideCategoryModal,
   confirmDialog,
   confirmDialogWithCheckbox,
+  confirmDialogWithForgotPassword,
   getCategoryName,
   updateButtonPlacement,
   hideIconInModal,
@@ -55,7 +56,7 @@ import {
 } from "./noteCategoryManager.js";
 import {
   loadEncryptionSetup, hasEncryptionPassword, isUnlocked,
-  setEncryptionPassword, removeEncryptionPassword, unlockWithPassword,
+  setEncryptionPassword, removeEncryptionPassword, removeEncryptionPasswordForgotten, unlockWithPassword,
   unlockWithRecoveryKey, isEncryptionUiEnabled, setEncryptionUiEnabled,
   isEncryptionFeatureEnabled, setEncryptionFeatureEnabled
 } from './encryptionManager.js';
@@ -404,12 +405,25 @@ export function setupEventListeners() {
     const settingsModal = document.getElementById('settingsModal');
     if (settingsModal) settingsModal.classList.remove('active');
 
-    const confirmed = await confirmDialog(
+    const { confirmed, forgotPassword } = await confirmDialogWithForgotPassword(
       'This will decrypt all your encrypted notes and remove the encryption password. Are you sure?',
       'Remove Encryption Password',
       'Remove'
     );
     if (!confirmed) return;
+
+    if (forgotPassword) {
+      try {
+        await removeEncryptionPasswordForgotten();
+        await loadNotes();
+        updateEncryptionUI();
+        showToast('Encrypted notes deleted and encryption password removed');
+      } catch (err) {
+        showToast('Error removing encryption password');
+        console.error(err);
+      }
+      return;
+    }
 
     if (!isUnlocked()) {
       showToast('Please unlock your notes first before removing encryption');
