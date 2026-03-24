@@ -4,6 +4,7 @@ import { toggleToolbars, getToolbarsVisible } from './toolbarToggle.js';
 import { toggleSpellCheck, isSpellCheckEnabled } from './noteControls.js';
 import { hasEncryptionPassword, lockSession, isUnlocked } from './encryptionManager.js';
 import { addEncryptedOverlay, removeEncryptedOverlay } from './ui.js';
+import { getNotes } from './state.js';
 
 // ── Privacy mode ──────────────────────────────────────────────────────────────
 
@@ -23,10 +24,16 @@ async function applyDecryptionToAllNotes() {
 
   for (const noteEl of document.querySelectorAll('.note[data-encrypted="true"]')) {
     const noteId = noteEl.dataset.id;
-    const ciphertext = noteEl.dataset.encryptedContent || '';
+    // Prefer dataset ciphertext; fall back to in-memory state
+    let ciphertext = noteEl.dataset.encryptedContent || '';
+    if (!ciphertext.startsWith('ENC:')) {
+      const stateNote = getNotes().find(n => String(n.id) === noteId);
+      ciphertext = stateNote?.content || '';
+    }
     removeEncryptedOverlay(noteEl);
     if (!ciphertext.startsWith('ENC:')) {
-      noteEl.dataset.decryptionFailed = 'true';
+      // No valid ciphertext — show overlay, let user try manually
+      addEncryptedOverlay(noteEl);
       continue;
     }
     const plaintext = await decryptNoteContent(ciphertext);
@@ -38,9 +45,10 @@ async function applyDecryptionToAllNotes() {
       noteEl.dataset.decryptionFailed = 'false';
       if (noteEl.dataset.readOnly === 'true') setEditorReadOnly(noteId, true);
     } else {
-      quill.clipboard.dangerouslyPasteHTML('<p style="opacity:0.6;font-style:italic">⚠️ Decryption failed — expand and click 🔐 to clear</p>');
+      // Decryption failed — show overlay rather than embedding error text in content
+      quill.setText('');
       quill.enable(false);
-      noteEl.dataset.decryptionFailed = 'true';
+      addEncryptedOverlay(noteEl);
     }
   }
 }

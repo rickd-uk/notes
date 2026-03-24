@@ -125,22 +125,25 @@ ${note.encrypted ? '' : '<button class="note-delete" title="Delete note">🗑️
       );
       let content = placeholder ? decodeURIComponent(placeholder.dataset.content) : '';
 
+      let showEncryptedOverlay = false;
       if (noteElement.dataset.encrypted === 'true') {
         // Dynamic import to avoid circular dependency risk
         const { isUnlocked, decryptNoteContent } = await import('./encryptionManager.js');
+        noteElement.dataset.encryptedContent = decodeURIComponent(placeholder?.dataset.content || '');
         if (isUnlocked()) {
           const decrypted = await decryptNoteContent(content);
           if (decrypted) {
             content = decrypted;
           } else {
-            content = '<p style="opacity:0.6;font-style:italic">⚠️ Decryption failed — expand the note and click 🔐 to clear it</p>';
-            noteElement.dataset.decryptionFailed = 'true';
+            // Render-time decryption failure — show overlay, don't pollute note content.
+            // The user can try manually via expand + 🔐. Only mark permanently failed
+            // if the manual decrypt in the expanded view also fails.
+            content = '';
+            showEncryptedOverlay = true;
           }
-          noteElement.dataset.encryptedContent = decodeURIComponent(placeholder?.dataset.content || '');
         } else {
           content = '';
-          noteElement.dataset.encryptedContent = decodeURIComponent(placeholder?.dataset.content || '');
-          // Add overlay after Quill is created (below)
+          showEncryptedOverlay = true;
         }
       }
 
@@ -150,12 +153,9 @@ ${note.encrypted ? '' : '<button class="note-delete" title="Delete note">🗑️
         setEditorReadOnly(noteId, true);
       }
 
-      // Show centered overlay for locked encrypted notes (not inside Quill — it strips styles)
-      if (noteElement.dataset.encrypted === 'true' && noteElement.dataset.decryptionFailed !== 'true') {
-        const { isUnlocked } = await import('./encryptionManager.js');
-        if (!isUnlocked()) {
-          addEncryptedOverlay(noteElement);
-        }
+      // Show centered overlay for locked/undecrytable encrypted notes
+      if (showEncryptedOverlay) {
+        addEncryptedOverlay(noteElement);
       }
 
       // Hint when user tries to type in a still-encrypted note

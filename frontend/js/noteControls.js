@@ -6,7 +6,7 @@ import {
 } from "./toolbarToggle.js";
 import { setNoteReadOnly } from "./api.js";
 import {
-  hasEncryptionPassword, isUnlocked, encryptNote, decryptAndSaveNote
+  isUnlocked, encryptNote, decryptAndSaveNote, isEncryptionUiEnabled
 } from './encryptionManager.js';
 import { showToast } from './uiUtils.js';
 import { addEncryptedOverlay, removeEncryptedOverlay } from './ui.js';
@@ -118,8 +118,8 @@ export function addExpandedNoteControls(noteElement) {
   controlsContainer.appendChild(spellCheckBtn);
   controlsContainer.appendChild(lockBtn);
 
-  // Add encrypt button — only visible if user has set an encryption password
-  if (hasEncryptionPassword()) {
+  // Add encrypt button — only visible if user has set a password AND has encryption UI enabled
+  if (isEncryptionUiEnabled()) {
     const isEncrypted = noteElement.dataset.encrypted === 'true';
 
     const encryptBtn = document.createElement('button');
@@ -207,9 +207,18 @@ export function addExpandedNoteControls(noteElement) {
             showToast('Cannot decrypt: reload the page and try again');
             return;
           }
-          const plaintext = await decryptAndSaveNote(noteId, ciphertext);
+          let plaintext;
+          try {
+            plaintext = await decryptAndSaveNote(noteId, ciphertext);
+          } catch {
+            // Decryption failed — mark so the user can clear on next attempt
+            noteElement.dataset.decryptionFailed = 'true';
+            showToast('⚠️ Decryption failed — click 🔐 again to clear this note');
+            return;
+          }
           noteElement.dataset.encrypted = 'false';
           noteElement.dataset.readOnly = 'false';
+          noteElement.dataset.decryptionFailed = 'false';
           noteElement.classList.remove('note--encrypted', 'note--locked');
           removeEncryptedOverlay(noteElement);
           noteElement.querySelector('.note-encrypted-badge')?.remove();
@@ -223,6 +232,7 @@ export function addExpandedNoteControls(noteElement) {
           lockBtn.classList.remove('active');
           lockBtn.querySelector('span:first-child').textContent = '✏️';
           lockBtn.querySelector('.tooltip').textContent = 'Make view-only';
+          showToast('Note decrypted');
         }
         encryptBtn.classList.toggle('active', nowEncrypted);
         encryptBtn.querySelector('span:first-child').textContent = '🔐';

@@ -55,7 +55,8 @@ import {
 import {
   loadEncryptionSetup, hasEncryptionPassword, isUnlocked,
   setEncryptionPassword, removeEncryptionPassword, unlockWithPassword,
-  unlockWithRecoveryKey
+  unlockWithRecoveryKey, isEncryptionUiEnabled, setEncryptionUiEnabled,
+  isEncryptionFeatureEnabled, setEncryptionFeatureEnabled
 } from './encryptionManager.js';
 // NOTE: saveEncryptionPassword and removeEncryptionPasswordApi are called internally
 // by encryptionManager.js — do NOT import them here.
@@ -283,18 +284,58 @@ export function setupEventListeners() {
     deleteAllCategoriesBtn.addEventListener("click", handleDeleteAllCategories);
   }
 
-  // Load encryption setup and update UI
+  // Load encryption setup and update UI (settings modal + sidebar toggle)
   async function updateEncryptionUI() {
     await loadEncryptionSetup();
+    const featureToggle = document.getElementById('encryptionFeatureToggle');
+    const details = document.getElementById('encryptionDetails');
     const noPassword = document.getElementById('encryptionNoPassword');
     const hasPassword = document.getElementById('encryptionHasPassword');
-    if (noPassword && hasPassword) {
+
+    const featureOn = isEncryptionFeatureEnabled();
+    if (featureToggle) featureToggle.checked = featureOn;
+    if (details) details.style.display = featureOn ? '' : 'none';
+
+    if (featureOn && noPassword && hasPassword) {
       const has = hasEncryptionPassword();
       noPassword.style.display = has ? 'none' : '';
       hasPassword.style.display = has ? '' : 'none';
+      if (has) {
+        const toggle = document.getElementById('encryptionEnabledToggle');
+        const notice = document.getElementById('encryptionDisabledNotice');
+        if (toggle) toggle.checked = isEncryptionUiEnabled();
+        if (notice) notice.style.display = isEncryptionUiEnabled() ? 'none' : '';
+      }
     }
+
+    // Keep sidebar "Show Encrypted" row in sync
+    syncSidebarEncryptionToggle();
   }
+
+  function syncSidebarEncryptionToggle() {
+    const row = document.getElementById('strictDecryptToggleRow');
+    if (!row) return;
+    const visible = isEncryptionFeatureEnabled() && hasEncryptionPassword();
+    row.style.display = visible ? '' : 'none';
+  }
+
   updateEncryptionUI();
+
+  // Feature-level toggle (enable/disable encryption entirely)
+  document.getElementById('encryptionFeatureToggle')?.addEventListener('change', e => {
+    setEncryptionFeatureEnabled(e.target.checked);
+    const details = document.getElementById('encryptionDetails');
+    if (details) details.style.display = e.target.checked ? '' : 'none';
+    syncSidebarEncryptionToggle();
+  });
+
+  // Controls-on-notes toggle
+  document.getElementById('encryptionEnabledToggle')?.addEventListener('change', e => {
+    const enabled = e.target.checked;
+    setEncryptionUiEnabled(enabled);
+    const notice = document.getElementById('encryptionDisabledNotice');
+    if (notice) notice.style.display = enabled ? 'none' : '';
+  });
 
   const setEncryptionPasswordBtn = document.getElementById('setEncryptionPasswordBtn');
   const cancelSetEncryptionBtn = document.getElementById('cancelSetEncryptionBtn');

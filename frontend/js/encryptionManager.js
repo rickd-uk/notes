@@ -69,6 +69,26 @@ export function isUnlocked() {
   return _sessionKey !== null;
 }
 
+// Feature-level toggle — off by default for new users
+export function isEncryptionFeatureEnabled() {
+  return localStorage.getItem('encryptionFeatureEnabled') === 'true';
+}
+
+export function setEncryptionFeatureEnabled(enabled) {
+  localStorage.setItem('encryptionFeatureEnabled', enabled ? 'true' : 'false');
+}
+
+// Controls-on-notes toggle — only relevant when feature is on and password is set
+export function isEncryptionUiEnabled() {
+  if (!isEncryptionFeatureEnabled()) return false;
+  if (!hasEncryptionPassword()) return false;
+  return localStorage.getItem('encryptionUiEnabled') !== 'false';
+}
+
+export function setEncryptionUiEnabled(enabled) {
+  localStorage.setItem('encryptionUiEnabled', enabled ? 'true' : 'false');
+}
+
 // ── Unlock ───────────────────────────────────────────────────────────────────
 
 export async function unlockWithPassword(password) {
