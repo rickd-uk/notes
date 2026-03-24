@@ -250,13 +250,6 @@ body.dark-mode .empty-title {
 /* Mobile adjustments - EXTREMELY AGGRESSIVE version */
 @media (max-width: 768px) {
     /* Force single column layout on mobile with !important */
-  .user-info {
-            position: absolute;
-            top: 10px;
-            right: 60px; /* Space for the add button */
-            margin-right: 0;
-            font-size: 12px;
-        }
     .notes-container {
         display: flex !important;
         flex-direction: column !important;

@@ -307,9 +307,3 @@ body.dark-mode .header-controls-group {
     text-overflow: ellipsis;
   }
 }
-
-@media (min-width: 370px) {
-  .username-display {
-    margin-left: 40px;
-  }
-}
