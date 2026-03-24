@@ -316,6 +316,11 @@ button.note-delete:hover {
     opacity: 1 !important;
     background-color: rgba(255, 255, 255, 0.9) !important;
   }
+
+  /* Delete button is replaced by the mobile nav bar's trash button */
+  .note.expanded button.note-delete {
+    display: none !important;
+  }
 }
 
 /* ── Read-only / locked notes ─────────────────────────────── */

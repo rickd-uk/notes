@@ -114,12 +114,6 @@
     min-height: 120px;
   }
 
-  /* Adjust expanded note for mobile */
-  .note.expanded {
-    width: 90%;
-    height: 80%;
-  }
-
   /* Adjust modal for mobile */
   .modal-content {
     width: 90%;

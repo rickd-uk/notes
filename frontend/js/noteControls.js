@@ -9,7 +9,7 @@ import {
   isUnlocked, encryptNote, decryptAndSaveNote, isEncryptionUiEnabled
 } from './encryptionManager.js';
 import { showToast } from './uiUtils.js';
-import { addEncryptedOverlay, removeEncryptedOverlay } from './ui.js';
+import { addEncryptedOverlay, removeEncryptedOverlay, toggleNoteExpansion } from './ui.js';
 import { getNotes } from './state.js';
 // NOTE: showUnlockModal is NOT imported statically. eventHandlers.js imports ui.js,
 // ui.js dynamically imports noteControls.js — a static import here would create a
@@ -251,6 +251,119 @@ export function addExpandedNoteControls(noteElement) {
 
   // Apply current spell check state to all editors for consistency
   applySpellCheckToAll(spellCheckEnabled);
+
+  // ── Mobile nav bar ────────────────────────────────────────
+  // Only inject on mobile viewports to avoid unnecessary DOM on desktop.
+  if (window.innerWidth <= 768) {
+    _injectMobileNav(noteElement);
+  }
+}
+
+/**
+ * Inject the mobile top nav bar into an expanded note.
+ * Called only at mobile viewport widths (≤768px).
+ * @param {HTMLElement} noteElement
+ */
+function _injectMobileNav(noteElement) {
+  // Remove any stale nav from a previous expansion
+  noteElement.querySelector('.mobile-note-nav')?.remove();
+
+  const noteId = noteElement.dataset.id;
+  const isReadOnly = noteElement.dataset.readOnly === 'true';
+  const isEncrypted = noteElement.dataset.encrypted === 'true';
+
+  const nav = document.createElement('div');
+  nav.className = 'mobile-note-nav';
+
+  // Helper to create a nav button
+  function navBtn(content, label, extraClass = '') {
+    const btn = document.createElement('button');
+    btn.className = `mobile-nav-btn${extraClass ? ' ' + extraClass : ''}`;
+    btn.setAttribute('aria-label', label);
+    btn.innerHTML = `<span aria-hidden="true">${content}</span>`;
+    return btn;
+  }
+
+  // ← Back button (far left)
+  const backBtn = navBtn('←', 'Close note', 'mobile-nav-back');
+  backBtn.addEventListener('click', () => toggleNoteExpansion(noteElement));
+
+  // T — Toolbar toggle
+  const toolbarBtn = navBtn('<span style="font-weight:bold;font-size:17px">T</span>', 'Toggle toolbar');
+  if (getToolbarsVisible()) toolbarBtn.classList.add('active');
+  toolbarBtn.addEventListener('click', () => {
+    const newState = toggleToolbars();
+    toolbarBtn.classList.toggle('active', newState);
+  });
+
+  // Aa — Spell check toggle
+  const spellBtn = navBtn('<span style="font-weight:bold;font-size:15px">Aa</span>', 'Toggle spell check');
+  spellBtn.classList.toggle('active', spellCheckEnabled);
+  spellBtn.addEventListener('click', () => {
+    toggleSpellCheck();
+    spellBtn.classList.toggle('active', spellCheckEnabled);
+  });
+
+  // ✏️ / 👁 — Lock toggle (hidden for encrypted notes)
+  const lockBtn = navBtn(isReadOnly ? '👁' : '✏️', isReadOnly ? 'Make editable' : 'Make view-only');
+  if (isReadOnly) lockBtn.classList.add('active');
+  if (isEncrypted) lockBtn.style.display = 'none';
+  lockBtn.addEventListener('click', async () => {
+    const nowReadOnly = noteElement.dataset.readOnly !== 'true';
+    const result = await setNoteReadOnly(noteId, nowReadOnly);
+    if (result) {
+      noteElement.dataset.readOnly = nowReadOnly ? 'true' : 'false';
+      noteElement.classList.toggle('note--locked', nowReadOnly);
+      const existing = noteElement.querySelector('.note-lock-badge');
+      if (nowReadOnly && !existing) {
+        const badge = document.createElement('div');
+        badge.className = 'note-lock-badge';
+        badge.title = 'View-only';
+        badge.textContent = '👁';
+        noteElement.appendChild(badge);
+      } else if (!nowReadOnly && existing) {
+        existing.remove();
+      }
+      setEditorReadOnly(noteId, nowReadOnly);
+      lockBtn.classList.toggle('active', nowReadOnly);
+      lockBtn.querySelector('span').textContent = nowReadOnly ? '👁' : '✏️';
+      lockBtn.setAttribute('aria-label', nowReadOnly ? 'Make editable' : 'Make view-only');
+    }
+  });
+
+  // 🔐 — Encrypt toggle (only if encryption UI is enabled)
+  let encryptBtn = null;
+  if (isEncryptionUiEnabled()) {
+    encryptBtn = navBtn('🔐', isEncrypted ? 'Decrypt note' : 'Encrypt note');
+    if (isEncrypted) encryptBtn.classList.add('active');
+    // Delegate to the desktop encrypt button — it has all the state mutation logic.
+    // display:none on mobile doesn't prevent programmatic .click().
+    encryptBtn.addEventListener('click', () => {
+      const desktopEncryptBtn = document.querySelector(
+        '.expanded-note-controls .expanded-control-btn:last-child'
+      );
+      if (desktopEncryptBtn) desktopEncryptBtn.click();
+    });
+  }
+
+  // 🗑 — Delete button (far right)
+  const deleteBtn = navBtn('🗑', 'Delete note', 'mobile-nav-delete');
+  deleteBtn.addEventListener('click', () => {
+    // Delegate to the note's own delete button which has confirm-dialog wiring.
+    const noteDeleteBtn = noteElement.querySelector('button.note-delete');
+    if (noteDeleteBtn) noteDeleteBtn.click();
+  });
+
+  // Assemble: ← | T | Aa | ✏️ | [🔐] | → | 🗑
+  nav.appendChild(backBtn);
+  nav.appendChild(toolbarBtn);
+  nav.appendChild(spellBtn);
+  nav.appendChild(lockBtn);
+  if (encryptBtn) nav.appendChild(encryptBtn);
+  nav.appendChild(deleteBtn);
+
+  // Insert as first child so the Quill toolbar sits naturally below the nav bar
+  noteElement.insertBefore(nav, noteElement.firstChild);
 }
 
 /**
@@ -273,6 +386,11 @@ export function removeExpandedNoteControls() {
     applySpellCheckToAll(spellCheckEnabled);
     savedSpellCheckState = null;
   }
+
+  // Remove mobile nav bar if present.
+  // Note: .expanded is already removed from the note by the time this runs,
+  // so we query document-wide — only one .mobile-note-nav can exist at a time.
+  document.querySelector('.mobile-note-nav')?.remove();
 }
 
 /**
