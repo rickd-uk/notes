@@ -77,6 +77,10 @@ export function showUnlockModal(onSuccess) {
 
   document.getElementById('cancelUnlockBtn').addEventListener('click', cleanup);
 
+  document.getElementById('unlockPasswordInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('confirmUnlockBtn').click();
+  });
+
   document.getElementById('confirmUnlockBtn').addEventListener('click', async () => {
     const input = document.getElementById('unlockPasswordInput').value.trim();
     if (!input) { showToast('Please enter your password or recovery key'); return; }
@@ -352,6 +356,12 @@ export function setupEventListeners() {
 
   if (setEncryptionPasswordBtn) setEncryptionPasswordBtn.addEventListener('click', openSetEncryptionModal);
   if (cancelSetEncryptionBtn) cancelSetEncryptionBtn.addEventListener('click', () => setEncryptionModal.classList.remove('active'));
+
+  ['encNewPassword', 'encConfirmPassword'].forEach(id => {
+    document.getElementById(id)?.addEventListener('keydown', e => {
+      if (e.key === 'Enter') confirmSetEncryptionBtn?.click();
+    });
+  });
 
   if (confirmSetEncryptionBtn) {
     confirmSetEncryptionBtn.addEventListener('click', async () => {
