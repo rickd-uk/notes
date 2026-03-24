@@ -230,10 +230,12 @@ body.dark-mode .empty-title {
 /* For all screen sizes, never use more than 3 columns */
 .notes-container.note-count-many {
     grid-template-columns: repeat(auto-fill, minmax(calc((100% - 40px) / 3), 1fr)) !important;
+    grid-auto-rows: 300px;
 }
 
 .notes-container.note-count-many .note {
     min-height: 250px;
+    max-height: 300px;
 }
 
 /* Wider screen optimization */

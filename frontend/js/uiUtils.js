@@ -26,6 +26,8 @@ export function hideAllNoteButtons() {
 // Function to recreate delete buttons when modals are closed
 export function recreateAllNoteButtons() {
   document.querySelectorAll('.note:not(.expanded)').forEach(note => {
+    // Don't add delete button to encrypted notes
+    if (note.dataset.encrypted === 'true') return;
     // Only add if doesn't exist
     if (!note.querySelector('.note-delete')) {
       const newBtn = document.createElement('button');
