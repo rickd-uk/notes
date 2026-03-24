@@ -118,11 +118,16 @@ ${note.encrypted ? '<div class="note-lock-badge" title="Encrypted">🔐</div>' :
         const { isUnlocked, decryptNoteContent } = await import('./encryptionManager.js');
         if (isUnlocked()) {
           const decrypted = await decryptNoteContent(content);
-          content = decrypted || '<p><em>Decryption failed</em></p>';
-          noteElement.dataset.encryptedContent = placeholder?.dataset.content || '';
+          if (decrypted) {
+            content = decrypted;
+          } else {
+            content = '<p style="opacity:0.6;font-style:italic">⚠️ Decryption failed — expand the note and click 🔐 to clear it</p>';
+            noteElement.dataset.decryptionFailed = 'true';
+          }
+          noteElement.dataset.encryptedContent = decodeURIComponent(placeholder?.dataset.content || '');
         } else {
           content = '<p style="opacity:0.4;font-style:italic">🔐 Encrypted — expand and unlock to view</p>';
-          noteElement.dataset.encryptedContent = placeholder?.dataset.content || '';
+          noteElement.dataset.encryptedContent = decodeURIComponent(placeholder?.dataset.content || '');
         }
       }
 
@@ -374,6 +379,9 @@ export function toggleNoteExpansion(noteElement) {
   const isExpanding = !noteElement.classList.contains("expanded");
 
   if (isExpanding) {
+    // Save position so we can restore it on collapse
+    noteElement._prevNextSibling = noteElement.nextSibling;
+
     // REMOVE ALL DELETE BUTTONS EXCEPT FOR THIS NOTE
     hideAllNoteButtons();
 
@@ -443,8 +451,16 @@ background-color: var(--surface-color);
     // Reset overlay style
     overlay.style = "";
 
-    // Return note to its original container
-    elements.notesContainer.appendChild(noteElement);
+    // Return note to its original position in the container
+    const sibling = noteElement._prevNextSibling;
+    if (sibling && sibling.parentElement === elements.notesContainer) {
+      elements.notesContainer.insertBefore(noteElement, sibling);
+    } else {
+      elements.notesContainer.appendChild(noteElement);
+    }
+    noteElement._prevNextSibling = null;
+    // Scroll the note into view so it's visible after collapse
+    setTimeout(() => noteElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
 
     // Allow scrolling on main container again
     document.body.style.overflow = "";

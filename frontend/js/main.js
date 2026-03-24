@@ -13,7 +13,7 @@ import { initToolbarToggle } from "./toolbarToggle.js";
 import { applyToolbarVisibilityToAll } from "./quillEditor.js";
 import { initSpellCheck, applySpellCheckToAll } from "./noteControls.js";
 import { initSidebarToggles } from "./sidebarToggles.js";
-import { loadEncryptionSetup, hasEncryptionPassword } from "./encryptionManager.js";
+import { loadEncryptionSetup, restoreSessionKey } from "./encryptionManager.js";
 
 // Function to update the username display
 async function updateUsernameDisplay() {
@@ -76,13 +76,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await updateUsernameDisplay();
 
-  // Load encryption setup — prompt for password upfront if one is set,
-  // so encrypt/decrypt both work seamlessly without mid-action interruptions
+  // Load encryption setup — needed before loadNotes so renderNotes knows if user has encryption
   await loadEncryptionSetup();
-  if (hasEncryptionPassword()) {
-    const { showUnlockModal } = await import('./eventHandlers.js');
-    showUnlockModal();
-  }
+
+  // Restore session key from sessionStorage (survives page refresh, cleared on explicit lock)
+  await restoreSessionKey();
 
   // Load initial data
   await loadCategories();

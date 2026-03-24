@@ -9,6 +9,7 @@ import {
   hasEncryptionPassword, isUnlocked, encryptNote, decryptAndSaveNote
 } from './encryptionManager.js';
 import { showToast } from './uiUtils.js';
+import { getNotes } from './state.js';
 // NOTE: showUnlockModal is NOT imported statically. eventHandlers.js imports ui.js,
 // ui.js dynamically imports noteControls.js — a static import here would create a
 // cycle that causes showUnlockModal to be undefined at module init time.
@@ -127,11 +128,11 @@ export function addExpandedNoteControls(noteElement) {
       const nowEncrypted = noteElement.dataset.encrypted !== 'true';
 
       if (!isUnlocked()) {
-        showToast('Enter your encryption password to continue');
-        // Dynamic import to avoid static cycle: eventHandlers → ui → (dynamic) noteControls → eventHandlers
+        console.warn('[noteControls] isUnlocked()=false, showing modal');
         const { showUnlockModal } = await import('./eventHandlers.js');
         showUnlockModal(async () => {
-          // retry after unlock
+          const toggle = document.getElementById('sidebarStrictDecryptToggle');
+          if (toggle) toggle.checked = true;
           encryptBtn.click();
         });
         return;
@@ -158,12 +159,37 @@ export function addExpandedNoteControls(noteElement) {
           lockBtn.classList.add('active');
           lockBtn.querySelector('span:first-child').textContent = '🔒';
         } else {
-          // dataset.encryptedContent is set by ui.js renderNotes (Task 10).
-          // If it's absent (note was just encrypted this session), fall back to
-          // quill content, which IS the ciphertext the server just stored.
-          const ciphertext = noteElement.dataset.encryptedContent || quill?.root.innerHTML || '';
+          // If decryption previously failed (wrong key / corrupted), offer to clear the note
+          if (noteElement.dataset.decryptionFailed === 'true') {
+            const { setNoteEncryptedContent } = await import('./api.js');
+            await setNoteEncryptedContent(noteId, '', false);
+            await setNoteReadOnly(noteId, false);
+            noteElement.dataset.encrypted = 'false';
+            noteElement.dataset.readOnly = 'false';
+            noteElement.dataset.decryptionFailed = 'false';
+            noteElement.classList.remove('note--encrypted', 'note--locked');
+            if (quill) {
+              quill.enable(true);
+              quill.clipboard.dangerouslyPasteHTML('');
+            }
+            setEditorReadOnly(noteId, false);
+            lockBtn.classList.remove('active');
+            lockBtn.querySelector('span:first-child').textContent = '🔓';
+            encryptBtn.classList.remove('active');
+            encryptBtn.querySelector('.tooltip').textContent = 'Encrypt note';
+            showToast('Note cleared — content could not be recovered');
+            return;
+          }
+
+          // Resolve ciphertext: prefer dataset (set by renderNotes), then fall back
+          // to in-memory state (reliable after unlock), then quill HTML (last resort).
+          let ciphertext = noteElement.dataset.encryptedContent || '';
           if (!ciphertext.startsWith('ENC:')) {
-            showToast('No encrypted content found — reload and try again');
+            const stateNote = getNotes().find(n => String(n.id) === noteId);
+            ciphertext = stateNote?.content || '';
+          }
+          if (!ciphertext.startsWith('ENC:')) {
+            showToast('Cannot decrypt: reload the page and try again');
             return;
           }
           const plaintext = await decryptAndSaveNote(noteId, ciphertext);

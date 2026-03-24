@@ -48,9 +48,21 @@ export async function deriveKey(password, saltB64) {
     { name: 'PBKDF2', salt, iterations: PBKDF2_ITERATIONS, hash: 'SHA-256' },
     keyMaterial,
     { name: 'AES-GCM', length: 256 },
-    false,
+    true,
     ['encrypt', 'decrypt']
   );
+}
+
+// Export a CryptoKey to base64 string for sessionStorage persistence
+export async function exportKey(key) {
+  const raw = await crypto.subtle.exportKey('raw', key);
+  return b64encode(raw);
+}
+
+// Import a base64 string back to a CryptoKey
+export async function importKey(b64) {
+  const raw = b64decode(b64);
+  return crypto.subtle.importKey('raw', raw, { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']);
 }
 
 // Derive an AES-256-GCM key from a recovery key (normalised) and base64 salt

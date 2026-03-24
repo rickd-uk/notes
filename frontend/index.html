@@ -71,6 +71,7 @@
     <link rel="stylesheet" href="css/note-controls.css" />
     <link rel="stylesheet" href="css/settings-modal.css" />
     <link rel="stylesheet" href="css/sidebar-collapse.css" />
+    <link rel="stylesheet" href="css/privacy-toggle.css" />
   </head>
   <body>
     <div class="sidebar">
@@ -112,6 +113,24 @@
           <span class="spellcheck-label">Spell Check</span>
           <label class="switch">
             <input type="checkbox" id="sidebarSpellCheckToggle" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- Privacy Screen Toggle -->
+        <div class="privacy-toggle">
+          <span class="privacy-label">👁 Privacy</span>
+          <label class="switch">
+            <input type="checkbox" id="sidebarPrivacyToggle" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- Unlock Notes Toggle (only shown when encryption password is set) -->
+        <div class="strict-decrypt-toggle" id="strictDecryptToggleRow" style="display:none">
+          <span class="strict-decrypt-label">🔑 Show Encrypted</span>
+          <label class="switch">
+            <input type="checkbox" id="sidebarStrictDecryptToggle" />
             <span class="slider"></span>
           </label>
         </div>

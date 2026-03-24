@@ -420,6 +420,10 @@ export async function createNewNote() {
 
 // Handle note input (debounced)
 export function handleNoteInput(noteId, content) {
+  // Skip saving if note is encrypted or read-only
+  const noteEl = document.querySelector(`.note[data-id="${noteId}"]`);
+  if (noteEl && (noteEl.dataset.encrypted === 'true' || noteEl.dataset.readOnly === 'true')) return;
+
   // Update locally for immediate feedback
   const note = updateNoteInState(noteId, content);
   if (!note) return;
@@ -427,6 +431,9 @@ export function handleNoteInput(noteId, content) {
   // Debounce the API call to avoid too many requests while typing
   clearTimeout(note.saveTimeout);
   note.saveTimeout = setTimeout(async () => {
+    // Re-check: note may have been encrypted/locked in the 500ms window
+    const el = document.querySelector(`.note[data-id="${noteId}"]`);
+    if (el && (el.dataset.encrypted === 'true' || el.dataset.readOnly === 'true')) return;
     await updateNote(noteId, content, note.category_id);
   }, 500); // Wait 500ms after typing stops
 }

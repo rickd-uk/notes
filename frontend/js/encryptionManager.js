@@ -2,8 +2,31 @@
 
 import {
   generateSalt, generateRecoveryKey, deriveKey, deriveKeyFromRecoveryKey,
-  encryptText, decryptText, createVerifier, verifyKey
+  encryptText, decryptText, createVerifier, verifyKey, exportKey, importKey
 } from './crypto.js';
+
+const SESSION_KEY_STORAGE = 'enc_session_key';
+
+async function persistSessionKey(key) {
+  try {
+    sessionStorage.setItem(SESSION_KEY_STORAGE, await exportKey(key));
+  } catch { /* ignore */ }
+}
+
+function clearPersistedSessionKey() {
+  sessionStorage.removeItem(SESSION_KEY_STORAGE);
+}
+
+export async function restoreSessionKey() {
+  try {
+    const stored = sessionStorage.getItem(SESSION_KEY_STORAGE);
+    if (stored) {
+      _sessionKey = await importKey(stored);
+    }
+  } catch {
+    sessionStorage.removeItem(SESSION_KEY_STORAGE);
+  }
+}
 import {
   getEncryptionSetup, saveEncryptionPassword, removeEncryptionPasswordApi,
   setNoteEncryptedContent, setNoteReadOnly
@@ -38,7 +61,7 @@ export async function unlockWithPassword(password) {
   const setup = await getEncryptionSetup(); // get fresh verifier
   const key = await deriveKey(password, setup.encryption_salt);
   const ok = await verifyKey(key, setup.encryption_verifier);
-  if (ok) { _sessionKey = key; }
+  if (ok) { _sessionKey = key; await persistSessionKey(key); }
   return ok;
 }
 
@@ -48,13 +71,14 @@ export async function unlockWithRecoveryKey(recoveryKey) {
   const setup = await getEncryptionSetup();
   const key = await deriveKeyFromRecoveryKey(recoveryKey, setup.encryption_salt);
   const ok = await verifyKey(key, setup.encryption_recovery_verifier);
-  if (ok) { _sessionKey = key; }
+  if (ok) { _sessionKey = key; await persistSessionKey(key); }
   return ok;
 }
 
 // Lock session (forget key)
 export function lockSession() {
   _sessionKey = null;
+  clearPersistedSessionKey();
 }
 
 // ── Set / remove password ────────────────────────────────────────────────────
@@ -74,6 +98,7 @@ export async function setEncryptionPassword(password) {
   if (!result?.success) throw new Error('Failed to save encryption password');
 
   _sessionKey = mainKey;
+  await persistSessionKey(mainKey);
   _encryptionSetup = { has_encryption_password: true, encryption_salt: salt };
 
   return recoveryKey;
