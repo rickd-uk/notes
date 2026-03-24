@@ -152,3 +152,18 @@ body.dark-mode .no-icons-message {
   }
 }
 
+/* Username display at the top of the sidebar */
+.sidebar-username {
+  padding: 12px 20px 10px;
+  font-size: 14px;
+  color: var(--text-secondary, #757575);
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.dark-mode .sidebar-username {
+  color: #aaa;
+}

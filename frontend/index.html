@@ -75,6 +75,9 @@
   </head>
   <body>
     <div class="sidebar">
+      <div class="sidebar-username">
+        <span id="usernameDisplay"></span>
+      </div>
       <div class="frontpage-image">
         <!--  <img src="images/simple-notes.png" alt="Simple Notes"
         onerror="this.outerHTML='<div class=\'fallback-text\'>Welcome to Simple Notes!</div>'" > 
@@ -145,9 +148,6 @@
       <div class="notes-header">
         <button class="nav-toggle" id="navToggleBtn" aria-label="Toggle sidebar">&#9776;</button>
         <div class="current-category"></div>
-        <div class="user-info">
-          <span class="username-display" id="usernameDisplay">Loading...</span>
-        </div>
         <button class="add-note-btn" id="addNoteBtn">+</button>
       </div>
       <div class="notes-container" id="notesContainer">

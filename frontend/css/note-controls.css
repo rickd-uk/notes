@@ -255,9 +255,6 @@ body.dark-mode .header-controls-group {
     z-index: 10; /* Make sure it doesn't interfere with other elements */
   }
 
-  .notes-header .user-info {
-    margin-right: 30px;
-  }
 }
 
 /* Very small screen adjustments */
@@ -301,24 +298,6 @@ body.dark-mode .header-controls-group {
     flex-wrap: wrap;
     justify-content: flex-end;
     padding: 10px 10px;
-  }
-
-  /* Ensure user-info doesn't take up all space if it wraps */
-  .notes-header .user-info {
-    /* Apply to the .user-info container or .username-display */
-    /* To prevent it from taking full width if it wraps to its own line */
-    /* flex-basis: auto; /* Allow it to shrink */
-    /* max-width: 100%; /* Or a more constrained max-width if needed next to other items */
-    margin-bottom: 5px;
-    /* Add specific text overflow handling for the username itself if not already done */
-  }
-  .notes-header .username-display {
-    display: inline-block; /* Or block if it needs to be on its own line when long */
-    max-width: 100px; /* Example: Adjust as needed */
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    vertical-align: middle; /* Align with buttons if on the same line */
   }
 
   /* Make sure the current category indicator doesn't overlap */

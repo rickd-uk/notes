@@ -95,18 +95,6 @@
     min-height: 56px;
   }
 
-  /* Keep .user-info and .add-note-btn on the sides */
-  .notes-header .user-info {
-    /* This will be on the left by default with space-between */
-    /* You might want to limit its width if it can get too long */
-    max-width: calc(
-      50% - 80px
-    ); /* Adjust 80px based on half the width of header-controls-group */
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
   .add-note-btn {
     position: relative;
     z-index: 2;
