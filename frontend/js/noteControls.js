@@ -74,37 +74,41 @@ export function addExpandedNoteControls(noteElement) {
     spellCheckBtn.classList.toggle("active", spellCheckEnabled);
   });
 
-  // Add lock/unlock toggle button
+  // Add editable/view-only toggle button
   const noteId = noteElement.dataset.id;
   const isReadOnly = noteElement.dataset.readOnly === "true";
+  const isEncrypted = noteElement.dataset.encrypted === "true";
 
   const lockBtn = document.createElement("button");
   lockBtn.className = `expanded-control-btn${isReadOnly ? " active" : ""}`;
   lockBtn.innerHTML = `
-    <span>${isReadOnly ? "🔒" : "🔓"}</span>
-    <span class="tooltip">${isReadOnly ? "Unlock note" : "Lock note"}</span>
+    <span>${isReadOnly ? "👁" : "✏️"}</span>
+    <span class="tooltip">${isReadOnly ? "Make editable" : "Make view-only"}</span>
   `;
+  // Hide for encrypted notes — editing encrypted placeholder makes no sense
+  if (isEncrypted) lockBtn.style.display = 'none';
+
   lockBtn.addEventListener("click", async () => {
     const nowReadOnly = noteElement.dataset.readOnly !== "true";
     const result = await setNoteReadOnly(noteId, nowReadOnly);
     if (result) {
       noteElement.dataset.readOnly = nowReadOnly ? "true" : "false";
       noteElement.classList.toggle("note--locked", nowReadOnly);
-      // Update lock badge on card
+      // Update badge on card
       const existing = noteElement.querySelector(".note-lock-badge");
       if (nowReadOnly && !existing) {
         const badge = document.createElement("div");
         badge.className = "note-lock-badge";
-        badge.title = "Read-only";
-        badge.textContent = "🔒";
+        badge.title = "View-only";
+        badge.textContent = "👁";
         noteElement.appendChild(badge);
       } else if (!nowReadOnly && existing) {
         existing.remove();
       }
       setEditorReadOnly(noteId, nowReadOnly);
       lockBtn.classList.toggle("active", nowReadOnly);
-      lockBtn.querySelector("span:first-child").textContent = nowReadOnly ? "🔒" : "🔓";
-      lockBtn.querySelector(".tooltip").textContent = nowReadOnly ? "Unlock note" : "Lock note";
+      lockBtn.querySelector("span:first-child").textContent = nowReadOnly ? "👁" : "✏️";
+      lockBtn.querySelector(".tooltip").textContent = nowReadOnly ? "Make editable" : "Make view-only";
     }
   });
 
@@ -155,9 +159,10 @@ export function addExpandedNoteControls(noteElement) {
             quill.enable(false);
           }
           setEditorReadOnly(noteId, true);
-          // Update lock button state too
+          // Keep lock button hidden (note is now encrypted)
+          lockBtn.style.display = 'none';
           lockBtn.classList.add('active');
-          lockBtn.querySelector('span:first-child').textContent = '🔒';
+          lockBtn.querySelector('span:first-child').textContent = '👁';
         } else {
           // If decryption previously failed (wrong key / corrupted), offer to clear the note
           if (noteElement.dataset.decryptionFailed === 'true') {
@@ -173,8 +178,10 @@ export function addExpandedNoteControls(noteElement) {
               quill.clipboard.dangerouslyPasteHTML('');
             }
             setEditorReadOnly(noteId, false);
+            lockBtn.style.display = '';
             lockBtn.classList.remove('active');
-            lockBtn.querySelector('span:first-child').textContent = '🔓';
+            lockBtn.querySelector('span:first-child').textContent = '✏️';
+            lockBtn.querySelector('.tooltip').textContent = 'Make view-only';
             encryptBtn.classList.remove('active');
             encryptBtn.querySelector('.tooltip').textContent = 'Encrypt note';
             showToast('Note cleared — content could not be recovered');
@@ -201,8 +208,11 @@ export function addExpandedNoteControls(noteElement) {
             quill.clipboard.dangerouslyPasteHTML(plaintext);
           }
           setEditorReadOnly(noteId, false);
+          // Note is now decrypted — show the edit/view-only toggle
+          lockBtn.style.display = '';
           lockBtn.classList.remove('active');
-          lockBtn.querySelector('span:first-child').textContent = '🔓';
+          lockBtn.querySelector('span:first-child').textContent = '✏️';
+          lockBtn.querySelector('.tooltip').textContent = 'Make view-only';
         }
         encryptBtn.classList.toggle('active', nowEncrypted);
         encryptBtn.querySelector('span:first-child').textContent = '🔐';

@@ -91,7 +91,7 @@ export async function renderNotes() {
     <div class="note-category-icon">${categoryIcon}</div>
   </div>
 </div>
-${note.read_only && !note.encrypted ? '<div class="note-lock-badge" title="Read-only">🔒</div>' : ''}
+${note.read_only && !note.encrypted ? '<div class="note-lock-badge" title="View-only">👁</div>' : ''}
 ${note.encrypted ? '<div class="note-lock-badge" title="Encrypted">🔐</div>' : ''}
 <button class="note-delete" title="Delete note">🗑️</button>
 <div class="note-expand" title="Expand/collapse note">
