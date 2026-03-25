@@ -37,18 +37,17 @@
     background-color: #616161;
 }
 
-/* Normal cancel button style for edit mode */
+/* Edit mode matches add mode */
 #categoryModal[data-mode="edit"] .modal-btn-cancel {
-    background-color: transparent;
-    color: var(--text-color);
-    border: 1px solid #e0e0e0;
+    background-color: #757575;
+    color: white;
+    border: none;
 }
 
 #categoryModal[data-mode="edit"] .modal-btn-cancel:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: #616161;
 }
 
-/* Update button style for edit mode */
 #categoryModal[data-mode="edit"] .modal-btn-confirm {
     background-color: var(--primary-color);
     color: white;
@@ -59,15 +58,11 @@
     background-color: #5000d2;
 }
 
-/* Style the modal header differently based on mode */
-#categoryModal[data-mode="add"] .modal-header {
+/* Modal header — same style for both modes */
+#categoryModal[data-mode="add"] .modal-header,
+#categoryModal[data-mode="edit"] .modal-header {
     color: var(--primary-color);
     font-size: 20px;
-}
-
-#categoryModal[data-mode="edit"] .modal-header {
-    color: #333333;
-    font-size: 18px;
 }
 
 /* Make modal content a bit taller to accommodate multiple adds */
@@ -110,21 +105,11 @@ body.dark-mode #categoryModal[data-mode="add"] .modal-btn-cancel:hover {
 }
 
 body.dark-mode #categoryModal[data-mode="edit"] .modal-btn-cancel {
-    background-color: transparent;
-    color: var(--text-color);
-    border-color: #444444;
+    background-color: #424242;
 }
 
 body.dark-mode #categoryModal[data-mode="edit"] .modal-btn-cancel:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-}
-
-body.dark-mode #categoryModal[data-mode="add"] .modal-header {
-    color: var(--primary-color);
-}
-
-body.dark-mode #categoryModal[data-mode="edit"] .modal-header {
-    color: #e0e0e0;
+    background-color: #555555;
 }
 
 /* Mobile adjustments */
