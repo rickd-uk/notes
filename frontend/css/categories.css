@@ -139,13 +139,6 @@ body.dark-mode .no-icons-message {
     background-color: var(--primary-color);
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .icon-grid {
-    grid-template-columns: repeat(6, 1fr);
-  }
-}
-
 @media (max-width: 480px) {
   .icon-grid {
     grid-template-columns: repeat(4, 1fr);
@@ -212,8 +205,12 @@ body.dark-mode .sidebar-username {
   }
 }
 
-/* Mobile touch targets — phone only (≤768px) */
+/* Responsive adjustments — mobile touch targets and layout */
 @media (max-width: 768px) {
+  .icon-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
   .btn-edit,
   .btn-delete {
     min-width: 44px;
