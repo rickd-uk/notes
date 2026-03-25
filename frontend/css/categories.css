@@ -121,9 +121,9 @@ body.dark-mode .no-icons-message {
 .icon-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 12px;
-    font-size: 20px;
+    gap: 5px;
+    padding: 8px 6px;
+    font-size: 16px;
     border-radius: 8px;
     cursor: pointer;
     background-color: var(--background-color);
@@ -133,7 +133,7 @@ body.dark-mode .no-icons-message {
 }
 
 .icon-name {
-    font-size: 13px;
+    font-size: 11px;
     color: var(--text-color);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -149,11 +149,6 @@ body.dark-mode .no-icons-message {
     background-color: var(--primary-color);
 }
 
-@media (max-width: 480px) {
-  .icon-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
 
 /* Username display at the top of the sidebar */
 .sidebar-username {
