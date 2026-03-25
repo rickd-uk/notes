@@ -221,13 +221,12 @@ button.note-delete:hover {
 
 /* Make expanded note footer behave differently */
 .note.expanded .note-footer {
-  position: sticky;
-  bottom: 5px;
   background-color: var(--surface-color);
   padding-top: 5px;
   border-top: 1px solid #f0f0f0;
   z-index: 2;
   margin-top: auto; /* Push to bottom */
+  margin-bottom: 10px; /* Gap between footer and bottom edge — adjust this value */
 }
 
 
