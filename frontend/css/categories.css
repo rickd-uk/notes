@@ -50,8 +50,7 @@
     align-items: center;
 }
 
-.category:hover .category-controls,
-.categories.edit-mode .category-controls {
+.category:hover .category-controls {
     opacity: 1;
 }
 
@@ -289,7 +288,7 @@ body.dark-mode .sidebar-username {
   display: none;
 }
 
-/* Arrow reorder buttons — visible in edit mode on all screen sizes */
+/* Arrow reorder buttons — mobile/tablet only, shown in edit mode */
 .btn-move-wrap {
   display: none;
   flex-direction: row;
@@ -297,10 +296,6 @@ body.dark-mode .sidebar-username {
   gap: 2px;
   margin-right: 6px;
   flex-shrink: 0;
-}
-
-.categories.edit-mode .btn-move-wrap {
-  display: flex;
 }
 
 .btn-move-up,
@@ -356,6 +351,10 @@ body.dark-mode .sidebar-username {
   .categories.edit-mode .category-controls {
     display: flex;
     opacity: 1;
+  }
+
+  .categories.edit-mode .btn-move-wrap {
+    display: flex;
   }
 
   #categoryEditToggle {
