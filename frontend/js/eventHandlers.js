@@ -703,6 +703,9 @@ export async function handleBulkDelete() {
 
 // Handle category creation - modified for multiple additions
 export async function handleCategoryCreate() {
+  const btn = elements.confirmCategoryBtn;
+  if (btn?.disabled) return;
+
   const name = elements.categoryInput.value.trim();
   let icon = elements.categoryIconInput.value.trim();
 
@@ -716,27 +719,32 @@ export async function handleCategoryCreate() {
     icon = "📁";
   }
 
-  const newCategory = await createCategory(name, icon);
+  if (btn) btn.disabled = true;
+  try {
+    const newCategory = await createCategory(name, icon);
 
-  if (newCategory) {
-    // Add to state and update UI
-    addCategoryToState(newCategory);
-    renderCategories();
+    if (newCategory) {
+      // Add to state and update UI
+      addCategoryToState(newCategory);
+      renderCategories();
 
-    // Hide the used icon immediately in the modal (auto-selects next icon)
-    hideIconInModal(icon);
+      // Hide the used icon immediately in the modal (auto-selects next icon)
+      hideIconInModal(icon);
 
-    // Fill name for the next auto-selected icon
-    const nextIcon = elements.categoryIconInput.value;
-    const nextIconEl = nextIcon ? document.querySelector(`.icon-item[data-icon="${nextIcon}"]`) : null;
-    elements.categoryInput.value = nextIconEl?.dataset.name || '';
-    elements.categoryInput.dispatchEvent(new Event("input"));
+      // Fill name for the next auto-selected icon
+      const nextIcon = elements.categoryIconInput.value;
+      const nextIconEl = nextIcon ? document.querySelector(`.icon-item[data-icon="${nextIcon}"]`) : null;
+      elements.categoryInput.value = nextIconEl?.dataset.name || '';
+      elements.categoryInput.dispatchEvent(new Event("input"));
 
-    // Focus on the input field for next category
-    elements.categoryInput.focus();
+      // Focus on the input field for next category
+      elements.categoryInput.focus();
 
-    // Show success toast
-    showToast("Category added");
+      // Show success toast
+      showToast("Category added");
+    }
+  } finally {
+    if (btn) btn.disabled = false;
   }
 }
 
