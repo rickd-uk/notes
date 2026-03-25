@@ -195,7 +195,7 @@ body.dark-mode .sidebar-username {
     align-items: center;
     justify-content: center;
     background: rgba(98, 0, 238, 0.12);
-    color: #6200ee;
+    color: var(--primary-color);
     border: none;
     border-radius: 6px;
     padding: 4px 7px;
@@ -207,7 +207,7 @@ body.dark-mode .sidebar-username {
   }
 
   #categoryEditToggle.active {
-    background: #6200ee;
+    background: var(--primary-color);
     color: #fff;
   }
 }

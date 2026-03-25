@@ -136,7 +136,9 @@ export function setupEventListeners() {
       // listener runs on the .category child before this one fires.
       e.stopPropagation();
       const isActive = categoriesContainer.classList.toggle('edit-mode');
-      e.target.classList.toggle('active', isActive);
+      // Use querySelector rather than e.target in case the button gains child nodes
+      const btn = categoriesContainer.querySelector('#categoryEditToggle');
+      if (btn) btn.classList.toggle('active', isActive);
       localStorage.setItem('categoryEditMode', String(isActive));
     });
   }
