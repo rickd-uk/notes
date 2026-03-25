@@ -312,11 +312,15 @@ export function renderCategories() {
 
   const customCategoriesHTML = categories
     .map(
-      (category) => `
-<div class="category${currentCategoryId === category.id.toString() ? " active" : ""}" data-id="${category.id}">
+      (category, index) => `
+<div class="category${currentCategoryId === category.id.toString() ? " active" : ""}" data-id="${category.id}" draggable="true">
 <div class="category-icon">${category.icon || "📁"}</div>
 <div class="category-name">${category.name}</div>
 <div class="category-controls">
+<div class="btn-move-wrap">
+<button class="btn-move-up" title="Move up" data-id="${category.id}"${index === 0 ? " disabled" : ""}>↑</button>
+<button class="btn-move-down" title="Move down" data-id="${category.id}"${index === categories.length - 1 ? " disabled" : ""}>↓</button>
+</div>
 <button class="btn-edit" title="Edit category">✏️</button>
 <button class="btn-delete" title="Delete category">🗑️</button>
 </div>
@@ -333,7 +337,7 @@ export function renderCategories() {
 </div>
 <div class="category${currentCategoryId === "uncategorized" ? " active" : ""}" data-id="uncategorized">
   <div class="category-icon">❓</div>
-  <div class="category-name">Uncategorized</div>
+  <div class="category-name">None</div>
 </div>
 ${customCategoriesHTML}
 `;
@@ -387,7 +391,8 @@ ${customCategoriesHTML}
 
   // Add event listeners to categories
   document.querySelectorAll(".category").forEach((categoryElem) => {
-    categoryElem.addEventListener("click", () => {
+    categoryElem.addEventListener("click", (e) => {
+      if (e.target.closest(".btn-move-wrap")) return;
       handleCategoryClick(categoryElem.dataset.id);
     });
 

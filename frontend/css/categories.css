@@ -46,7 +46,8 @@
     transition: opacity 0.2s;
 }
 
-.category:hover .category-controls {
+.category:hover .category-controls,
+.categories.edit-mode .category-controls {
     opacity: 1;
 }
 
@@ -282,6 +283,59 @@ body.dark-mode .sidebar-username {
 /* Hide the edit toggle button on desktop */
 #categoryEditToggle {
   display: none;
+}
+
+/* Arrow reorder buttons — visible in edit mode on all screen sizes */
+.btn-move-wrap {
+  display: none;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+.categories.edit-mode .btn-move-wrap {
+  display: flex;
+}
+
+.btn-move-up,
+.btn-move-down {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(98, 0, 238, 0.08);
+  border: 1px solid rgba(98, 0, 238, 0.25);
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--primary-color);
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.btn-move-up:hover,
+.btn-move-down:hover {
+  background-color: rgba(98, 0, 238, 0.18);
+}
+
+.btn-move-up:disabled,
+.btn-move-down:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+/* Drag-and-drop visual feedback */
+.category.dragging {
+  opacity: 0.4;
+}
+
+.category.drag-over {
+  background-color: rgba(98, 0, 238, 0.1);
+  border-left: 3px solid var(--primary-color);
 }
 
 /* Mobile/drawer: hide category controls by default, show in edit mode */

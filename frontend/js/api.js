@@ -397,6 +397,25 @@ export async function deleteCategory(id, deleteNotes = false) {
   }
 }
 
+// Save new category order to the server
+export async function reorderCategories(order) {
+  const apiUrl = getApiUrl();
+  try {
+    const response = await fetch(`${apiUrl}/categories/reorder`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ order }),
+    });
+    if (!response.ok) throw new Error('Failed to save category order');
+    return true;
+  } catch (err) {
+    console.error('Error saving category order:', err);
+    showToast('Failed to save category order');
+    return false;
+  }
+}
+
 // Add to api.js - Function to delete all categories
 
 export async function setNoteReadOnly(noteId, readOnly) {

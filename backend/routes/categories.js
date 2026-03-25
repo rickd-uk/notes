@@ -13,12 +13,12 @@ router.get('/', async (req, res) => {
     
     // Handle admin user from .env file (backward compatibility)
     if (userId === 'admin') {
-      const result = await db.query('SELECT * FROM categories');
+      const result = await db.query('SELECT * FROM categories ORDER BY sort_order ASC, id ASC');
       return res.json(result.rows);
     }
-    
+
     const result = await db.query(
-      'SELECT * FROM categories WHERE user_id = $1',
+      'SELECT * FROM categories WHERE user_id = $1 ORDER BY sort_order ASC, id ASC',
       [userId]
     );
     res.json(result.rows);
@@ -36,16 +36,23 @@ router.post('/', async (req, res) => {
     
     // Handle admin user from .env file (backward compatibility)
     if (userId === 'admin') {
+      const maxResult = await db.query('SELECT COALESCE(MAX(sort_order), 0) AS max FROM categories');
+      const sortOrder = maxResult.rows[0].max + 1;
       const result = await db.query(
-        'INSERT INTO categories (name, icon) VALUES ($1, $2) RETURNING *',
-        [name, icon]
+        'INSERT INTO categories (name, icon, sort_order) VALUES ($1, $2, $3) RETURNING *',
+        [name, icon, sortOrder]
       );
       return res.status(201).json(result.rows[0]);
     }
-    
+
+    const maxResult = await db.query(
+      'SELECT COALESCE(MAX(sort_order), 0) AS max FROM categories WHERE user_id = $1',
+      [userId]
+    );
+    const sortOrder = maxResult.rows[0].max + 1;
     const result = await db.query(
-      'INSERT INTO categories (name, icon, user_id) VALUES ($1, $2, $3) RETURNING *',
-      [name, icon, userId]
+      'INSERT INTO categories (name, icon, user_id, sort_order) VALUES ($1, $2, $3, $4) RETURNING *',
+      [name, icon, userId, sortOrder]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -295,6 +302,44 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   } finally {
     // Release client
+    client.release();
+  }
+});
+
+// Reorder categories — accepts { order: [{id, sort_order}, ...] }
+router.patch('/reorder', async (req, res) => {
+  const { order } = req.body;
+  const userId = req.user.userId;
+
+  if (!Array.isArray(order) || order.length === 0) {
+    return res.status(400).json({ error: 'order must be a non-empty array' });
+  }
+
+  const client = await db.getClient();
+  try {
+    await client.query('BEGIN');
+
+    for (const { id, sort_order } of order) {
+      if (userId === 'admin') {
+        await client.query(
+          'UPDATE categories SET sort_order = $1 WHERE id = $2',
+          [sort_order, id]
+        );
+      } else {
+        await client.query(
+          'UPDATE categories SET sort_order = $1 WHERE id = $2 AND user_id = $3',
+          [sort_order, id, userId]
+        );
+      }
+    }
+
+    await client.query('COMMIT');
+    res.json({ message: 'Order saved' });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error('Error reordering categories:', err);
+    res.status(500).json({ error: 'Server error' });
+  } finally {
     client.release();
   }
 });

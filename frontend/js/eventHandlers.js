@@ -25,6 +25,7 @@ import {
   createCategory,
   updateCategory,
   deleteCategory,
+  reorderCategories,
   loadNotes,
   loadCategories,
   logout,
@@ -63,6 +64,15 @@ import {
 } from './encryptionManager.js';
 // NOTE: saveEncryptionPassword and removeEncryptionPasswordApi are called internally
 // by encryptionManager.js — do NOT import them here.
+import { saveCategoriesToCache } from "./cache.js";
+
+async function saveAndRerenderCategories(newOrder) {
+  const order = newOrder.map((cat, index) => ({ id: cat.id, sort_order: index }));
+  setCategories(newOrder);
+  saveCategoriesToCache(newOrder);
+  renderCategories();
+  await reorderCategories(order);
+}
 
 export function showUnlockModal(onSuccess) {
   const modal = document.getElementById('unlockEncryptionModal');
@@ -132,6 +142,79 @@ export function setupEventListeners() {
       const isActive = categoriesContainer.classList.toggle('edit-mode');
       categoryEditToggle.classList.toggle('active', isActive);
       localStorage.setItem('categoryEditMode', String(isActive));
+    });
+  }
+
+  // Category reorder — arrow buttons (delegated on categoriesContainer)
+  if (categoriesContainer) {
+    categoriesContainer.addEventListener('click', async (e) => {
+      const upBtn = e.target.closest('.btn-move-up');
+      const downBtn = e.target.closest('.btn-move-down');
+
+      if (upBtn) {
+        e.stopPropagation();
+        const id = upBtn.dataset.id;
+        const cats = getCategories();
+        const index = cats.findIndex(c => c.id.toString() === id);
+        if (index <= 0) return;
+        const newOrder = [...cats];
+        [newOrder[index - 1], newOrder[index]] = [newOrder[index], newOrder[index - 1]];
+        await saveAndRerenderCategories(newOrder);
+        return;
+      }
+
+      if (downBtn) {
+        e.stopPropagation();
+        const id = downBtn.dataset.id;
+        const cats = getCategories();
+        const index = cats.findIndex(c => c.id.toString() === id);
+        if (index < 0 || index >= cats.length - 1) return;
+        const newOrder = [...cats];
+        [newOrder[index], newOrder[index + 1]] = [newOrder[index + 1], newOrder[index]];
+        await saveAndRerenderCategories(newOrder);
+        return;
+      }
+    });
+
+    // Drag-and-drop reorder (desktop, edit-mode only)
+    let dragSrcId = null;
+
+    categoriesContainer.addEventListener('dragstart', (e) => {
+      if (!categoriesContainer.classList.contains('edit-mode')) { e.preventDefault(); return; }
+      const category = e.target.closest('.category[draggable]');
+      if (!category) return;
+      dragSrcId = category.dataset.id;
+      category.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+
+    categoriesContainer.addEventListener('dragend', () => {
+      categoriesContainer.querySelectorAll('.category').forEach(el =>
+        el.classList.remove('dragging', 'drag-over')
+      );
+      dragSrcId = null;
+    });
+
+    categoriesContainer.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      const category = e.target.closest('.category[draggable]');
+      if (!category || category.dataset.id === dragSrcId) return;
+      categoriesContainer.querySelectorAll('.category').forEach(el => el.classList.remove('drag-over'));
+      category.classList.add('drag-over');
+    });
+
+    categoriesContainer.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      const target = e.target.closest('.category[draggable]');
+      if (!target || !dragSrcId || target.dataset.id === dragSrcId) return;
+      const cats = getCategories();
+      const srcIndex = cats.findIndex(c => c.id.toString() === dragSrcId);
+      const tgtIndex = cats.findIndex(c => c.id.toString() === target.dataset.id);
+      if (srcIndex < 0 || tgtIndex < 0) return;
+      const newOrder = [...cats];
+      const [moved] = newOrder.splice(srcIndex, 1);
+      newOrder.splice(tgtIndex, 0, moved);
+      await saveAndRerenderCategories(newOrder);
     });
   }
 
