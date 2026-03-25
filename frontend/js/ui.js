@@ -22,7 +22,11 @@ import {
   updateQuillEditorLayout,
   setEditorReadOnly,
 } from "./quillEditor.js";
-import { hideAllNoteButtons, recreateAllNoteButtons, showToast } from "./uiUtils.js";
+import {
+  hideAllNoteButtons,
+  recreateAllNoteButtons,
+  showToast,
+} from "./uiUtils.js";
 import { showNoteCategoryModal } from "./noteCategoryManager.js";
 
 /**
@@ -31,34 +35,36 @@ import { showNoteCategoryModal } from "./noteCategoryManager.js";
  * @returns {string} e.g. "just now", "5 min ago", "yesterday", "Mar 15", "Mar 15, 2024"
  */
 function formatRelativeDate(dateString) {
-  if (!dateString) return '';
+  if (!dateString) return "";
   const now = new Date();
   const date = new Date(dateString);
-  if (isNaN(date.getTime())) return '';
+  if (isNaN(date.getTime())) return "";
   const diff = Math.floor((now - date) / 1000); // seconds
 
-  if (diff < 60)           return 'just now';
-  if (diff < 3600)         return `${Math.floor(diff / 60)} min ago`;
-  if (diff < 86400)        return `${Math.floor(diff / 3600)} hour${Math.floor(diff / 3600) === 1 ? '' : 's'} ago`;
-  if (diff < 172800)       return 'yesterday';
-  if (diff < 604800)       return `${Math.floor(diff / 86400)} days ago`;
-  if (diff < 2592000)      return `${Math.floor(diff / 604800)} week${Math.floor(diff / 604800) === 1 ? '' : 's'} ago`;
+  if (diff < 60) return "just now";
+  if (diff < 3600) return `${Math.floor(diff / 60)} min ago`;
+  if (diff < 86400)
+    return `${Math.floor(diff / 3600)} hour${Math.floor(diff / 3600) === 1 ? "" : "s"} ago`;
+  if (diff < 172800) return "yesterday";
+  if (diff < 604800) return `${Math.floor(diff / 86400)} days ago`;
+  if (diff < 2592000)
+    return `${Math.floor(diff / 604800)} week${Math.floor(diff / 604800) === 1 ? "" : "s"} ago`;
 
-  const opts = { month: 'short', day: 'numeric' };
-  if (date.getFullYear() !== now.getFullYear()) opts.year = 'numeric';
+  const opts = { month: "short", day: "numeric" };
+  if (date.getFullYear() !== now.getFullYear()) opts.year = "numeric";
   return date.toLocaleDateString(undefined, opts);
 }
 
 export function addEncryptedOverlay(noteElement) {
   removeEncryptedOverlay(noteElement);
-  const overlay = document.createElement('div');
-  overlay.className = 'encrypted-overlay';
-  overlay.textContent = '🔐';
+  const overlay = document.createElement("div");
+  overlay.className = "encrypted-overlay";
+  overlay.textContent = "🔐";
   noteElement.appendChild(overlay);
 }
 
 export function removeEncryptedOverlay(noteElement) {
-  noteElement.querySelector('.encrypted-overlay')?.remove();
+  noteElement.querySelector(".encrypted-overlay")?.remove();
 }
 
 // Render notes in the UI
@@ -88,12 +94,13 @@ export async function renderNotes() {
 
     notes.forEach((note) => {
       const noteElement = document.createElement("div");
-      noteElement.className = 'note'
-        + (note.read_only ? ' note--locked' : '')
-        + (note.encrypted ? ' note--encrypted' : '');
+      noteElement.className =
+        "note" +
+        (note.read_only ? " note--locked" : "") +
+        (note.encrypted ? " note--encrypted" : "");
       noteElement.dataset.id = note.id;
       noteElement.dataset.readOnly = note.read_only ? "true" : "false";
-      noteElement.dataset.encrypted = note.encrypted ? 'true' : 'false';
+      noteElement.dataset.encrypted = note.encrypted ? "true" : "false";
 
       const formattedDate = formatRelativeDate(note.updated_at);
 
@@ -121,9 +128,9 @@ export async function renderNotes() {
     <div class="note-category-icon">${categoryIcon}</div>
   </div>
 </div>
-${note.read_only && !note.encrypted ? '<div class="note-lock-badge" title="View-only">👁</div>' : ''}
-${note.encrypted ? '<div class="note-encrypted-badge" title="Encrypted — expand the note and click 🔐 to decrypt for editing">🔐</div>' : ''}
-${note.encrypted ? '' : '<button class="note-delete" title="Delete note">🗑\uFE0E</button>'}
+${note.read_only && !note.encrypted ? '<div class="note-lock-badge" title="View-only">👁</div>' : ""}
+${note.encrypted ? '<div class="note-encrypted-badge" title="Encrypted — expand the note and click 🔐 to decrypt for editing">🔐</div>' : ""}
+${note.encrypted ? "" : '<button class="note-delete" title="Delete note">🗑\uFE0E</button>'}
 <div class="note-expand" title="Expand/collapse note">
   <span class="expand-icon">⤢</span>
 </div>
@@ -141,14 +148,18 @@ ${note.encrypted ? '' : '<button class="note-delete" title="Delete note">🗑\uF
       const placeholder = noteElement.querySelector(
         ".note-content-placeholder",
       );
-      let content = placeholder ? decodeURIComponent(placeholder.dataset.content) : '';
+      let content = placeholder
+        ? decodeURIComponent(placeholder.dataset.content)
+        : "";
 
       // Encrypted notes always show the padlock overlay in card view.
       // Content is only decrypted in the expanded view when the user clicks 🔐.
-      const showEncryptedOverlay = noteElement.dataset.encrypted === 'true';
+      const showEncryptedOverlay = noteElement.dataset.encrypted === "true";
       if (showEncryptedOverlay) {
-        noteElement.dataset.encryptedContent = decodeURIComponent(placeholder?.dataset.content || '');
-        content = '';
+        noteElement.dataset.encryptedContent = decodeURIComponent(
+          placeholder?.dataset.content || "",
+        );
+        content = "";
       }
 
       // Create Quill editor for this note (async — loads Quill on first call)
@@ -163,11 +174,11 @@ ${note.encrypted ? '' : '<button class="note-delete" title="Delete note">🗑\uF
       }
 
       // Hint when user tries to type in a still-encrypted note
-      if (noteElement.dataset.encrypted === 'true') {
-        const editorEl = noteElement.querySelector('.ql-editor');
+      if (noteElement.dataset.encrypted === "true") {
+        const editorEl = noteElement.querySelector(".ql-editor");
         if (editorEl) {
-          editorEl.addEventListener('click', () => {
-            showToast('Expand the note and click 🔐 to decrypt it for editing');
+          editorEl.addEventListener("click", () => {
+            showToast("Expand the note and click 🔐 to decrypt it for editing");
           });
         }
       }
@@ -268,10 +279,10 @@ ${note.encrypted ? '' : '<button class="note-delete" title="Delete note">🗑\uF
   }
 
   // Toggle view-all class for category badge visibility
-  if (getCurrentCategoryId() === 'all') {
-    notesContainer.classList.add('view-all');
+  if (getCurrentCategoryId() === "all") {
+    notesContainer.classList.add("view-all");
   } else {
-    notesContainer.classList.remove('view-all');
+    notesContainer.classList.remove("view-all");
   }
 
   updateCurrentCategoryDisplay();
@@ -281,14 +292,14 @@ export function updateCurrentCategoryDisplay() {
   const el = elements.currentCategoryElement;
   if (!el) return;
   const categoryId = getCurrentCategoryId();
-  if (categoryId === 'all') {
-    el.textContent = '📄 All Notes';
-  } else if (categoryId === 'uncategorized') {
-    el.textContent = '❓ Uncategorized';
+  if (categoryId === "all") {
+    el.textContent = "📄 All";
+  } else if (categoryId === "uncategorized") {
+    el.textContent = "❓ Uncategorized";
   } else {
     const cats = getCategories();
-    const cat = cats.find(c => String(c.id) === String(categoryId));
-    el.textContent = cat ? `${cat.icon || '📁'} ${cat.name}` : '';
+    const cat = cats.find((c) => String(c.id) === String(categoryId));
+    el.textContent = cat ? `${cat.icon || "📁"} ${cat.name}` : "";
   }
 }
 
@@ -318,7 +329,7 @@ export function renderCategories() {
   categoriesContainer.innerHTML = `
 <div class="category${currentCategoryId === "all" ? " active" : ""}" data-id="all">
   <div class="category-icon">📄</div>
-  <div class="category-name">All Notes</div>
+  <div class="category-name">All</div>
   <button id="categoryEditToggle" title="Toggle category editing">✏</button>
   <button class="add-category-btn" id="addCategoryBtn" title="Add category">+</button>
 </div>
@@ -330,13 +341,13 @@ ${customCategoriesHTML}
 `;
 
   // Restore edit-mode toggle state from localStorage
-  const editModeActive = localStorage.getItem('categoryEditMode') === 'true';
+  const editModeActive = localStorage.getItem("categoryEditMode") === "true";
   if (editModeActive) {
-    categoriesContainer.classList.add('edit-mode');
-    const toggleBtn = document.getElementById('categoryEditToggle');
-    if (toggleBtn) toggleBtn.classList.add('active');
+    categoriesContainer.classList.add("edit-mode");
+    const toggleBtn = document.getElementById("categoryEditToggle");
+    if (toggleBtn) toggleBtn.classList.add("active");
   } else {
-    categoriesContainer.classList.remove('edit-mode');
+    categoriesContainer.classList.remove("edit-mode");
   }
 
   // Update current category label
@@ -379,7 +390,7 @@ ${customCategoriesHTML}
   // Add event listeners to categories
   document.querySelectorAll(".category").forEach((categoryElem) => {
     categoryElem.addEventListener("click", (e) => {
-      if (e.target.id === 'categoryEditToggle') return;
+      if (e.target.id === "categoryEditToggle") return;
       handleCategoryClick(categoryElem.dataset.id);
     });
 
@@ -510,7 +521,11 @@ background-color: var(--surface-color);
     }
     noteElement._prevNextSibling = null;
     // Scroll the note into view so it's visible after collapse
-    setTimeout(() => noteElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+    setTimeout(
+      () =>
+        noteElement.scrollIntoView({ behavior: "smooth", block: "nearest" }),
+      50,
+    );
 
     // Allow scrolling on main container again
     document.body.style.overflow = "";
