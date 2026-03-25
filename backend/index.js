@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const compression = require("compression");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const history = require("connect-history-api-fallback");
@@ -31,6 +32,7 @@ const app = express();
 const port = process.env.PORT || 3012;
 
 // Middleware
+app.use(compression());
 app.use(cors());
 app.use(morgan("combined"));
 
@@ -90,7 +92,15 @@ app.use((err, req, res, next) => {
 });
 
 // Static files and history middleware for single-page application routing
-app.use(express.static(path.join(__dirname, "../frontend")));
+// Cache static assets for 1 day; index.html stays uncached so deploys take effect immediately
+app.use(express.static(path.join(__dirname, "../frontend"), {
+  maxAge: "1d",
+  setHeaders(res, filePath) {
+    if (filePath.endsWith("index.html")) {
+      res.setHeader("Cache-Control", "no-cache");
+    }
+  },
+}));
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/index.html"));
 });
