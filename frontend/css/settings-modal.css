@@ -69,7 +69,7 @@
 .settings-link-btn {
     display: block;
     width: 100%;
-    padding: 10px 12px;
+    padding: 10px 18px;
     background-color: transparent;
     color: var(--text-color);
     border: 1px solid var(--border-color);
@@ -89,17 +89,17 @@
 /* Danger zone button */
 .settings-danger-btn {
     width: 100%;
-    padding: 9px 12px;
+    padding: 9px 16px;
     background-color: transparent;
     color: #f44336;
     border: 1px solid #f44336;
     border-radius: var(--border-radius);
     cursor: pointer;
-    text-align: left;
-    font-size: 13px;
+    text-align: center;
+    font-size: 15px;
     font-weight: 600;
     transition: background-color 0.2s;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
 }
 
 .settings-danger-btn:hover {
@@ -109,15 +109,16 @@
 /* Two small buttons side by side */
 .settings-danger-pair {
     display: grid;
+    font-size: 15px;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
 }
 
 .settings-danger-btn--small {
     width: 100%;
-    margin-bottom: 0;
-    font-size: 12px;
+    margin-bottom: 12px;
+    font-size: 14px;
     padding: 8px 10px;
     text-align: center;
 }
