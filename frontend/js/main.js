@@ -55,13 +55,6 @@ async function updateUsernameDisplay() {
 
 // Initialize the application
 document.addEventListener("DOMContentLoaded", async () => {
-  // Check if Quill is loaded
-  if (typeof Quill === "undefined") {
-    console.error(
-      "Quill.js is not loaded. Rich text editing will not be available.",
-    );
-  }
-
   // Initialize dark mode
   initDarkMode();
 
