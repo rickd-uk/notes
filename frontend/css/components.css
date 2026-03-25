@@ -244,6 +244,13 @@
         padding: 5px 10px;
         max-width: 120px;
     }
+
+    /* Touch target: logout button */
+    .logout-btn {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
 }
 
 /* Very small screens */
