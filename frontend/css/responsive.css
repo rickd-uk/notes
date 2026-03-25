@@ -34,8 +34,8 @@
     position: fixed;
     left: -100%;
     top: 0;
-    width: 85%;
-    max-width: var(--sidebar-width);
+    width: 80%;
+    max-width: 320px;
     height: 100%;
     z-index: 99;
     transition: left 0.3s ease;
