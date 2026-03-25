@@ -267,6 +267,11 @@
     min-height: 0; /* Required for flex children to scroll */
 }
 
+.sidebar-toggles {
+    flex-shrink: 0;
+    border-top: 1px solid var(--border-color);
+}
+
 /* toolbar-toggle.css - Styles for formatting toolbar toggle functionality */
 
 /* Container for toolbar toggle switch in sidebar */
