@@ -121,7 +121,8 @@ export function setupEventListeners() {
 
   // Add category button
   if (addCategoryBtn) {
-    addCategoryBtn.addEventListener("click", () => {
+    addCategoryBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
       showCategoryModal();
     });
   }

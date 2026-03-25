@@ -65,39 +65,34 @@
     color: var(--primary-color);
 }
 
-.add-category {
-    padding: 12px 20px;
-    margin-top: auto;
-    display: flex;
-    justify-content: center;
-}
-
 .add-category-btn {
-    width: 48px;
-    height: 48px;
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     background-color: var(--primary-color);
     color: white;
     border: none;
-    font-size: 28px;
+    font-size: 22px;
     font-weight: 700;
     line-height: 1;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 3px 8px rgba(98, 0, 238, 0.4);
+    box-shadow: 0 2px 6px rgba(98, 0, 238, 0.4);
     transition: transform 0.15s, box-shadow 0.15s;
+    margin-left: auto;
 }
 
 .add-category-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(98, 0, 238, 0.5);
+    box-shadow: 0 4px 12px rgba(98, 0, 238, 0.5);
 }
 
 .add-category-btn:active {
     transform: translateY(0);
-    box-shadow: 0 2px 6px rgba(98, 0, 238, 0.35);
+    box-shadow: 0 2px 4px rgba(98, 0, 238, 0.3);
 }
 
 .icon-selector {
