@@ -209,3 +209,15 @@ body.dark-mode .settings-section-label--danger {
         display: block;
     }
 }
+
+/* Mobile touch target for settings gear button */
+@media (max-width: 768px) {
+    .settings-btn {
+        min-width: 44px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px 8px;
+    }
+}
