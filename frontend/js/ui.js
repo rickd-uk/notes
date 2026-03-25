@@ -329,8 +329,7 @@ export function renderCategories() {
   categoriesContainer.innerHTML = `
 <div class="category${currentCategoryId === "all" ? " active" : ""}" data-id="all">
   <div class="category-icon">📄</div>
-  <div class="category-name">Inbox</div>
-  <button id="categoryEditToggle" title="Toggle category editing">✏</button>
+  <div class="category-name">All</div>
 </div>
 <div class="category${currentCategoryId === "uncategorized" ? " active" : ""}" data-id="uncategorized">
   <div class="category-icon">❓</div>
@@ -388,8 +387,7 @@ ${customCategoriesHTML}
 
   // Add event listeners to categories
   document.querySelectorAll(".category").forEach((categoryElem) => {
-    categoryElem.addEventListener("click", (e) => {
-      if (e.target.id === "categoryEditToggle") return;
+    categoryElem.addEventListener("click", () => {
       handleCategoryClick(categoryElem.dataset.id);
     });
 

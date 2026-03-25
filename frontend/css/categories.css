@@ -50,6 +50,59 @@
     opacity: 1;
 }
 
+/* Hide edit/delete controls while inline editing is active */
+.category.editing .category-controls {
+  display: none !important;
+  opacity: 0 !important;
+}
+
+/* Inline category name editing */
+.category-inline-input {
+    flex: 1;
+    min-width: 0;
+    font-size: 15px;
+    padding: 2px 6px;
+    border: 1px solid var(--primary-color);
+    border-radius: 4px;
+    outline: none;
+    background: var(--background-color);
+    color: var(--text-color);
+}
+
+
+.category-inline-save,
+.category-inline-cancel {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 3px 5px;
+    border-radius: 4px;
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-left: 14px;
+}
+
+.category-inline-save {
+    color: var(--primary-color);
+}
+
+.category-inline-save:hover {
+    background-color: rgba(98, 0, 238, 0.12);
+}
+
+.category-inline-cancel {
+    color: #999;
+}
+
+.category-inline-cancel:hover {
+    background-color: rgba(0, 0, 0, 0.06);
+}
+
+body.dark-mode .category-inline-input {
+    background: var(--background-color);
+    border-color: var(--primary-color);
+}
+
 .btn-edit, .btn-delete {
     background: none;
     border: none;
@@ -131,6 +184,39 @@
   min-height: 60px;
 }
 
+/* Hide extra icons by default; show when grid is expanded */
+.icon-item[data-extra] {
+  display: none;
+}
+
+.icon-grid.expanded .icon-item[data-extra] {
+  display: flex;
+}
+
+/* "More icons" toggle button */
+.icon-more-btn {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 6px 0;
+  background: none;
+  border: 1px solid var(--primary-color);
+  border-radius: 6px;
+  color: var(--primary-color);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.icon-more-btn:hover {
+  background-color: rgba(98, 0, 238, 0.08);
+}
+
+body.dark-mode .icon-more-btn {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
 /* Message for when no icons are available */
 .no-icons-message {
   grid-column: 1 / -1;
@@ -193,10 +279,9 @@ body.dark-mode .sidebar-username {
   color: #aaa;
 }
 
-/* Hide the edit toggle button on desktop — injected by JS unconditionally */
+/* Hide the edit toggle button on desktop */
 #categoryEditToggle {
   display: none;
-  margin-left: auto;
 }
 
 /* Mobile/drawer: hide category controls by default, show in edit mode */

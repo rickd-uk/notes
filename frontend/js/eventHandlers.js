@@ -124,20 +124,13 @@ export function setupEventListeners() {
     addCategoryBtn.addEventListener("click", () => showCategoryModal());
   }
 
-  // Category edit mode toggle (mobile only — button is injected by renderCategories)
+  // Category edit mode toggle (mobile only — button is in static sidebar header)
   const categoriesContainer = document.querySelector('.categories');
-  if (categoriesContainer) {
-    categoriesContainer.addEventListener('click', (e) => {
-      if (e.target.id !== 'categoryEditToggle') return;
-      // stopPropagation prevents bubbling to ancestors above .categories.
-      // The early-return guard in renderCategories()'s querySelectorAll loop
-      // is separately required to prevent handleCategoryClick("all") — that
-      // listener runs on the .category child before this one fires.
-      e.stopPropagation();
+  const categoryEditToggle = document.getElementById('categoryEditToggle');
+  if (categoryEditToggle && categoriesContainer) {
+    categoryEditToggle.addEventListener('click', () => {
       const isActive = categoriesContainer.classList.toggle('edit-mode');
-      // Use querySelector rather than e.target in case the button gains child nodes
-      const btn = categoriesContainer.querySelector('#categoryEditToggle');
-      if (btn) btn.classList.toggle('active', isActive);
+      categoryEditToggle.classList.toggle('active', isActive);
       localStorage.setItem('categoryEditMode', String(isActive));
     });
   }
@@ -587,14 +580,85 @@ export async function handleCategoryClick(newCategoryId) {
   }
 }
 
-// Handle category edit
+// Handle category edit — inline editing in the sidebar row
 export function handleCategoryEdit(categoryId) {
   const categories = getCategories();
   const category = categories.find((cat) => cat.id.toString() === categoryId);
+  if (!category) return;
 
-  if (category) {
-    showCategoryModal(true, categoryId, category.name, category.icon);
+  const categoryElem = document.querySelector(`.category[data-id="${categoryId}"]`);
+  if (!categoryElem) return;
+
+  // Prevent opening a second inline editor
+  if (categoryElem.querySelector(".category-inline-input")) return;
+
+  const nameDiv = categoryElem.querySelector(".category-name");
+
+  // Build inline editor
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "category-inline-input";
+  input.value = category.name;
+  input.maxLength = 18;
+
+  const saveBtn = document.createElement("button");
+  saveBtn.type = "button";
+  saveBtn.className = "category-inline-save";
+  saveBtn.title = "Save";
+  saveBtn.textContent = "✓";
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.type = "button";
+  cancelBtn.className = "category-inline-cancel";
+  cancelBtn.title = "Cancel";
+  cancelBtn.textContent = "✕";
+
+  // Hide original name and suppress controls via class
+  nameDiv.style.display = "none";
+  categoryElem.classList.add("editing");
+
+  // Insert inline editor after nameDiv
+  nameDiv.insertAdjacentElement("afterend", saveBtn);
+  nameDiv.insertAdjacentElement("afterend", cancelBtn);
+  nameDiv.insertAdjacentElement("afterend", input);
+
+  input.focus();
+  input.select();
+
+  function cancelEdit() {
+    input.remove();
+    saveBtn.remove();
+    cancelBtn.remove();
+    nameDiv.style.display = "";
+    categoryElem.classList.remove("editing");
   }
+
+  async function saveEdit() {
+    const newName = input.value.trim();
+    if (!newName) return;
+    if (newName === category.name) { cancelEdit(); return; }
+
+    saveBtn.disabled = true;
+    const updated = await updateCategory(categoryId, newName, category.icon);
+    if (updated) {
+      updateCategoryInState(categoryId, { ...category, name: newName });
+      renderCategories();
+      showToast("Category renamed");
+    } else {
+      saveBtn.disabled = false;
+    }
+  }
+
+  saveBtn.addEventListener("click", (e) => { e.stopPropagation(); saveEdit(); });
+  cancelBtn.addEventListener("click", (e) => { e.stopPropagation(); cancelEdit(); });
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); saveEdit(); }
+    if (e.key === "Escape") { cancelEdit(); }
+  });
+
+  // Prevent clicking the row while editing
+  input.addEventListener("click", (e) => e.stopPropagation());
 }
 
 // Handle category delete

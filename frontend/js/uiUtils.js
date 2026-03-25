@@ -119,12 +119,26 @@ export function showCategoryModal(isEdit = false, categoryId = null, categoryNam
     }
   }
   
-  // Show all icons — same layout in both add and edit mode
+  // Reset icon grid: deselect all, collapse extra icons
+  const iconGrid = document.getElementById('iconGrid');
   const allIconItems = document.querySelectorAll('.icon-item');
   allIconItems.forEach(item => {
     item.classList.remove('selected');
     item.style.display = '';
   });
+  if (iconGrid) iconGrid.classList.remove('expanded');
+
+  // Wire "More icons" toggle button
+  const iconMoreBtn = document.getElementById('iconMoreBtn');
+  if (iconMoreBtn) {
+    // Replace with clone to remove old listeners
+    const fresh = iconMoreBtn.cloneNode(true);
+    iconMoreBtn.replaceWith(fresh);
+    fresh.addEventListener('click', () => {
+      const expanded = iconGrid.classList.toggle('expanded');
+      fresh.textContent = expanded ? 'Fewer icons ▴' : 'More icons ▾';
+    });
+  }
 
   // Make sure category list content is empty
   const categorySelectionDiv = document.getElementById('categorySelectionList');
@@ -148,17 +162,23 @@ export function showCategoryModal(isEdit = false, categoryId = null, categoryNam
     updateCharCount(categoryName);
     const iconElement = document.querySelector(`.icon-item[data-icon="${categoryIcon}"]`);
     if (iconElement) {
+      // If the icon is in the extra set, expand the grid so it's visible
+      if (iconElement.dataset.extra && iconGrid) {
+        iconGrid.classList.add('expanded');
+        const btn = document.getElementById('iconMoreBtn');
+        if (btn) btn.textContent = 'Fewer icons ▴';
+      }
       iconElement.classList.add('selected');
       categoryIconInput.value = categoryIcon;
     }
   } else {
     // For new categories, select the first available icon
-    const firstVisibleIcon = document.querySelector('.icon-item:not([style*="display: none"])');
+    const firstVisibleIcon = document.querySelector('.icon-item:not([data-extra])');
     if (firstVisibleIcon) {
       firstVisibleIcon.classList.add('selected');
       categoryIconInput.value = firstVisibleIcon.dataset.icon;
     }
-    
+
     categoryInput.value = firstVisibleIcon?.dataset.name || '';
     updateCharCount(categoryInput.value);
     categoryEditId.value = '';
@@ -201,7 +221,13 @@ export function hideCategoryModal() {
   if (!categoryModal) return;
   
   categoryModal.classList.remove('active');
-  
+
+  // Collapse extra icons for next open
+  const iconGrid = document.getElementById('iconGrid');
+  if (iconGrid) iconGrid.classList.remove('expanded');
+  const iconMoreBtn = document.getElementById('iconMoreBtn');
+  if (iconMoreBtn) iconMoreBtn.textContent = 'More icons ▾';
+
   if (categoryInput) categoryInput.value = '';
   if (categoryIconInput) categoryIconInput.value = '📁';
   if (categoryEditId) categoryEditId.value = '';

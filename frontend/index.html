@@ -97,6 +97,7 @@
       </div>
       <div class="sidebar-categories-header">
         <span class="sidebar-categories-label">Categories</span>
+        <button id="categoryEditToggle" title="Toggle category editing">Manage</button>
         <button class="add-category-btn" id="addCategoryBtn" title="Add category">+</button>
       </div>
       <div class="sidebar-scrollable">
@@ -209,21 +210,22 @@
             <div class="icon-item" data-icon="🔬" data-name="Science">🔬 <span class="icon-name">Science</span></div>
             <div class="icon-item" data-icon="🏠" data-name="Home">🏠 <span class="icon-name">Home</span></div>
             <div class="icon-item" data-icon="❤️" data-name="Health">❤️ <span class="icon-name">Health</span></div>
-            <div class="icon-item" data-icon="🌱" data-name="Garden">🌱 <span class="icon-name">Garden</span></div>
-            <div class="icon-item" data-icon="💪" data-name="Fitness">💪 <span class="icon-name">Fitness</span></div>
-            <div class="icon-item" data-icon="🧠" data-name="Brain">🧠 <span class="icon-name">Brain</span></div>
-            <div class="icon-item" data-icon="🎵" data-name="Music">🎵 <span class="icon-name">Music</span></div>
-            <div class="icon-item" data-icon="🎬" data-name="Movies">🎬 <span class="icon-name">Movies</span></div>
-            <div class="icon-item" data-icon="🎮" data-name="Gaming">🎮 <span class="icon-name">Gaming</span></div>
-            <div class="icon-item" data-icon="💰" data-name="Finance">💰 <span class="icon-name">Finance</span></div>
-            <div class="icon-item" data-icon="🏆" data-name="Goals">🏆 <span class="icon-name">Goals</span></div>
-            <div class="icon-item" data-icon="🎯" data-name="Focus">🎯 <span class="icon-name">Focus</span></div>
-            <div class="icon-item" data-icon="☕" data-name="Coffee">☕ <span class="icon-name">Coffee</span></div>
-            <div class="icon-item" data-icon="🍔" data-name="Food">🍔 <span class="icon-name">Food</span></div>
-            <div class="icon-item" data-icon="✈️" data-name="Travel">✈️ <span class="icon-name">Travel</span></div>
-            <div class="icon-item" data-icon="🌍" data-name="World">🌍 <span class="icon-name">World</span></div>
-            <div class="icon-item" data-icon="🔥" data-name="Hot">🔥 <span class="icon-name">Hot</span></div>
+            <div class="icon-item" data-icon="🌱" data-name="Garden" data-extra="true">🌱 <span class="icon-name">Garden</span></div>
+            <div class="icon-item" data-icon="💪" data-name="Fitness" data-extra="true">💪 <span class="icon-name">Fitness</span></div>
+            <div class="icon-item" data-icon="🧠" data-name="Brain" data-extra="true">🧠 <span class="icon-name">Brain</span></div>
+            <div class="icon-item" data-icon="🎵" data-name="Music" data-extra="true">🎵 <span class="icon-name">Music</span></div>
+            <div class="icon-item" data-icon="🎬" data-name="Movies" data-extra="true">🎬 <span class="icon-name">Movies</span></div>
+            <div class="icon-item" data-icon="🎮" data-name="Gaming" data-extra="true">🎮 <span class="icon-name">Gaming</span></div>
+            <div class="icon-item" data-icon="💰" data-name="Finance" data-extra="true">💰 <span class="icon-name">Finance</span></div>
+            <div class="icon-item" data-icon="🏆" data-name="Goals" data-extra="true">🏆 <span class="icon-name">Goals</span></div>
+            <div class="icon-item" data-icon="🎯" data-name="Focus" data-extra="true">🎯 <span class="icon-name">Focus</span></div>
+            <div class="icon-item" data-icon="☕" data-name="Coffee" data-extra="true">☕ <span class="icon-name">Coffee</span></div>
+            <div class="icon-item" data-icon="🍔" data-name="Food" data-extra="true">🍔 <span class="icon-name">Food</span></div>
+            <div class="icon-item" data-icon="✈️" data-name="Travel" data-extra="true">✈️ <span class="icon-name">Travel</span></div>
+            <div class="icon-item" data-icon="🌍" data-name="World" data-extra="true">🌍 <span class="icon-name">World</span></div>
+            <div class="icon-item" data-icon="🔥" data-name="Hot" data-extra="true">🔥 <span class="icon-name">Hot</span></div>
           </div>
+          <button type="button" class="icon-more-btn" id="iconMoreBtn">More icons ▾</button>
         </div>
         <input type="hidden" id="categoryIconInput" value="📁" />
         <input type="hidden" id="categoryEditId" />
