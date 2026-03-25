@@ -320,6 +320,7 @@ export function renderCategories() {
   <div class="category-icon">📄</div>
   <div class="category-name">All Notes</div>
   <button id="categoryEditToggle" title="Toggle category editing">✏</button>
+  <button class="add-category-btn" id="addCategoryBtn" title="Add category">+</button>
 </div>
 <div class="category${currentCategoryId === "uncategorized" ? " active" : ""}" data-id="uncategorized">
   <div class="category-icon">❓</div>
