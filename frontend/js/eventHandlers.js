@@ -192,7 +192,10 @@ export function setupEventListeners() {
       suggestion.classList.add("selected");
       if (elements.categoryIconInput) elements.categoryIconInput.value = icon;
       // Always fill name when picking a suggestion
-      if (elements.categoryInput) elements.categoryInput.value = name;
+      if (elements.categoryInput) {
+        elements.categoryInput.value = name;
+        elements.categoryInput.dispatchEvent(new Event("input"));
+      }
       elements.categoryInput?.focus();
     });
   });
@@ -748,6 +751,7 @@ export async function handleCategoryCreate() {
     const nextIcon = elements.categoryIconInput.value;
     const nextIconEl = nextIcon ? document.querySelector(`.icon-item[data-icon="${nextIcon}"]`) : null;
     elements.categoryInput.value = nextIconEl?.dataset.name || '';
+    elements.categoryInput.dispatchEvent(new Event("input"));
 
     // Focus on the input field for next category
     elements.categoryInput.focus();
