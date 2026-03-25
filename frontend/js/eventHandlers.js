@@ -105,6 +105,7 @@ export function showUnlockModal(onSuccess) {
 export function setupEventListeners() {
   const {
     addNoteBtn,
+    addCategoryBtn,
     categoryModal,
     categoryInput,
     cancelCategoryBtn, // This might be null
@@ -118,15 +119,15 @@ export function setupEventListeners() {
     addNoteBtn.addEventListener("click", createNewNote);
   }
 
+  // Add category button
+  if (addCategoryBtn) {
+    addCategoryBtn.addEventListener("click", () => showCategoryModal());
+  }
+
   // Category edit mode toggle (mobile only — button is injected by renderCategories)
   const categoriesContainer = document.querySelector('.categories');
   if (categoriesContainer) {
     categoriesContainer.addEventListener('click', (e) => {
-      if (e.target.id === 'addCategoryBtn') {
-        e.stopPropagation();
-        showCategoryModal();
-        return;
-      }
       if (e.target.id !== 'categoryEditToggle') return;
       // stopPropagation prevents bubbling to ancestors above .categories.
       // The early-return guard in renderCategories()'s querySelectorAll loop
