@@ -211,3 +211,21 @@ body.dark-mode .sidebar-username {
     color: #fff;
   }
 }
+
+/* Mobile touch targets — phone only (≤768px) */
+@media (max-width: 768px) {
+  .btn-edit,
+  .btn-delete {
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #categoryEditToggle {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
