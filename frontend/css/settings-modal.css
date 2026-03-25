@@ -208,10 +208,8 @@ body.dark-mode .settings-section-label--danger {
     .modal-drag-handle {
         display: block;
     }
-}
 
-/* Mobile touch target for settings gear button */
-@media (max-width: 768px) {
+    /* Mobile touch target for settings gear button */
     .settings-btn {
         min-width: 44px;
         min-height: 44px;
