@@ -20,8 +20,8 @@
 /* Toolbar styles with improved layout */
 .ql-toolbar.ql-snow {
     background-color: var(--background-color);
-    border: none;
-    border-bottom: 1px solid #e0e0e0;
+    border: none !important;
+    border-bottom: 1px solid #e0e0e0 !important;
     border-radius: var(--border-radius) var(--border-radius) 0 0;
     padding: 5px;
     padding-right: 40px; /* Space for delete button */
@@ -47,7 +47,7 @@
 
 /* Content area styles */
 .ql-container.ql-snow {
-    border: none;
+    border: none !important;
     font-family: inherit;
     font-size: inherit;
     height: calc(100% - 42px); /* Adjust for toolbar height */
