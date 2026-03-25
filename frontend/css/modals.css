@@ -113,3 +113,29 @@ body.dark-mode .suggestion-item.selected {
     background: rgba(187, 134, 252, 0.18);
     border-color: var(--primary-color);
 }
+
+/* z-index layering and modal fixes (merged from modal-fix.css) */
+.modal {
+    z-index: 9999 !important;
+}
+
+.modal-content {
+    z-index: 10000 !important;
+    position: relative;
+}
+
+.modal.active {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.note-overlay.active {
+    z-index: 9000;
+}
+
+.note.expanded {
+    z-index: 9001;
+}
+
+.modal-input:focus {
+    outline: none;
+}
