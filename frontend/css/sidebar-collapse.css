@@ -1,8 +1,0 @@
-/* sidebar-collapse.css — current-category visibility on desktop */
-
-/* On desktop the sidebar is always visible, so hide the header label */
-@media (min-width: 1200px) {
-  .current-category {
-    display: none;
-  }
-}

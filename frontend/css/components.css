@@ -266,3 +266,88 @@
     overflow-y: auto;
     min-height: 0; /* Required for flex children to scroll */
 }
+
+/* toolbar-toggle.css - Styles for formatting toolbar toggle functionality */
+
+/* Container for toolbar toggle switch in sidebar */
+.toolbar-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  border-top: 1px solid var(--border-color);
+  margin-bottom: 0; /* Remove bottom margin */
+}
+
+/* Toolbar toggle label */
+.toolbar-label {
+  font-size: 14px;
+  color: var(--text-color);
+}
+
+/* Styling for when toolbars are hidden */
+[data-toolbars-hidden="true"] .note:not(.expanded) .ql-toolbar {
+  display: none !important;
+}
+
+[data-toolbars-hidden="true"] .note:not(.expanded) .ql-container.ql-snow {
+  height: calc(100% - 10px) !important;
+  margin-top: 0 !important;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .toolbar-toggle {
+    padding: 8px 15px;
+  }
+  
+  .toolbar-label {
+    font-size: 13px;
+  }
+}
+
+/* Dark mode support */
+body.dark-mode .toolbar-toggle {
+  border-color: var(--border-color);
+}
+
+/* Note: The switch styling itself is inherited from dark-mode.css */
+/* privacy-toggle.css - Privacy screen and strict decrypt toggles */
+
+.privacy-toggle,
+.strict-decrypt-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.privacy-label,
+.strict-decrypt-label {
+  font-size: 14px;
+  color: var(--text-color);
+}
+
+/* Privacy screen — blur all note content in the grid */
+body.privacy-mode .note:not(.expanded) .ql-editor {
+  filter: blur(6px);
+  user-select: none;
+  pointer-events: none;
+}
+
+body.privacy-mode .note:not(.expanded) {
+  cursor: default;
+}
+
+@media (max-width: 768px) {
+  .privacy-toggle,
+  .strict-decrypt-toggle {
+    padding: 8px 15px;
+  }
+
+  .privacy-label,
+  .strict-decrypt-label {
+    font-size: 13px;
+  }
+}
