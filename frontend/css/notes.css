@@ -657,15 +657,15 @@ body.dark-mode .header-controls-group {
     font-size: 18px;
   }
 
-  /* On very small screens, hide the optional buttons to save space */
-  #searchButton,
-  #sortButton {
-    display: none;
-  }
-
   .header-controls-group {
     margin-right: 5px;
     padding: 2px 4px;
+  }
+
+  .header-control-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
   }
 
   /* Ensure the notes header has proper layout */
