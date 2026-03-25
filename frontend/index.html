@@ -410,6 +410,26 @@
     <!-- Toast notification -->
     <div class="toast" id="toast"></div>
 
+    <!-- Nuclear confirm modal (Delete Everything) -->
+    <div class="modal" id="nuclearConfirmModal">
+      <div class="modal-content" style="max-width:380px">
+        <div class="modal-header" style="color:#f44336">💣 Delete Everything</div>
+        <p style="font-size:13px;color:#888;margin-bottom:16px">
+          This will permanently delete <strong>all notes and all categories</strong>. This cannot be undone.
+        </p>
+        <p style="font-size:13px;margin-bottom:8px">Type <strong>YES</strong> to enable the countdown:</p>
+        <input type="text" id="nuclearConfirmInput" class="modal-input" placeholder="Type YES" autocomplete="off" />
+        <div id="nuclearCountdown" style="font-size:13px;color:#f44336;text-align:center;min-height:20px;margin-bottom:8px"></div>
+        <div class="modal-actions">
+          <button type="button" class="modal-btn modal-btn-cancel" id="cancelNuclearBtn">Cancel</button>
+          <button type="button" id="doItNuclearBtn" disabled
+            style="padding:8px 16px;margin-left:10px;border-radius:var(--border-radius);font-weight:500;cursor:pointer;background-color:#f44336;color:white;border:none;opacity:0.4">
+            Do it
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="expanded-note-controls"></div>
 
     <!-- Set sidebar toggle states immediately from localStorage to prevent animation flicker on load -->

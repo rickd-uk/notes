@@ -37,6 +37,7 @@ import {
   confirmDialog,
   confirmDialogWithCheckbox,
   confirmDialogWithForgotPassword,
+  confirmDialogNuclear,
   getCategoryName,
   updateButtonPlacement,
   hideIconInModal,
@@ -794,48 +795,39 @@ export function handleCategoryModalCancel() {
 
 // Handle deletion of all categories
 export async function handleDeleteAllCategories() {
-  // Close settings modal before showing confirm dialog (never stack modals)
   const settingsModal = document.getElementById("settingsModal");
   if (settingsModal) settingsModal.classList.remove("active");
 
-  const confirmed = await confirmDialog(
-    "Are you sure?",
+  if (getCategories().length === 0) {
+    showToast("No categories to delete");
+    return;
+  }
+
+  const { confirmed, deleteNotes } = await confirmDialogWithCheckbox(
+    "Delete all categories? Notes will be moved to Uncategorized unless you check the box below.",
     "Delete All Categories",
-    "Yes",
+    "Delete All",
   );
 
-  if (confirmed) {
-    // If there are no categories, show message and return
-    if (getCategories().length === 0) {
-      showToast("No categories to delete");
-      return;
-    }
+  if (!confirmed) return;
 
-    // Show loading message
-    showToast("Deleting all categories...");
+  showToast("Deleting all categories...");
 
-    // Call the API to delete all categories
-    const result = await deleteAllCategories();
+  if (deleteNotes) {
+    await deleteAllNotesInCategory("all");
+  }
 
-    if (!result.error) {
-      // Clear categories array
-      setCategories([]);
+  const result = await deleteAllCategories();
 
-      // Switch to all notes view
-      setCurrentCategoryId("all");
-
-      // Reload notes to reflect changes
-      await loadNotes();
-
-      // Re-render categories
-      renderCategories();
-
-      // Show success message
-      if (result.count !== undefined) {
-        showToast(`Deleted ${result.count} categories`);
-      } else {
-        showToast("All categories deleted");
-      }
+  if (!result.error) {
+    setCategories([]);
+    setCurrentCategoryId("all");
+    await loadNotes();
+    renderCategories();
+    if (result.count !== undefined) {
+      showToast(`Deleted ${result.count} categories${deleteNotes ? " and all notes" : ""}`);
+    } else {
+      showToast("All categories deleted");
     }
   }
 }
@@ -845,11 +837,7 @@ export async function handleDeleteEverything() {
   const settingsModal = document.getElementById("settingsModal");
   if (settingsModal) settingsModal.classList.remove("active");
 
-  const confirmed = await confirmDialog(
-    "This will permanently delete ALL your notes and ALL categories. This cannot be undone.",
-    "Delete Everything",
-    "Delete Everything",
-  );
+  const confirmed = await confirmDialogNuclear();
 
   if (confirmed) {
     showToast("Deleting everything…");

@@ -424,6 +424,84 @@ export function confirmDialogWithForgotPassword(message, headerText = 'Remove En
   });
 }
 
+// Nuclear confirm — requires typing YES then pressing Do it within 5 seconds
+export function confirmDialogNuclear() {
+  return new Promise((resolve) => {
+    const modal = document.getElementById('nuclearConfirmModal');
+    const input = document.getElementById('nuclearConfirmInput');
+    const doItBtn = document.getElementById('doItNuclearBtn');
+    const cancelBtn = document.getElementById('cancelNuclearBtn');
+    const countdown = document.getElementById('nuclearCountdown');
+
+    // Reset state
+    input.value = '';
+    doItBtn.disabled = true;
+    doItBtn.style.opacity = '0.4';
+    countdown.textContent = '';
+    let timer = null;
+    let secondsLeft = 0;
+
+    modal.classList.add('active');
+    setTimeout(() => input.focus(), 50);
+
+    function startCountdown() {
+      secondsLeft = 5;
+      countdown.textContent = `Press "Do it" within ${secondsLeft}s…`;
+      doItBtn.disabled = false;
+      doItBtn.style.opacity = '1';
+      timer = setInterval(() => {
+        secondsLeft--;
+        if (secondsLeft <= 0) {
+          clearInterval(timer);
+          timer = null;
+          doItBtn.disabled = true;
+          doItBtn.style.opacity = '0.4';
+          countdown.textContent = 'Time expired — type YES again to retry.';
+          input.value = '';
+        } else {
+          countdown.textContent = `Press "Do it" within ${secondsLeft}s…`;
+        }
+      }, 1000);
+    }
+
+    function cleanup() {
+      clearInterval(timer);
+      timer = null;
+      modal.classList.remove('active');
+      input.removeEventListener('input', onInput);
+      doItBtn.removeEventListener('click', onDoIt);
+      cancelBtn.removeEventListener('click', onCancel);
+      document.removeEventListener('keydown', onKey);
+    }
+
+    const onInput = () => {
+      if (input.value.trim().toUpperCase() === 'YES') {
+        if (!timer) startCountdown();
+      } else {
+        clearInterval(timer);
+        timer = null;
+        doItBtn.disabled = true;
+        doItBtn.style.opacity = '0.4';
+        countdown.textContent = '';
+      }
+    };
+
+    const onDoIt = () => {
+      if (doItBtn.disabled) return;
+      cleanup();
+      resolve(true);
+    };
+
+    const onCancel = () => { cleanup(); resolve(false); };
+    const onKey = (e) => { if (e.key === 'Escape') onCancel(); };
+
+    input.addEventListener('input', onInput);
+    doItBtn.addEventListener('click', onDoIt);
+    cancelBtn.addEventListener('click', onCancel);
+    document.addEventListener('keydown', onKey);
+  });
+}
+
 // Get category name by ID
 export function getCategoryName(categoryId, categories) {
   if (categoryId === 'all') {
