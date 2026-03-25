@@ -319,6 +319,7 @@ export function renderCategories() {
 <div class="category${currentCategoryId === "all" ? " active" : ""}" data-id="all">
   <div class="category-icon">📄</div>
   <div class="category-name">All Notes</div>
+  <button id="categoryEditToggle" title="Toggle category editing">✏</button>
 </div>
 <div class="category${currentCategoryId === "uncategorized" ? " active" : ""}" data-id="uncategorized">
   <div class="category-icon">❓</div>
@@ -326,6 +327,16 @@ export function renderCategories() {
 </div>
 ${customCategoriesHTML}
 `;
+
+  // Restore edit-mode toggle state from localStorage
+  const editModeActive = localStorage.getItem('categoryEditMode') === 'true';
+  if (editModeActive) {
+    categoriesContainer.classList.add('edit-mode');
+    const toggleBtn = document.getElementById('categoryEditToggle');
+    if (toggleBtn) toggleBtn.classList.add('active');
+  } else {
+    categoriesContainer.classList.remove('edit-mode');
+  }
 
   // Update current category label
   /*  if (currentCategoryId === 'all') {
