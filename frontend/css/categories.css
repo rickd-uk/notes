@@ -99,7 +99,7 @@
 /* Better handling of the icon grid when many icons are hidden */
 .icon-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 8px;
   min-height: 60px;
 }
@@ -218,7 +218,7 @@ body.dark-mode .sidebar-username {
 /* Responsive adjustments — mobile touch targets and layout */
 @media (max-width: 768px) {
   .icon-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(1, 1fr);
   }
 
   .btn-edit,
