@@ -130,6 +130,10 @@ export function setupEventListeners() {
   if (categoriesContainer) {
     categoriesContainer.addEventListener('click', (e) => {
       if (e.target.id !== 'categoryEditToggle') return;
+      // stopPropagation prevents bubbling to ancestors above .categories.
+      // The early-return guard in renderCategories()'s querySelectorAll loop
+      // is separately required to prevent handleCategoryClick("all") — that
+      // listener runs on the .category child before this one fires.
       e.stopPropagation();
       const isActive = categoriesContainer.classList.toggle('edit-mode');
       e.target.classList.toggle('active', isActive);
