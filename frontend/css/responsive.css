@@ -118,15 +118,6 @@
   .note-expand {
     opacity: 0.5;
   }
-
-  .category .category-controls {
-    opacity: 0.5;
-    transition: opacity 0.2s;
-  }
-
-  .category:active .category-controls {
-    opacity: 1;
-  }
 }
 
 /* Small screens adjustments */

@@ -167,3 +167,47 @@ body.dark-mode .no-icons-message {
 body.dark-mode .sidebar-username {
   color: #aaa;
 }
+
+/* Hide the edit toggle button on desktop — injected by JS unconditionally */
+#categoryEditToggle {
+  display: none;
+}
+
+/* Mobile/drawer: hide category controls by default, show in edit mode */
+@media (max-width: 1199px) {
+  .category-controls {
+    display: none;
+  }
+
+  /* Suppress base hover rule so it can't fight display:none */
+  .category:hover .category-controls {
+    opacity: 0;
+  }
+
+  .categories.edit-mode .category-controls {
+    display: flex;
+    opacity: 1;
+  }
+
+  #categoryEditToggle {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    background: rgba(98, 0, 238, 0.12);
+    color: #6200ee;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 7px;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    min-width: 28px;
+    min-height: 28px;
+  }
+
+  #categoryEditToggle.active {
+    background: #6200ee;
+    color: #fff;
+  }
+}
