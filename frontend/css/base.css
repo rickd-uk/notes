@@ -1,7 +1,7 @@
 /* base.css - Variables, resets, and basic styling */
 
 :root {
-  --sidebar-width: 220px;
+  --sidebar-width: 300px;
   --sidebar-collapsed-width: 48px;
   --primary-color: #6200ee;
   --secondary-color: #03dac6;

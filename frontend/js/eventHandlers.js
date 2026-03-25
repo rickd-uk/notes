@@ -142,6 +142,7 @@ export function setupEventListeners() {
       const isActive = categoriesContainer.classList.toggle('edit-mode');
       categoryEditToggle.classList.toggle('active', isActive);
       localStorage.setItem('categoryEditMode', String(isActive));
+      renderCategories();
     });
   }
 

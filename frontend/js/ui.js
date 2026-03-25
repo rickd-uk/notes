@@ -295,7 +295,7 @@ export function updateCurrentCategoryDisplay() {
   if (categoryId === "all") {
     el.textContent = "📄 All";
   } else if (categoryId === "uncategorized") {
-    el.textContent = "❓ Uncategorized";
+    el.textContent = "❓ None";
   } else {
     const cats = getCategories();
     const cat = cats.find((c) => String(c.id) === String(categoryId));
@@ -310,12 +310,19 @@ export function renderCategories() {
   const categoriesContainer = elements.categoriesContainer;
   const currentCategoryElement = elements.currentCategoryElement;
 
+  const editModeActive = localStorage.getItem("categoryEditMode") === "true";
+  const MAX_NAME_EDIT = 7;
+
   const customCategoriesHTML = categories
     .map(
-      (category, index) => `
+      (category, index) => {
+        const displayName = editModeActive && category.name.length > MAX_NAME_EDIT
+          ? category.name.slice(0, MAX_NAME_EDIT) + "…"
+          : category.name;
+        return `
 <div class="category${currentCategoryId === category.id.toString() ? " active" : ""}" data-id="${category.id}" draggable="true">
 <div class="category-icon">${category.icon || "📁"}</div>
-<div class="category-name">${category.name}</div>
+<div class="category-name" title="${category.name}">${displayName}</div>
 <div class="category-controls">
 <div class="btn-move-wrap">
 <button class="btn-move-up" title="Move up" data-id="${category.id}"${index === 0 ? " disabled" : ""}>↑</button>
@@ -325,8 +332,8 @@ export function renderCategories() {
 <button class="btn-delete" title="Delete category">🗑️</button>
 </div>
 </div>
-`,
-    )
+`;
+      })
     .join("");
 
   // Update the existing system categories and add custom ones
@@ -343,7 +350,6 @@ ${customCategoriesHTML}
 `;
 
   // Restore edit-mode toggle state from localStorage
-  const editModeActive = localStorage.getItem("categoryEditMode") === "true";
   if (editModeActive) {
     categoriesContainer.classList.add("edit-mode");
     const toggleBtn = document.getElementById("categoryEditToggle");
