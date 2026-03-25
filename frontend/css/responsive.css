@@ -110,7 +110,7 @@
   }
 
   .icon-grid {
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 
   /* Fix for note controls on mobile (always visible) */

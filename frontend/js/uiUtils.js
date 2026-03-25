@@ -119,22 +119,11 @@ export function showCategoryModal(isEdit = false, categoryId = null, categoryNam
     }
   }
   
-  // Filter out icons that are already in use
-  const usedIcons = getUsedIcons(categoryId); // Skip the current category when editing
-  
-  // Reset icon selection - only show available icons
+  // Show all icons — same layout in both add and edit mode
   const allIconItems = document.querySelectorAll('.icon-item');
   allIconItems.forEach(item => {
-    const iconValue = item.dataset.icon;
     item.classList.remove('selected');
-    
-    // If this icon is already used by another category, hide it
-    if (usedIcons.includes(iconValue) && !(isEdit && iconValue === categoryIcon)) {
-      item.style.display = 'none';
-    } else {
-      // Otherwise, show it
-      item.style.display = '';
-    }
+    item.style.display = '';
   });
 
   // Make sure category list content is empty
@@ -143,8 +132,6 @@ export function showCategoryModal(isEdit = false, categoryId = null, categoryNam
     categorySelectionDiv.innerHTML = '';
   }
   
-  // Check if we need to show the "no icons available" message
-  updateIconGridVisibility();
   
   const charCount = document.getElementById("categoryCharCount");
   function updateCharCount(val) {
@@ -159,19 +146,10 @@ export function showCategoryModal(isEdit = false, categoryId = null, categoryNam
     categoryEditId.value = categoryId;
     categoryInput.value = categoryName;
     updateCharCount(categoryName);
-    
-    // Set selected icon - this will always be visible because we excluded it in usedIcons
     const iconElement = document.querySelector(`.icon-item[data-icon="${categoryIcon}"]`);
     if (iconElement) {
       iconElement.classList.add('selected');
       categoryIconInput.value = categoryIcon;
-    } else {
-      // Find the first available icon if the current one doesn't exist
-      const firstVisibleIcon = document.querySelector('.icon-item:not([style*="display: none"])');
-      if (firstVisibleIcon) {
-        firstVisibleIcon.classList.add('selected');
-        categoryIconInput.value = firstVisibleIcon.dataset.icon;
-      }
     }
   } else {
     // For new categories, select the first available icon
