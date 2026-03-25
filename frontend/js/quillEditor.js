@@ -1,4 +1,26 @@
 // quillEditor.js - Quill rich text editor integration with content size limits
+
+// Lazily load Quill JS + CSS on first use — avoids blocking initial page load.
+// Returns a promise that resolves once window.Quill is available.
+let quillLoadPromise = null;
+function loadQuill() {
+  if (window.Quill) return Promise.resolve();
+  if (quillLoadPromise) return quillLoadPromise;
+  quillLoadPromise = new Promise((resolve, reject) => {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "vendor/quill.snow.css";
+    document.head.appendChild(link);
+
+    const script = document.createElement("script");
+    script.src = "vendor/quill.js";
+    script.onload = resolve;
+    script.onerror = () => reject(new Error("Failed to load Quill editor"));
+    document.head.appendChild(script);
+  });
+  return quillLoadPromise;
+}
+
 import { handleNoteInput } from "./eventHandlers.js";
 import { getToolbarsVisible } from "./toolbarToggle.js";
 import {
@@ -54,7 +76,8 @@ function showPasteWarning(message, isError = false) {
 }
 
 // Initialize Quill for all notes
-export function initializeQuillEditors() {
+export async function initializeQuillEditors() {
+  await loadQuill();
   document.querySelectorAll(".note").forEach((noteElement) => {
     const noteId = noteElement.dataset.id;
     const textareaContent =
@@ -66,7 +89,8 @@ export function initializeQuillEditors() {
 }
 
 // Create a Quill editor for a note
-export function createQuillEditor(noteElement, noteId, initialContent) {
+export async function createQuillEditor(noteElement, noteId, initialContent) {
+  await loadQuill();
   // Clean up any existing editor for this note
   destroyQuillEditor(noteId);
 

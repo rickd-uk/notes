@@ -151,8 +151,8 @@ ${note.encrypted ? '' : '<button class="note-delete" title="Delete note">🗑\uF
         content = '';
       }
 
-      // Create Quill editor for this note
-      createQuillEditor(noteElement, noteId, content);
+      // Create Quill editor for this note (async — loads Quill on first call)
+      await createQuillEditor(noteElement, noteId, content);
       if (noteElement.dataset.readOnly === "true") {
         setEditorReadOnly(noteId, true);
       }
