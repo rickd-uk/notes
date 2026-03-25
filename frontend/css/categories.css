@@ -100,7 +100,7 @@
 .icon-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
+  gap: 8px;
   min-height: 60px;
 }
 
@@ -121,9 +121,9 @@ body.dark-mode .no-icons-message {
 .icon-item {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 8px;
-    font-size: 18px;
+    gap: 8px;
+    padding: 10px 12px;
+    font-size: 20px;
     border-radius: 8px;
     cursor: pointer;
     background-color: var(--background-color);
