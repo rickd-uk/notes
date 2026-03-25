@@ -83,7 +83,7 @@ export function addExpandedNoteControls(noteElement) {
   const lockBtn = document.createElement("button");
   lockBtn.className = `expanded-control-btn${isReadOnly ? " active" : ""}`;
   lockBtn.innerHTML = `
-    <span>${isReadOnly ? "👁" : "✏️"}</span>
+    <span>${isReadOnly ? "✏️" : "👁"}</span>
     <span class="tooltip">${isReadOnly ? "Make editable" : "Make view-only"}</span>
   `;
   // Hide for encrypted notes — editing encrypted placeholder makes no sense
@@ -108,7 +108,7 @@ export function addExpandedNoteControls(noteElement) {
       }
       setEditorReadOnly(noteId, nowReadOnly);
       lockBtn.classList.toggle("active", nowReadOnly);
-      lockBtn.querySelector("span:first-child").textContent = nowReadOnly ? "👁" : "✏️";
+      lockBtn.querySelector("span:first-child").textContent = nowReadOnly ? "✏️" : "👁";
       lockBtn.querySelector(".tooltip").textContent = nowReadOnly ? "Make editable" : "Make view-only";
     }
   });
@@ -310,7 +310,7 @@ function _injectMobileNav(noteElement) {
   });
 
   // ✏️ / 👁 — Lock toggle (hidden for encrypted notes)
-  const lockBtn = navBtn(isReadOnly ? '👁' : '✏️', isReadOnly ? 'Make editable' : 'Make view-only');
+  const lockBtn = navBtn(isReadOnly ? '✏️' : '👁', isReadOnly ? 'Make editable' : 'Make view-only');
   lockBtn.dataset.action = 'lock';
   if (isReadOnly) lockBtn.classList.add('active');
   if (isEncrypted) lockBtn.style.display = 'none';
@@ -332,7 +332,7 @@ function _injectMobileNav(noteElement) {
       }
       setEditorReadOnly(noteId, nowReadOnly);
       lockBtn.classList.toggle('active', nowReadOnly);
-      lockBtn.querySelector('span[aria-hidden]').textContent = nowReadOnly ? '👁' : '✏️';
+      lockBtn.querySelector('span[aria-hidden]').textContent = nowReadOnly ? '✏️' : '👁';
       lockBtn.setAttribute('aria-label', nowReadOnly ? 'Make editable' : 'Make view-only');
     }
   });
