@@ -70,9 +70,9 @@
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
+    background-color: white;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
     font-size: 22px;
     font-weight: 700;
     line-height: 1;
@@ -80,14 +80,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 6px rgba(98, 0, 238, 0.4);
-    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 2px 6px rgba(98, 0, 238, 0.25);
+    transition: transform 0.15s, box-shadow 0.15s, background-color 0.15s;
     margin-left: auto;
 }
 
 .add-category-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(98, 0, 238, 0.5);
+    box-shadow: 0 4px 12px rgba(98, 0, 238, 0.45);
 }
 
 .add-category-btn:active {
