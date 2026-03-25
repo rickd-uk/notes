@@ -377,7 +377,8 @@ ${customCategoriesHTML}
 
   // Add event listeners to categories
   document.querySelectorAll(".category").forEach((categoryElem) => {
-    categoryElem.addEventListener("click", () => {
+    categoryElem.addEventListener("click", (e) => {
+      if (e.target.id === 'categoryEditToggle') return;
       handleCategoryClick(categoryElem.dataset.id);
     });
 

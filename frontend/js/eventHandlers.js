@@ -125,6 +125,18 @@ export function setupEventListeners() {
     });
   }
 
+  // Category edit mode toggle (mobile only — button is injected by renderCategories)
+  const categoriesContainer = document.querySelector('.categories');
+  if (categoriesContainer) {
+    categoriesContainer.addEventListener('click', (e) => {
+      if (e.target.id !== 'categoryEditToggle') return;
+      e.stopPropagation();
+      const isActive = categoriesContainer.classList.toggle('edit-mode');
+      e.target.classList.toggle('active', isActive);
+      localStorage.setItem('categoryEditMode', String(isActive));
+    });
+  }
+
   // Dark mode toggle
   if (darkModeToggle) {
     darkModeToggle.addEventListener("change", handleDarkModeToggle);
