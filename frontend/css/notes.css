@@ -624,7 +624,7 @@ body.dark-mode .header-controls-group {
 
   .header-controls-group {
     padding: 4px 6px;
-    margin-left: 0; /* Remove the large left margin */
+    margin-left: 10px;
     margin-right: 10px;
     position: relative; /* Ensure proper positioning */
     z-index: 10; /* Make sure it doesn't interfere with other elements */
