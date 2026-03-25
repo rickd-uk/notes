@@ -197,6 +197,18 @@ export function setupEventListeners() {
     });
   });
 
+  // Live character counter for category name
+  if (categoryInput) {
+    const charCount = document.getElementById("categoryCharCount");
+    categoryInput.addEventListener("input", () => {
+      const len = categoryInput.value.length;
+      if (charCount) {
+        charCount.textContent = `${len} / 18`;
+        charCount.style.color = len >= 18 ? "#e53935" : len >= 14 ? "#fb8c00" : "#999";
+      }
+    });
+  }
+
   // Handle Enter key in category modal
   if (categoryInput) {
     categoryInput.addEventListener("keypress", (e) => {

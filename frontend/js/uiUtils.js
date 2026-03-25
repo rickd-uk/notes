@@ -157,9 +157,19 @@ export function showCategoryModal(isEdit = false, categoryId = null, categoryNam
   // Check if we need to show the "no icons available" message
   updateIconGridVisibility();
   
+  const charCount = document.getElementById("categoryCharCount");
+  function updateCharCount(val) {
+    if (charCount) {
+      const len = val.length;
+      charCount.textContent = `${len} / 18`;
+      charCount.style.color = len >= 18 ? "#e53935" : len >= 14 ? "#fb8c00" : "#999";
+    }
+  }
+
   if (isEdit) {
     categoryEditId.value = categoryId;
     categoryInput.value = categoryName;
+    updateCharCount(categoryName);
     
     // Set selected icon - this will always be visible because we excluded it in usedIcons
     const iconElement = document.querySelector(`.icon-item[data-icon="${categoryIcon}"]`);
@@ -183,6 +193,7 @@ export function showCategoryModal(isEdit = false, categoryId = null, categoryNam
     }
     
     categoryInput.value = firstVisibleIcon?.dataset.name || '';
+    updateCharCount(categoryInput.value);
     categoryEditId.value = '';
   }
   
