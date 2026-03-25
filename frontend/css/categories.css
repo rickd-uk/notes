@@ -99,9 +99,9 @@
 /* Better handling of the icon grid when many icons are hidden */
 .icon-grid {
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  gap: 8px;
-  min-height: 90px; /* Ensures grid has minimum height even when empty */
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  min-height: 60px;
 }
 
 /* Message for when no icons are available */
@@ -119,16 +119,24 @@ body.dark-mode .no-icons-message {
 }
 
 .icon-item {
-    width: 36px;
-    height: 36px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    border-radius: 4px;
+    gap: 6px;
+    padding: 6px 8px;
+    font-size: 18px;
+    border-radius: 8px;
     cursor: pointer;
     background-color: var(--background-color);
     transition: all 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.icon-name {
+    font-size: 12px;
+    color: var(--text-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .icon-item:hover {
@@ -208,7 +216,7 @@ body.dark-mode .sidebar-username {
 /* Responsive adjustments — mobile touch targets and layout */
 @media (max-width: 768px) {
   .icon-grid {
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .btn-edit,
