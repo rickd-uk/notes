@@ -143,17 +143,6 @@ export function showCategoryModal(isEdit = false, categoryId = null, categoryNam
     categorySelectionDiv.innerHTML = '';
   }
   
-  // Dim suggestion chips whose icon is already in use
-  document.querySelectorAll('.suggestion-item').forEach(item => {
-    const iconVal = item.dataset.icon;
-    const isUsed = usedIcons.includes(iconVal) && !(isEdit && iconVal === categoryIcon);
-    item.classList.toggle('used', isUsed);
-    item.disabled = isUsed;
-  });
-
-  // Reset suggestion selection
-  document.querySelectorAll('.suggestion-item').forEach(s => s.classList.remove('selected'));
-
   // Check if we need to show the "no icons available" message
   updateIconGridVisibility();
   
@@ -494,12 +483,6 @@ export function hideIconInModal(icon) {
     updateIconGridVisibility();
   }
 
-  // Grey out the matching suggestion chip
-  const chip = document.querySelector(`.suggestion-item[data-icon="${icon}"]`);
-  if (chip) {
-    chip.classList.add('used');
-    chip.disabled = true;
-  }
 }
 
 // Function to select the first available icon

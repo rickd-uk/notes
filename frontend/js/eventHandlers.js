@@ -165,38 +165,17 @@ export function setupEventListeners() {
       document.querySelectorAll(".icon-item").forEach((item) => {
         item.classList.remove("selected");
       });
-      document.querySelectorAll(".suggestion-item").forEach((s) => {
-        s.classList.remove("selected");
-      });
       iconItem.classList.add("selected");
       elements.categoryIconInput.value = iconItem.dataset.icon;
       // Auto-fill name from icon's data-name
       const nameInput = elements.categoryInput;
       if (nameInput) {
         const suggested = iconItem.dataset.name || ICON_NAMES[iconItem.dataset.icon];
-        if (suggested) nameInput.value = suggested;
+        if (suggested) {
+          nameInput.value = suggested;
+          nameInput.dispatchEvent(new Event("input"));
+        }
       }
-    });
-  });
-
-  // Suggestion chip selection
-  document.querySelectorAll(".suggestion-item").forEach((suggestion) => {
-    suggestion.addEventListener("click", () => {
-      const icon = suggestion.dataset.icon;
-      const name = suggestion.dataset.name;
-      // Select matching icon in grid (if visible)
-      document.querySelectorAll(".icon-item").forEach((item) => {
-        item.classList.toggle("selected", item.dataset.icon === icon && item.style.display !== 'none');
-      });
-      document.querySelectorAll(".suggestion-item").forEach((s) => s.classList.remove("selected"));
-      suggestion.classList.add("selected");
-      if (elements.categoryIconInput) elements.categoryIconInput.value = icon;
-      // Always fill name when picking a suggestion
-      if (elements.categoryInput) {
-        elements.categoryInput.value = name;
-        elements.categoryInput.dispatchEvent(new Event("input"));
-      }
-      elements.categoryInput?.focus();
     });
   });
 
