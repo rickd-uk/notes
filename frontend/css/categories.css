@@ -82,7 +82,7 @@
     justify-content: center;
     box-shadow: 0 2px 6px rgba(98, 0, 238, 0.25);
     transition: transform 0.15s, box-shadow 0.15s, background-color 0.15s;
-    margin-left: auto;
+    margin-left: 22px;
 }
 
 .add-category-btn:hover {
@@ -180,6 +180,7 @@ body.dark-mode .sidebar-username {
 /* Hide the edit toggle button on desktop — injected by JS unconditionally */
 #categoryEditToggle {
   display: none;
+  margin-left: auto;
 }
 
 /* Mobile/drawer: hide category controls by default, show in edit mode */

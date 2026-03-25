@@ -384,7 +384,7 @@ body.dark-mode .empty-title {
 @media (max-width: 768px) {
   .sidebar {
     width: 85% !important;
-    max-width: 280px !important; /* Slightly wider on mobile for better usability */
+    max-width: 320px !important; /* Slightly wider on mobile for better usability */
   }
   
   .category-name {
