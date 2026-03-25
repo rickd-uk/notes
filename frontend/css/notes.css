@@ -67,6 +67,7 @@
   justify-content: space-between;
   align-items: center;
   margin-top: 4px;
+  margin-bottom: 6px; /* Gap between footer and bottom edge — adjust this value */
   font-size: 11px;
   color: #757575;
   position: relative;
