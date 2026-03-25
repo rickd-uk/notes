@@ -133,10 +133,12 @@ body.dark-mode .no-icons-message {
 }
 
 .icon-name {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text-color);
     overflow: hidden;
     text-overflow: ellipsis;
+    min-width: 0;
+    flex: 1;
 }
 
 .icon-item:hover {
